@@ -1,4 +1,4 @@
-package com.khub;
+package com.khub.misc;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
