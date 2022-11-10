@@ -24,7 +24,6 @@ public class Configuration {
         Properties configuration = new Properties();
         try {
             configuration.load(new FileInputStream(configPath));
-            logger.log(Level.INFO, "Configuration initialized");
 
         } catch (FileNotFoundException e) {
             logger.log(Level.SEVERE, "No file found at " + configPath, e);
@@ -33,6 +32,8 @@ public class Configuration {
             logger.log(Level.SEVERE, "Unable to read the file", e);
 
         }
+
+        logger.log(Level.INFO, "Configuration initialized");
         return configuration;
     }
 }
