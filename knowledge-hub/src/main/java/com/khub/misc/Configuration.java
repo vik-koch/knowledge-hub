@@ -30,7 +30,6 @@ public class Configuration {
 
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Unable to read the file", e);
-
         }
 
         logger.log(Level.INFO, "Configuration initialized");
