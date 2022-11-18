@@ -16,6 +16,9 @@ import com.google.gson.JsonSyntaxException;
 import com.khub.exceptions.InvalidConfigurationException;
 import com.khub.misc.HttpRequestBuilder;
 
+// TODO: Maybe make requests parallelizable
+// (one space => all pages for space => all comments/attachments for each page)
+
 /**
  * Confluence API Crawler for retrieving spaces, pages, commentaries and attachments
  */
@@ -23,8 +26,8 @@ public class ConfluenceCrawler extends Crawler {
 
     private static final String URL_KEY = "confluence.url";
     private static final String TOKEN_KEY = "confluence.token";
-    private static final String PAYLOAD_KEY = "crowd.token_key";
     private static final String HEADER_KEY = "Cookie";
+    private static final String PAYLOAD_KEY = "crowd.token_key";
 
     private HashSet<JsonElement> globalSpaces = new HashSet<JsonElement>();
     private HashSet<JsonElement> globalPages = new HashSet<JsonElement>();
@@ -61,9 +64,29 @@ public class ConfluenceCrawler extends Crawler {
     }
 
     /**
+     * Runs the retrieval process from Confluence that cascades over global spaces, pages,
+     * commentaries and attachments, as well as over private spaces and pages.
+     */
+    public void run() {
+        logger.log(Level.INFO, "Retrieval of Confluence content started");
+
+        retrieveGlobalSpaces();
+        retrieveGlobalPages();
+        retrievePersonalSpaces();
+        retrievePersonalPages();
+        retrieveCommentariesAndAttachments();
+
+        logger.log(Level.INFO, "Retrieval of Confluence content finished");
+        logger.log(Level.INFO, "Retrieved " + globalSpaces.size() + " global spaces, " + globalPages.size() 
+            + " global pages with " + commentaries.size() + " commentaries and " + attachments.size()
+            + " attachments, as well as " + personalSpaces.size() + " personal spaces and " + personalPages.size()
+            + " personal pages");
+    }
+
+    /**
      * Retrieves all global spaces from Confluence as {@code JSON}
      */
-    public void retrieveGlobalSpaces() {
+    private void retrieveGlobalSpaces() {
         String uri = this.url + "space?type=global&limit=9999";
         JsonArray jsonArray = retrieve(uri);
 
@@ -81,7 +104,7 @@ public class ConfluenceCrawler extends Crawler {
      * Retrieves all global pages from Confluence as {@code JSON}.
      * Spaces must be retrieved prior to this method call.
      */
-    public void retrieveGlobalPages() {
+    private void retrieveGlobalPages() {
         globalPages.clear();
 
         for (JsonElement space : globalSpaces) {
@@ -103,7 +126,7 @@ public class ConfluenceCrawler extends Crawler {
     /**
      * Retrieves all personal spaces from Confluence as {@code JSON}
      */
-    public void retrievePersonalSpaces() {
+    private void retrievePersonalSpaces() {
         String uri = this.url + "space?type=personal&limit=9999";
         JsonArray jsonArray = retrieve(uri);
 
@@ -121,7 +144,7 @@ public class ConfluenceCrawler extends Crawler {
      * Retrieves all personal pages from Confluence as {@code JSON}.
      * Spaces must be retrieved prior to this method call.
      */
-    public void retrievePersonalPages() {
+    private void retrievePersonalPages() {
         personalPages.clear();
 
         for (JsonElement space : personalSpaces) {
@@ -143,7 +166,7 @@ public class ConfluenceCrawler extends Crawler {
      * Retrieves all commentaries and attachments from Confluence global pages
      * as {@code JSON}. Global pages must be retrieved prior to this method call.
      */
-    public void retrieveCommentariesAndAttachments() {
+    private void retrieveCommentariesAndAttachments() {
         commentaries.clear();
         attachments.clear();
 
@@ -202,7 +225,7 @@ public class ConfluenceCrawler extends Crawler {
             logger.log(Level.SEVERE, "Unable to send a request and/or receive a response", e);
 
         } catch (JsonSyntaxException e) {
-            logger.log(Level.SEVERE, "Malformed JSON format of Confluence spaces", e);
+            logger.log(Level.SEVERE, "Retrieved malformed JSON format", e);
         }
 
         return null;
