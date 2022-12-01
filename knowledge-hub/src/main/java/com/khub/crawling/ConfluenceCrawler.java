@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -66,8 +67,9 @@ public class ConfluenceCrawler extends Crawler {
     /**
      * Runs the retrieval process from Confluence that cascades over global spaces, pages,
      * commentaries and attachments, as well as over private spaces and pages.
+     * @return all retrieved data as {@code HashMap} of {@code HashSets} with {@code JsonElements}
      */
-    public void run() {
+    public HashMap<String, HashSet<JsonElement>> run() {
         logger.log(Level.INFO, "Retrieval of Confluence content started");
 
         retrieveGlobalSpaces();
@@ -81,6 +83,15 @@ public class ConfluenceCrawler extends Crawler {
             + " global pages with " + commentaries.size() + " commentaries and " + attachments.size()
             + " attachments, as well as " + personalSpaces.size() + " personal spaces and " + personalPages.size()
             + " personal pages");
+
+        return new HashMap<String, HashSet<JsonElement>>() {{
+            put("globalSpaces", globalSpaces);
+            put("globalPages", globalPages);
+            put("personalSpaces", personalSpaces);
+            put("personalPages", personalPages);
+            put("commentaries", commentaries);
+            put("attachments", attachments);
+        }};
     }
 
     /**
@@ -148,7 +159,7 @@ public class ConfluenceCrawler extends Crawler {
         personalPages.clear();
 
         for (JsonElement space : personalSpaces) {
-            String key = space.getAsJsonObject().get("key").toString();
+            String key = space.getAsJsonObject().get("key").toString().replace("\"", "");
             String uri = this.url + "space/" + key
                 + "/content/page?type=page&limit=9999&expand=body.storage";
 
@@ -182,10 +193,9 @@ public class ConfluenceCrawler extends Crawler {
 
             String key = page.getAsJsonObject().get("id").getAsString();
             String uri = this.url + "content/" + key + "/child/";
-            System.out.println(uri);
 
             if (commentariesCount != 0) {
-                JsonArray jsonArray = retrieve(uri + "comment?limit=9999");
+                JsonArray jsonArray = retrieve(uri + "comment?limit=9999&expand=body.storage");
                 commentaries.addAll(jsonArray.asList());
             }
 
@@ -229,29 +239,5 @@ public class ConfluenceCrawler extends Crawler {
         }
 
         return null;
-    }
-
-    public HashSet<JsonElement> getGlobalSpaces() {
-        return globalSpaces;
-    }
-
-    public HashSet<JsonElement> getGlobalPages() {
-        return globalPages;
-    }
-
-    public HashSet<JsonElement> getPersonalSpaces() {
-        return personalSpaces;
-    }
-
-    public HashSet<JsonElement> getPersonalPages() {
-        return personalPages;
-    }
-
-    public HashSet<JsonElement> getCommentaries() {
-        return commentaries;
-    }
-
-    public HashSet<JsonElement> getAttachments() {
-        return attachments;
     }
 }
