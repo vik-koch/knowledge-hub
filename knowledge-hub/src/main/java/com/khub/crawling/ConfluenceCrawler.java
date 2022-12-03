@@ -79,10 +79,6 @@ public class ConfluenceCrawler extends Crawler {
         retrieveCommentariesAndAttachments();
 
         logger.log(Level.INFO, "Retrieval of Confluence content finished");
-        logger.log(Level.INFO, "Retrieved " + globalSpaces.size() + " global spaces, " + globalPages.size() 
-            + " global pages with " + commentaries.size() + " commentaries and " + attachments.size()
-            + " attachments, as well as " + personalSpaces.size() + " personal spaces and " + personalPages.size()
-            + " personal pages");
 
         return new HashMap<String, HashSet<JsonElement>>() {{
             put("globalSpaces", globalSpaces);
@@ -105,7 +101,7 @@ public class ConfluenceCrawler extends Crawler {
         globalSpaces.addAll(jsonArray.asList());
 
         if (!globalSpaces.isEmpty()) {
-            logger.log(Level.INFO, "Confluence global spaces were retrieved");
+            logger.log(Level.INFO, globalSpaces.size() + " Confluence global spaces were retrieved");
         } else {
             logger.log(Level.WARNING, "No Confluence global spaces were retrieved");
         }
@@ -128,7 +124,7 @@ public class ConfluenceCrawler extends Crawler {
         }
 
         if (!globalPages.isEmpty()) {
-            logger.log(Level.INFO, "Confluence global pages were retrieved");
+            logger.log(Level.INFO, globalPages.size() + " Confluence global pages were retrieved");
         } else {
             logger.log(Level.WARNING, "No Confluence global pages were retrieved");
         }
@@ -145,7 +141,7 @@ public class ConfluenceCrawler extends Crawler {
         personalSpaces.addAll(jsonArray.asList());
 
         if (!personalSpaces.isEmpty()) {
-            logger.log(Level.INFO, "Confluence personal spaces were retrieved");
+            logger.log(Level.INFO, personalSpaces.size() + " Confluence personal spaces were retrieved");
         } else {
             logger.log(Level.WARNING, "No Confluence personal spaces were retrieved");
         }
@@ -167,7 +163,7 @@ public class ConfluenceCrawler extends Crawler {
             personalPages.addAll(jsonArray.asList());
         }
         if (!personalPages.isEmpty()) {
-            logger.log(Level.INFO, "Confluence personal pages were retrieved");
+            logger.log(Level.INFO, personalPages.size() + " Confluence personal pages were retrieved");
         } else {
             logger.log(Level.WARNING, "No Confluence personal pages were retrieved");
         }
@@ -185,7 +181,7 @@ public class ConfluenceCrawler extends Crawler {
             JsonObject children = page.getAsJsonObject().getAsJsonObject("children");
 
             int commentariesCount = children.getAsJsonObject("comment").get("size").getAsInt();
-            int attachmentCount = children.getAsJsonObject("comment").get("size").getAsInt();
+            int attachmentCount = children.getAsJsonObject("attachment").get("size").getAsInt();
 
             if (commentariesCount == 0 && attachmentCount == 0) {
                 continue;
@@ -206,13 +202,13 @@ public class ConfluenceCrawler extends Crawler {
         }
 
         if (!commentaries.isEmpty()) {
-            logger.log(Level.INFO, "Confluence commentaries were retrieved");
+            logger.log(Level.INFO, commentaries.size() + " Confluence commentaries were retrieved");
         } else {
             logger.log(Level.WARNING, "No Confluence commentaries were retrieved");
         }
 
         if (!attachments.isEmpty()) {
-            logger.log(Level.INFO, "Confluence attachments were retrieved");
+            logger.log(Level.INFO, attachments.size() + " Confluence attachments were retrieved");
         } else {
             logger.log(Level.WARNING, "No Confluence attachments were retrieved");
         }

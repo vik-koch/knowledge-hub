@@ -1,4 +1,4 @@
-package com.khub.database;
+package com.khub.misc;
 
 import java.util.Properties;
 
@@ -10,6 +10,7 @@ public class MongoConnector {
 
     private static final String URL_KEY = "mongo.url";
 
+    // Prevents instantiation
     private MongoConnector() {
     }
 

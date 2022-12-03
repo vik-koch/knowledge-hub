@@ -13,9 +13,9 @@ import org.bson.Document;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.khub.database.MongoConnector;
 import com.khub.exceptions.InvalidConfigurationException;
 import com.khub.misc.Configuration;
+import com.khub.misc.MongoConnector;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -37,7 +37,7 @@ public class CrawlerRunner {
     public void run(Properties configuration) {
         // Prepares mongo database
         MongoClient mongoClient = MongoConnector.getClient(configuration);
-        MongoDatabase database = mongoClient.getDatabase("rawdata");
+        MongoDatabase database = mongoClient.getDatabase("rawdata3");
 
         // Starts Confluence Crawler
         try {
