@@ -30,6 +30,8 @@ public class ConfluenceCrawler extends Crawler {
     private static final String HEADER_KEY = "Cookie";
     private static final String PAYLOAD_KEY = "crowd.token_key";
 
+    private HashSet<JsonElement> groups = new HashSet<JsonElement>();
+    private HashSet<JsonElement> groupMembers = new HashSet<JsonElement>();
     private HashSet<JsonElement> globalSpaces = new HashSet<JsonElement>();
     private HashSet<JsonElement> globalPages = new HashSet<JsonElement>();
     private HashSet<JsonElement> personalSpaces = new HashSet<JsonElement>();
@@ -72,6 +74,8 @@ public class ConfluenceCrawler extends Crawler {
     public HashMap<String, HashSet<JsonElement>> run() {
         logger.log(Level.INFO, "Retrieval of Confluence content started");
 
+        retrieveGroups();
+        retrieveGroupMembers();
         retrieveGlobalSpaces();
         retrieveGlobalPages();
         retrievePersonalSpaces();
@@ -88,6 +92,44 @@ public class ConfluenceCrawler extends Crawler {
             put("commentaries", commentaries);
             put("attachments", attachments);
         }};
+    }
+
+    /**
+     * Retrieves all groups from Confluence as {@code JSON}
+     */
+    private void retrieveGroups() {
+        String uri = this.url + "group?limit=9999";
+        JsonArray jsonArray = retrieve(uri);
+
+        groups.clear();
+        groups.addAll(jsonArray.asList());
+
+        if (!groups.isEmpty()) {
+            logger.log(Level.INFO, groups.size() + " Confluence groups were retrieved");
+        } else {
+            logger.log(Level.WARNING, "No Confluence groups were retrieved");
+        }
+    }
+
+    /**
+     * Retrieves all group members from Confluence as {@code JSON}
+     */
+    private void retrieveGroupMembers() {
+        groupMembers.clear();
+
+        for (JsonElement group : groups) {
+            String key = group.getAsJsonObject().get("name").getAsString();
+            String uri = this.url + "group/" + key + "/member?limit=9999";
+
+            JsonArray jsonArray = retrieve(uri);
+            groupMembers.addAll(retrieve(uri).asList());
+        }
+
+        if (!groupMembers.isEmpty()) {
+            logger.log(Level.INFO, groupMembers.size() + " Confluence group members were retrieved");
+        } else {
+            logger.log(Level.WARNING, "No Confluence group members were retrieved");
+        }
     }
 
     /**
@@ -117,7 +159,8 @@ public class ConfluenceCrawler extends Crawler {
         for (JsonElement space : globalSpaces) {
             String key = space.getAsJsonObject().get("key").getAsString();
             String uri = this.url + "space/" + key
-                + "/content/page?type=page&limit=9999&expand=body.storage,children.comment,children.attachment";
+                + "/content/page?type=page&limit=9999&expand=body.storage,children.comment,children.attachment,"
+                + "ancestors,history.contributors.publishers.users,history.lastUpdated";
 
             JsonArray jsonArray = retrieve(uri);
             globalPages.addAll(jsonArray.asList());
