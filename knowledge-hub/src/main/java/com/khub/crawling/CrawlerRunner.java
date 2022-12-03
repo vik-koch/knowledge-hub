@@ -2,6 +2,7 @@ package com.khub.crawling;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -36,14 +37,14 @@ public class CrawlerRunner {
     public void run(Properties configuration) {
         // Prepares mongo database
         MongoClient mongoClient = MongoConnector.getClient(configuration);
-        MongoDatabase database = mongoClient.getDatabase("data");
+        MongoDatabase database = mongoClient.getDatabase("rawdata");
 
         // Starts Confluence Crawler
         try {
             ConfluenceCrawler confluenceCrawler = ConfluenceCrawler.of(configuration);
             Map<String, List<JsonElement>> confluenceData = confluenceCrawler.run();
             for (String name : confluenceData.keySet()) {
-                writeToDb(database, name, confluenceData.get(name));
+                writeToDb(database, name, new HashSet<>(confluenceData.get(name)));
             }
         } catch (InvalidConfigurationException e) {
             logger.log(Level.SEVERE, "Unable to start a Confluence crawler", e);
@@ -54,7 +55,7 @@ public class CrawlerRunner {
             TeamsCrawler teamsCrawler = TeamsCrawler.of(configuration);
             Map<String, List<JsonElement>> teamsData = teamsCrawler.run();
             for (String name : teamsData.keySet()) {
-                writeToDb(database, name, teamsData.get(name));
+                writeToDb(database, name, new HashSet<>(teamsData.get(name)));
             }
         } catch (InvalidConfigurationException e) {
             logger.log(Level.SEVERE, "Unable to start a Teams crawler", e);
@@ -70,7 +71,7 @@ public class CrawlerRunner {
      * @param name - the {@code Collection} name
      * @param data - the {@code Collection} data
      */
-    private void writeToDb(MongoDatabase database, String name, List<JsonElement> data) {
+    private void writeToDb(MongoDatabase database, String name, HashSet<JsonElement> data) {
         if (data.size() == 0) return;
 
         MongoCollection<Document> collection = database.getCollection(name);
@@ -79,8 +80,10 @@ public class CrawlerRunner {
         // Converts JSON to BSON document
         for (JsonElement jsonElement : data) {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            jsonObject.addProperty("_id", jsonObject.get("id").getAsString());
-            jsonObject.remove("id");
+            if (jsonObject.has("id")) {
+                jsonObject.addProperty("_id", jsonObject.get("id").getAsString());
+                jsonObject.remove("id");
+            }
             documents.add(Document.parse(jsonObject.toString()));
         }
 

@@ -17,9 +17,6 @@ import com.google.gson.JsonSyntaxException;
 import com.khub.exceptions.InvalidConfigurationException;
 import com.khub.misc.HttpRequestBuilder;
 
-// TODO: Maybe make requests parallelizable
-// (one space => all pages for space => all comments/attachments for each page)
-
 /**
  * Confluence API Crawler for retrieving spaces, pages, commentaries and attachments
  */
@@ -119,17 +116,19 @@ public class ConfluenceCrawler extends Crawler {
     private void retrieveGroupMembers() {
         groupMembers.clear();
 
-        for (JsonElement group : groups) {
+        groups.parallelStream().forEach(group -> {
             String key = group.getAsJsonObject().get("name").getAsString().replace(" ", "%20");
             String uri = this.url + "group/" + key + "/member?limit=9999";
 
             List<JsonElement> jsonArray = new ArrayList<>();
-            retrieve(uri).forEach(member -> {
-                member.getAsJsonObject().addProperty("group", key);
+            List<JsonElement> result = retrieve(uri);
+            for (JsonElement jsonElement : result) {
+                JsonObject member = jsonElement.getAsJsonObject();
+                member.addProperty("group", key);
                 jsonArray.add(member);
-            });
+            }
             groupMembers.addAll(jsonArray);
-        }
+        });
 
         if (!groupMembers.isEmpty()) {
             logger.log(Level.INFO, groupMembers.size() + " Confluence group members were retrieved");
@@ -159,14 +158,14 @@ public class ConfluenceCrawler extends Crawler {
     private void retrieveGlobalPages() {
         globalPages.clear();
 
-        for (JsonElement space : globalSpaces) {
+        globalSpaces.parallelStream().forEach(space -> {
             String key = space.getAsJsonObject().get("key").getAsString();
             String uri = this.url + "space/" + key
                 + "/content/page?type=page&limit=9999&expand=body.storage,children.comment,children.attachment,"
                 + "ancestors,history.contributors.publishers.users,history.lastUpdated";
 
             globalPages.addAll(retrieve(uri));
-        }
+        });
 
         if (!globalPages.isEmpty()) {
             logger.log(Level.INFO, globalPages.size() + " Confluence global pages were retrieved");
@@ -198,13 +197,14 @@ public class ConfluenceCrawler extends Crawler {
     private void retrievePersonalPages() {
         personalPages.clear();
 
-        for (JsonElement space : personalSpaces) {
+        personalSpaces.parallelStream().forEach(space -> {
             String key = space.getAsJsonObject().get("key").toString().replace("\"", "");
             String uri = this.url + "space/" + key
                 + "/content/page?type=page&limit=9999&expand=body.storage";
 
             personalPages.addAll(retrieve(uri));
-        }
+        });
+
         if (!personalPages.isEmpty()) {
             logger.log(Level.INFO, personalPages.size() + " Confluence personal pages were retrieved");
         } else {
@@ -220,28 +220,26 @@ public class ConfluenceCrawler extends Crawler {
         commentaries.clear();
         attachments.clear();
 
-        for (JsonElement page : globalPages) {
+        globalPages.parallelStream().forEach(page -> {
             JsonObject children = page.getAsJsonObject().getAsJsonObject("children");
 
             int commentariesCount = children.getAsJsonObject("comment").get("size").getAsInt();
             int attachmentCount = children.getAsJsonObject("attachment").get("size").getAsInt();
 
-            if (commentariesCount == 0 && attachmentCount == 0) {
-                continue;
+            if (commentariesCount != 0 || attachmentCount != 0) {
+                String key = page.getAsJsonObject().get("id").getAsString();
+                String uri = this.url + "content/" + key + "/child/";
+    
+                if (commentariesCount != 0) {
+                    commentaries.addAll(retrieve(uri + "comment?limit=9999&expand=body.storage,ancestors,"
+                                                     + "history.contributors.publishers.users,history.lastUpdated"));
+                }
+    
+                if (attachmentCount != 0) {
+                    attachments.addAll(retrieve(uri + "attachment?limit=9999"));
+                }
             }
-
-            String key = page.getAsJsonObject().get("id").getAsString();
-            String uri = this.url + "content/" + key + "/child/";
-
-            if (commentariesCount != 0) {
-                commentaries.addAll(retrieve(uri + "comment?limit=9999&expand=body.storage,ancestors,"
-                                                 + "history.contributors.publishers.users,history.lastUpdated"));
-            }
-
-            if (attachmentCount != 0) {
-                attachments.addAll(retrieve(uri + "attachment?limit=9999"));
-            }
-        }
+        });
 
         if (!commentaries.isEmpty()) {
             logger.log(Level.INFO, commentaries.size() + " Confluence commentaries were retrieved");
