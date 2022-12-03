@@ -4,8 +4,8 @@ import java.io.IOException;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -30,14 +30,14 @@ public class ConfluenceCrawler extends Crawler {
     private static final String HEADER_KEY = "Cookie";
     private static final String PAYLOAD_KEY = "crowd.token_key";
 
-    private HashSet<JsonElement> groups = new HashSet<JsonElement>();
-    private HashSet<JsonElement> groupMembers = new HashSet<JsonElement>();
-    private HashSet<JsonElement> globalSpaces = new HashSet<JsonElement>();
-    private HashSet<JsonElement> globalPages = new HashSet<JsonElement>();
-    private HashSet<JsonElement> personalSpaces = new HashSet<JsonElement>();
-    private HashSet<JsonElement> personalPages = new HashSet<JsonElement>();
-    private HashSet<JsonElement> commentaries = new HashSet<JsonElement>();
-    private HashSet<JsonElement> attachments = new HashSet<JsonElement>();
+    private List<JsonElement> groups = new ArrayList<JsonElement>();
+    private List<JsonElement> groupMembers = new ArrayList<JsonElement>();
+    private List<JsonElement> globalSpaces = new ArrayList<JsonElement>();
+    private List<JsonElement> globalPages = new ArrayList<JsonElement>();
+    private List<JsonElement> personalSpaces = new ArrayList<JsonElement>();
+    private List<JsonElement> personalPages = new ArrayList<JsonElement>();
+    private List<JsonElement> commentaries = new ArrayList<JsonElement>();
+    private List<JsonElement> attachments = new ArrayList<JsonElement>();
 
     // Constructor
     private ConfluenceCrawler(String url, String[] header) {
@@ -69,9 +69,9 @@ public class ConfluenceCrawler extends Crawler {
     /**
      * Runs the retrieval process from Confluence that cascades over global spaces, pages,
      * commentaries and attachments, as well as over private spaces and pages.
-     * @return all retrieved data as {@code HashMap} of {@code HashSets} with {@code JsonElements}
+     * @return all retrieved data as {@code HashMap} of {@code List} with {@code JsonElements}
      */
-    public HashMap<String, HashSet<JsonElement>> run() {
+    public HashMap<String, List<JsonElement>> run() {
         logger.log(Level.INFO, "Retrieval of Confluence content started");
 
         retrieveGroups();
@@ -84,7 +84,7 @@ public class ConfluenceCrawler extends Crawler {
 
         logger.log(Level.INFO, "Retrieval of Confluence content finished");
 
-        HashMap<String, HashSet<JsonElement>> result = new HashMap<String, HashSet<JsonElement>>();
+        HashMap<String, List<JsonElement>> result = new HashMap<String, List<JsonElement>>();
         result.put("groups", groups);
         result.put("groupMembers", groupMembers);
         result.put("globalSpaces", globalSpaces);
@@ -120,10 +120,15 @@ public class ConfluenceCrawler extends Crawler {
         groupMembers.clear();
 
         for (JsonElement group : groups) {
-            String key = group.getAsJsonObject().get("name").getAsString();
+            String key = group.getAsJsonObject().get("name").getAsString().replace(" ", "%20");
             String uri = this.url + "group/" + key + "/member?limit=9999";
 
-            groupMembers.addAll(retrieve(uri));
+            List<JsonElement> jsonArray = new ArrayList<>();
+            retrieve(uri).forEach(member -> {
+                member.getAsJsonObject().addProperty("group", key);
+                jsonArray.add(member);
+            });
+            groupMembers.addAll(jsonArray);
         }
 
         if (!groupMembers.isEmpty()) {
@@ -229,7 +234,8 @@ public class ConfluenceCrawler extends Crawler {
             String uri = this.url + "content/" + key + "/child/";
 
             if (commentariesCount != 0) {
-                commentaries.addAll(retrieve(uri + "comment?limit=9999&expand=body.storage"));
+                commentaries.addAll(retrieve(uri + "comment?limit=9999&expand=body.storage,ancestors,"
+                                                 + "history.contributors.publishers.users,history.lastUpdated"));
             }
 
             if (attachmentCount != 0) {

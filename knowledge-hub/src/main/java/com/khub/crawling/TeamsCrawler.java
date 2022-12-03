@@ -1,5 +1,6 @@
 package com.khub.crawling;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,9 +29,9 @@ public class TeamsCrawler extends Crawler {
     private static final String HEADER_KEY = "Authorization";
     private static final String PAYLOAD_KEY = "Bearer";
 
-    private HashSet<JsonElement> teams = new HashSet<JsonElement>();
-    private HashSet<JsonElement> channels = new HashSet<JsonElement>();
-    private HashSet<JsonElement> messagesWithReplies = new HashSet<JsonElement>();
+    private List<JsonElement> teams = new ArrayList<JsonElement>();
+    private List<JsonElement> channels = new ArrayList<JsonElement>();
+    private List<JsonElement> messagesWithReplies = new ArrayList<JsonElement>();
 
     // Constructor
     private TeamsCrawler(String url, String[] header) {
@@ -65,8 +66,8 @@ public class TeamsCrawler extends Crawler {
      */
 
     // TODO: Replace for-each loops with concurrent threads
-    // TODO: Retrieve more SharePoint data Exchange Calendar events
-    public HashMap<String, HashSet<JsonElement>> run() {
+    // TODO: Retrieve more SharePoint data like Exchange Calendar events
+    public HashMap<String, List<JsonElement>> run() {
         logger.log(Level.INFO, "Retrieval of MS Teams content started");
 
         teams.clear();
@@ -90,7 +91,7 @@ public class TeamsCrawler extends Crawler {
         logger.log(Level.INFO, "Retrieved " + teams.size() + " teams, "+ channels.size() 
             + " channels and " + messagesWithReplies.size() + " messages");
 
-        HashMap<String, HashSet<JsonElement>> result = new HashMap<String, HashSet<JsonElement>>();
+        HashMap<String, List<JsonElement>> result = new HashMap<String, List<JsonElement>>();
         result.put("teams", teams);
         result.put("channels", channels);
         result.put("messagesWithReplies", messagesWithReplies);

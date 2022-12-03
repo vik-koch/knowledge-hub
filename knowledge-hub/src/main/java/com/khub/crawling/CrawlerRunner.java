@@ -2,7 +2,6 @@ package com.khub.crawling;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -37,12 +36,12 @@ public class CrawlerRunner {
     public void run(Properties configuration) {
         // Prepares mongo database
         MongoClient mongoClient = MongoConnector.getClient(configuration);
-        MongoDatabase database = mongoClient.getDatabase("rawdata3");
+        MongoDatabase database = mongoClient.getDatabase("data");
 
         // Starts Confluence Crawler
         try {
             ConfluenceCrawler confluenceCrawler = ConfluenceCrawler.of(configuration);
-            Map<String, HashSet<JsonElement>> confluenceData = confluenceCrawler.run();
+            Map<String, List<JsonElement>> confluenceData = confluenceCrawler.run();
             for (String name : confluenceData.keySet()) {
                 writeToDb(database, name, confluenceData.get(name));
             }
@@ -53,7 +52,7 @@ public class CrawlerRunner {
         // Starts Teams Crawler
         try {
             TeamsCrawler teamsCrawler = TeamsCrawler.of(configuration);
-            Map<String, HashSet<JsonElement>> teamsData = teamsCrawler.run();
+            Map<String, List<JsonElement>> teamsData = teamsCrawler.run();
             for (String name : teamsData.keySet()) {
                 writeToDb(database, name, teamsData.get(name));
             }
@@ -71,7 +70,7 @@ public class CrawlerRunner {
      * @param name - the {@code Collection} name
      * @param data - the {@code Collection} data
      */
-    private void writeToDb(MongoDatabase database, String name, HashSet<JsonElement> data) {
+    private void writeToDb(MongoDatabase database, String name, List<JsonElement> data) {
         if (data.size() == 0) return;
 
         MongoCollection<Document> collection = database.getCollection(name);
