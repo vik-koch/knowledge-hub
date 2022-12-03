@@ -6,10 +6,10 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -84,14 +84,16 @@ public class ConfluenceCrawler extends Crawler {
 
         logger.log(Level.INFO, "Retrieval of Confluence content finished");
 
-        return new HashMap<String, HashSet<JsonElement>>() {{
-            put("globalSpaces", globalSpaces);
-            put("globalPages", globalPages);
-            put("personalSpaces", personalSpaces);
-            put("personalPages", personalPages);
-            put("commentaries", commentaries);
-            put("attachments", attachments);
-        }};
+        HashMap<String, HashSet<JsonElement>> result = new HashMap<String, HashSet<JsonElement>>();
+        result.put("groups", groups);
+        result.put("groupMembers", groupMembers);
+        result.put("globalSpaces", globalSpaces);
+        result.put("globalPages", globalPages);
+        result.put("personalSpaces", personalSpaces);
+        result.put("personalPages", personalPages);
+        result.put("commentaries", commentaries);
+        result.put("attachments", attachments);
+        return result;
     }
 
     /**
@@ -99,10 +101,9 @@ public class ConfluenceCrawler extends Crawler {
      */
     private void retrieveGroups() {
         String uri = this.url + "group?limit=9999";
-        JsonArray jsonArray = retrieve(uri);
 
         groups.clear();
-        groups.addAll(jsonArray.asList());
+        groups.addAll(retrieve(uri));
 
         if (!groups.isEmpty()) {
             logger.log(Level.INFO, groups.size() + " Confluence groups were retrieved");
@@ -112,7 +113,8 @@ public class ConfluenceCrawler extends Crawler {
     }
 
     /**
-     * Retrieves all group members from Confluence as {@code JSON}
+     * Retrieves all group members from Confluence as {@code JSON}.
+     * Groups must be retrieved prior to this method call.
      */
     private void retrieveGroupMembers() {
         groupMembers.clear();
@@ -121,8 +123,7 @@ public class ConfluenceCrawler extends Crawler {
             String key = group.getAsJsonObject().get("name").getAsString();
             String uri = this.url + "group/" + key + "/member?limit=9999";
 
-            JsonArray jsonArray = retrieve(uri);
-            groupMembers.addAll(retrieve(uri).asList());
+            groupMembers.addAll(retrieve(uri));
         }
 
         if (!groupMembers.isEmpty()) {
@@ -137,10 +138,7 @@ public class ConfluenceCrawler extends Crawler {
      */
     private void retrieveGlobalSpaces() {
         String uri = this.url + "space?type=global&limit=9999";
-        JsonArray jsonArray = retrieve(uri);
-
-        globalSpaces.clear();
-        globalSpaces.addAll(jsonArray.asList());
+        globalSpaces.addAll(retrieve(uri));
 
         if (!globalSpaces.isEmpty()) {
             logger.log(Level.INFO, globalSpaces.size() + " Confluence global spaces were retrieved");
@@ -151,7 +149,7 @@ public class ConfluenceCrawler extends Crawler {
 
     /**
      * Retrieves all global pages from Confluence as {@code JSON}.
-     * Spaces must be retrieved prior to this method call.
+     * Global spaces must be retrieved prior to this method call.
      */
     private void retrieveGlobalPages() {
         globalPages.clear();
@@ -162,8 +160,7 @@ public class ConfluenceCrawler extends Crawler {
                 + "/content/page?type=page&limit=9999&expand=body.storage,children.comment,children.attachment,"
                 + "ancestors,history.contributors.publishers.users,history.lastUpdated";
 
-            JsonArray jsonArray = retrieve(uri);
-            globalPages.addAll(jsonArray.asList());
+            globalPages.addAll(retrieve(uri));
         }
 
         if (!globalPages.isEmpty()) {
@@ -178,10 +175,9 @@ public class ConfluenceCrawler extends Crawler {
      */
     private void retrievePersonalSpaces() {
         String uri = this.url + "space?type=personal&limit=9999";
-        JsonArray jsonArray = retrieve(uri);
 
         personalSpaces.clear();
-        personalSpaces.addAll(jsonArray.asList());
+        personalSpaces.addAll(retrieve(uri));
 
         if (!personalSpaces.isEmpty()) {
             logger.log(Level.INFO, personalSpaces.size() + " Confluence personal spaces were retrieved");
@@ -192,7 +188,7 @@ public class ConfluenceCrawler extends Crawler {
 
     /**
      * Retrieves all personal pages from Confluence as {@code JSON}.
-     * Spaces must be retrieved prior to this method call.
+     * Personal spaces must be retrieved prior to this method call.
      */
     private void retrievePersonalPages() {
         personalPages.clear();
@@ -202,8 +198,7 @@ public class ConfluenceCrawler extends Crawler {
             String uri = this.url + "space/" + key
                 + "/content/page?type=page&limit=9999&expand=body.storage";
 
-            JsonArray jsonArray = retrieve(uri);
-            personalPages.addAll(jsonArray.asList());
+            personalPages.addAll(retrieve(uri));
         }
         if (!personalPages.isEmpty()) {
             logger.log(Level.INFO, personalPages.size() + " Confluence personal pages were retrieved");
@@ -234,13 +229,11 @@ public class ConfluenceCrawler extends Crawler {
             String uri = this.url + "content/" + key + "/child/";
 
             if (commentariesCount != 0) {
-                JsonArray jsonArray = retrieve(uri + "comment?limit=9999&expand=body.storage");
-                commentaries.addAll(jsonArray.asList());
+                commentaries.addAll(retrieve(uri + "comment?limit=9999&expand=body.storage"));
             }
 
             if (attachmentCount != 0) {
-                JsonArray jsonArray = retrieve(uri + "attachment?limit=9999");
-                attachments.addAll(jsonArray.asList());
+                attachments.addAll(retrieve(uri + "attachment?limit=9999"));
             }
         }
 
@@ -263,12 +256,12 @@ public class ConfluenceCrawler extends Crawler {
      * @param uri - specific request {@code URI}
      * @return response as {@code JsonArray} or null if failed
      */
-    private JsonArray retrieve(String uri) {
+    private List<JsonElement> retrieve(String uri) {
         HttpRequest request = HttpRequestBuilder.build(uri, header);
         try {
             HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
             JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
-            return jsonObject.getAsJsonArray("results");
+            return jsonObject.getAsJsonArray("results").asList();
 
         } catch (InterruptedException | IOException e) {
             logger.log(Level.SEVERE, "Unable to send a request and/or receive a response", e);

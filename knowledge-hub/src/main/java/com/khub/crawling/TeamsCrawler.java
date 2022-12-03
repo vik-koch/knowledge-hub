@@ -90,11 +90,11 @@ public class TeamsCrawler extends Crawler {
         logger.log(Level.INFO, "Retrieved " + teams.size() + " teams, "+ channels.size() 
             + " channels and " + messagesWithReplies.size() + " messages");
 
-        return new HashMap<String, HashSet<JsonElement>>() {{
-                put("teams", teams);
-                put("channels", channels);
-                put("messagesWithReplies", messagesWithReplies);
-        }};
+        HashMap<String, HashSet<JsonElement>> result = new HashMap<String, HashSet<JsonElement>>();
+        result.put("teams", teams);
+        result.put("channels", channels);
+        result.put("messagesWithReplies", messagesWithReplies);
+        return result;
     }
 
     /**
@@ -105,7 +105,7 @@ public class TeamsCrawler extends Crawler {
         HashSet<JsonElement> teams = new HashSet<JsonElement>();
 
         String uri = this.url + "v1.0/me/joinedTeams";
-        teams.addAll(retrieve(uri).asList());
+        teams.addAll(retrieve(uri));
 
         if (!teams.isEmpty()) {
             logger.log(Level.INFO, teams.size() + " teams were retrieved");
@@ -125,7 +125,7 @@ public class TeamsCrawler extends Crawler {
         HashSet<JsonElement> channels = new HashSet<JsonElement>();
 
         String uri = this.url + "v1.0/teams/" + teamId + "/channels";
-        channels.addAll(retrieve(uri).asList());
+        channels.addAll(retrieve(uri));
 
         if (!channels.isEmpty()) {
             logger.log(Level.INFO, channels.size() + " team channels for team with ID " + teamId + " were retrieved");
@@ -146,7 +146,7 @@ public class TeamsCrawler extends Crawler {
         HashSet<JsonElement> messages = new HashSet<JsonElement>();
 
         String uri = this.url + "v1.0/teams/" + teamId + "/channels/" + channelId + "/messages?$expand=replies";
-        List<JsonElement> list = retrieve(uri).asList();
+        List<JsonElement> list = retrieve(uri);
         list.removeIf(message -> (!message.getAsJsonObject().get("messageType").getAsString().equals("message")));
         messages.addAll(list);
 
@@ -166,7 +166,7 @@ public class TeamsCrawler extends Crawler {
      * @param uri - specific request {@code URI}
      * @return response as {@code JsonArray} or null if failed
      */
-    private JsonArray retrieve(String uri) {
+    private List<JsonElement> retrieve(String uri) {
         JsonArray jsonArray = new JsonArray();
 
         try {
@@ -181,7 +181,7 @@ public class TeamsCrawler extends Crawler {
                 uri = nextLink != null ? nextLink.getAsString() : null;
             } while (uri != null);
 
-            return jsonArray;
+            return jsonArray.asList();
 
         } catch (InterruptedException | IOException e) {
             logger.log(Level.SEVERE, "Unable to send a request and/or receive a response", e);
