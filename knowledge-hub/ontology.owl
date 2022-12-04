@@ -1,0 +1,435 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#"
+     xml:base="http://www.semanticweb.org/khub/ontologies/2022/11/ontology"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#isPartOf -->
+
+    <owl:ObjectProperty rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#isPartOf"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Attachment -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Attachment">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Document"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Channel -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Channel">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#KnowledgeArtifact"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Client -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Client">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Person"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ClientCompany -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ClientCompany">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Company"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Commentary -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Commentary">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Message"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Community -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Community">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Group"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#CommunitySpace -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#CommunitySpace">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GlobalSpace"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Company -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Company"/>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#CompanyEvent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#CompanyEvent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Event"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Document -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Document">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#KnowledgeArtifact"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Employee -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Employee">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Person"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Event -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Event"/>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#EventLocation -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#EventLocation">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Location"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ExternalEmployee -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ExternalEmployee">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Employee"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ExternalTraining -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ExternalTraining">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Training"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#FirstLevelPage -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#FirstLevelPage">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Page"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GlobalSpace -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GlobalSpace">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Space"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Group -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Group"/>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GroupEvent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GroupEvent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Event"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GroupTeam -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GroupTeam">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#KnowledgeArtifact"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#InternalEmloyee -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#InternalEmloyee">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Employee"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#InternalTraining -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#InternalTraining">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Training"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Knowledge -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Knowledge"/>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#KnowledgeArtifact -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#KnowledgeArtifact">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Knowledge"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Location -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Location"/>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Message -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Message">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#KnowledgeArtifact"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#OfficeLocation -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#OfficeLocation">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Location"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#OtherGroup -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#OtherGroup">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Group"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#OtherLocation -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#OtherLocation">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Location"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#OtherSpace -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#OtherSpace">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GlobalSpace"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Page -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Page">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#KnowledgeArtifact"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#PartnerCompany -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#PartnerCompany">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Company"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Person -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Person"/>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#PersonalEvent -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#PersonalEvent">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Event"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#PersonalPage -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#PersonalPage">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Page"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#PersonalSpace -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#PersonalSpace">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Space"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Project -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Project"/>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ProjectSpace -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ProjectSpace">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GlobalSpace"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ProjectTeam -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ProjectTeam">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Group"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Recording -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Recording">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Document"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Reply -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Reply">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Message"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Role -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Role"/>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Space -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Space">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#KnowledgeArtifact"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#StarterMessage -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#StarterMessage">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Message"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#SubPage -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#SubPage">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Page"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Team -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Team">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Group"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#TeamSpace -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#TeamSpace">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GlobalSpace"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#TechTalk -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#TechTalk">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Knowledge"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Technology -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Technology">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Knowledge"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ThisCompany -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ThisCompany">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Company"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Training -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Training">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Knowledge"/>
+    </owl:Class>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+
