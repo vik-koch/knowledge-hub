@@ -24,7 +24,7 @@ import com.mongodb.client.MongoDatabase;
 /**
  * Runner for crawling processes
  */
-public class CrawlerRunner {
+public class CrawlingRunner {
 
     protected final Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -99,7 +99,7 @@ public class CrawlerRunner {
     public static void main(String[] args) throws InvalidConfigurationException {
         String configPath = String.join(File.separator, "knowledge-hub", "src", "main", "resources", "config.properties");
         Properties configuration = Configuration.initialize(configPath);
-        CrawlerRunner cr = new CrawlerRunner();
+        CrawlingRunner cr = new CrawlingRunner();
         cr.run(configuration);
     }
 }
