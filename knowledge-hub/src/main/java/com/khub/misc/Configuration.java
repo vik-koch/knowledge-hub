@@ -7,6 +7,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+// Wrapper class for Properties
 public class Configuration {
 
     private static final Logger logger = Logger.getLogger(Configuration.class.getName());
