@@ -39,7 +39,7 @@ public class CrawlingRunner {
         try {
             mongoClient = MongoConnector.getClient(configuration);
         } catch (InvalidConfigurationException e) {
-            logger.log(Level.SEVERE, "Unable to start a Crawling runner", e);
+            logger.log(Level.SEVERE, "Unable to start the crawling runner", e);
             return;
         }
         MongoDatabase database = mongoClient.getDatabase("raw_data");
