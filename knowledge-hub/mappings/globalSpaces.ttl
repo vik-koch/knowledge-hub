@@ -2,6 +2,7 @@
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix ql: <http://semweb.mmlab.be/ns/ql#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix : <http://example.org/rules/> .
 @base <http://example.com/base/> .
 
@@ -9,7 +10,7 @@
 
 :TriplesMap a rr:TriplesMap;
   rml:logicalSource [
-    rml:source "messages.json";
+    rml:source "globalSpaces.json";
     rml:referenceFormulation ql:JSONPath;
     rml:iterator "$.[*]"
   ].
@@ -19,30 +20,16 @@
 ].
 
 :TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:author;
+  rr:predicate owl:sameAs;
   rr:objectMap [
-    rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{createdBy}"
-  ]
-].
-
-:TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:ancestor;
-  rr:objectMap [
-    rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{ancestors}"
-  ]
-].
-
-:TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:mention;
-  rr:objectMap [
-    rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{mentions[*]}"
+    rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{name}"
   ]
 ].
 
 :TriplesMap rr:predicateObjectMap [
   rr:predicate rdf:type;
   rr:objectMap [
-    rr:constant khub:StarterMessage
+    rr:constant khub:GlobalSpace
   ]
 ].
 
@@ -54,29 +41,15 @@
 ].
 
 :TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:content;
+  rr:predicate khub:key;
   rr:objectMap [
-    rml:reference "content"
+    rml:reference "key"
   ]
 ].
 
 :TriplesMap rr:predicateObjectMap [
   rr:predicate khub:title;
   rr:objectMap [
-    rml:reference "title"
-  ]
-].
-
-:TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:lastUpdateTime;
-  rr:objectMap [
-    rml:reference "lastUpdatedAt"
-  ]
-].
-
-:TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:creationTime;
-  rr:objectMap [
-    rml:reference "createdAt"
+    rml:reference "name"
   ]
 ].

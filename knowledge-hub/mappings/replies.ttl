@@ -9,7 +9,7 @@
 
 :TriplesMap a rr:TriplesMap;
   rml:logicalSource [
-    rml:source "messages.json";
+    rml:source "replies.json";
     rml:referenceFormulation ql:JSONPath;
     rml:iterator "$.[*]"
   ].
@@ -33,6 +33,13 @@
 ].
 
 :TriplesMap rr:predicateObjectMap [
+  rr:predicate khub:reply;
+  rr:objectMap [
+    rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{replyToId}"
+  ]
+].
+
+:TriplesMap rr:predicateObjectMap [
   rr:predicate khub:mention;
   rr:objectMap [
     rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{mentions[*]}"
@@ -42,7 +49,7 @@
 :TriplesMap rr:predicateObjectMap [
   rr:predicate rdf:type;
   rr:objectMap [
-    rr:constant khub:StarterMessage
+    rr:constant khub:Reply
   ]
 ].
 

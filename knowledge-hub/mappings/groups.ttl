@@ -1,0 +1,34 @@
+@prefix rml: <http://semweb.mmlab.be/ns/rml#> .
+@prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix ql: <http://semweb.mmlab.be/ns/ql#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix : <http://example.org/rules/> .
+@base <http://example.com/base/> .
+
+@prefix khub: <http://semanticweb.org/khub/ontologies/2022/11/ontology#> .
+
+:TriplesMap a rr:TriplesMap;
+  rml:logicalSource [
+    rml:source "groups.json";
+    rml:referenceFormulation ql:JSONPath;
+    rml:iterator "$.[*]"
+  ].
+
+:TriplesMap rr:subjectMap [
+  rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{_id}"
+].
+
+:TriplesMap rr:predicateObjectMap [
+  rr:predicate owl:sameAs;
+  rr:objectMap [
+    rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{name}"
+  ]
+].
+
+:TriplesMap rr:predicateObjectMap [
+  rr:predicate rdf:type;
+  rr:objectMap [
+    rr:constant khub:ConfluenceGroup
+  ]
+].

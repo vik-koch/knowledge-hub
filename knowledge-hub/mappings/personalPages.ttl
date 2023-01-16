@@ -9,7 +9,7 @@
 
 :TriplesMap a rr:TriplesMap;
   rml:logicalSource [
-    rml:source "messages.json";
+    rml:source "personalPages.json";
     rml:referenceFormulation ql:JSONPath;
     rml:iterator "$.[*]"
   ].
@@ -26,23 +26,30 @@
 ].
 
 :TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:ancestor;
+  rr:predicate khub:author;
   rr:objectMap [
-    rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{ancestors}"
+    rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{lastUpdatedBy}"
   ]
 ].
 
 :TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:mention;
+  rr:predicate khub:ancestor;
   rr:objectMap [
-    rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{mentions[*]}"
+    rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{ancestors[*]}"
+  ]
+].
+
+:TriplesMap rr:predicateObjectMap [
+  rr:predicate khub:contributor;
+  rr:objectMap [
+    rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{contributors[*]}"
   ]
 ].
 
 :TriplesMap rr:predicateObjectMap [
   rr:predicate rdf:type;
   rr:objectMap [
-    rr:constant khub:StarterMessage
+    rr:constant khub:PersonalPage
   ]
 ].
 

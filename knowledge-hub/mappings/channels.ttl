@@ -2,6 +2,7 @@
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix ql: <http://semweb.mmlab.be/ns/ql#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix : <http://example.org/rules/> .
 @base <http://example.com/base/> .
 
@@ -9,20 +10,13 @@
 
 :TriplesMap a rr:TriplesMap;
   rml:logicalSource [
-    rml:source "messages.json";
+    rml:source "channels.json";
     rml:referenceFormulation ql:JSONPath;
     rml:iterator "$.[*]"
   ].
 
 :TriplesMap rr:subjectMap [
   rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{_id}"
-].
-
-:TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:author;
-  rr:objectMap [
-    rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{createdBy}"
-  ]
 ].
 
 :TriplesMap rr:predicateObjectMap [
@@ -33,16 +27,23 @@
 ].
 
 :TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:mention;
+  rr:predicate owl:sameAs;
   rr:objectMap [
-    rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{mentions[*]}"
+    rr:template "http://semanticweb.org/khub/ontologies/2022/11/ontology#{name}"
   ]
 ].
 
 :TriplesMap rr:predicateObjectMap [
   rr:predicate rdf:type;
   rr:objectMap [
-    rr:constant khub:StarterMessage
+    rr:constant khub:Channel
+  ]
+].
+
+:TriplesMap rr:predicateObjectMap [
+  rr:predicate khub:name;
+  rr:objectMap [
+    rml:reference "name"
   ]
 ].
 
@@ -57,20 +58,6 @@
   rr:predicate khub:content;
   rr:objectMap [
     rml:reference "content"
-  ]
-].
-
-:TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:title;
-  rr:objectMap [
-    rml:reference "title"
-  ]
-].
-
-:TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:lastUpdateTime;
-  rr:objectMap [
-    rml:reference "lastUpdatedAt"
   ]
 ].
 
