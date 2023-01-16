@@ -29,8 +29,8 @@ target/
 .vscode/
 
 # Apache Jena TBD folder
-dataset/
+knowledge-hub/dataset/
 
 # RML Mappings folders
-mappings/output/
-mappings/jsons/
+knowledge-hub/mappings/output/
+knowledge-hub/mappings/jsons/
