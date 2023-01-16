@@ -10,7 +10,7 @@
 
 :TriplesMap a rr:TriplesMap;
   rml:logicalSource [
-    rml:source "personalSpaces.json";
+    rml:source "jsons/personalSpaces.json";
     rml:referenceFormulation ql:JSONPath;
     rml:iterator "$.[*]"
   ].

@@ -10,7 +10,7 @@
 
 :TriplesMap a rr:TriplesMap;
   rml:logicalSource [
-    rml:source "groups.json";
+    rml:source "jsons/groups.json";
     rml:referenceFormulation ql:JSONPath;
     rml:iterator "$.[*]"
   ].

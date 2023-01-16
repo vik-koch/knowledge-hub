@@ -10,7 +10,7 @@
 
 :TriplesMap a rr:TriplesMap;
   rml:logicalSource [
-    rml:source "attachments.json";
+    rml:source "jsons/attachments.json";
     rml:referenceFormulation ql:JSONPath;
     rml:iterator "$.[*]"
   ].

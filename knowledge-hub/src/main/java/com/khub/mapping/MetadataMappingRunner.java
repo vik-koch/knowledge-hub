@@ -1,6 +1,9 @@
 package com.khub.mapping;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -46,8 +49,15 @@ public class MetadataMappingRunner {
         String path = configuration.getProperty("mappings.path");
         RMLMapper mapper = new RMLMapper(path);
 
+        try {
+            Files.createDirectories(Paths.get(path + File.separator + "jsons"));
+            Files.createDirectories(Paths.get(path + File.separator + "output"));
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Unable to create output folders", e);
+        }
+
         // Concurrently processes metadata fields for each collection
-        collectionNames.forEach(collectionName -> {
+        collectionNames.parallelStream().forEach(collectionName -> {
             MongoCollection<Document> collection = dataBase.getCollection(collectionName);
             mapper.exportCollection(collection);
             mapper.executeMapping(collection.getNamespace().getCollectionName());
