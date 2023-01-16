@@ -27,3 +27,6 @@ target/
 
 # VS Code folder
 .vscode/
+
+# Apache Jena TBD folder
+dataset/

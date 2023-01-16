@@ -31,6 +31,13 @@
       <artifactId>mongodb-driver</artifactId>
       <version>3.12.11</version>
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.apache.jena/jena -->
+    <dependency>
+      <groupId>org.apache.jena</groupId>
+      <artifactId>jena</artifactId>
+      <version>4.7.0</version>
+      <type>pom</type>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/be.ugent.rml/rmlmapper -->
     <dependency>
       <groupId>be.ugent.rml</groupId>
