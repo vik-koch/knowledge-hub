@@ -3,7 +3,7 @@ package com.khub.jena;
 import java.util.Properties;
 
 import org.apache.jena.query.Dataset;
-import org.apache.jena.tdb.TDBFactory;
+import org.apache.jena.tdb2.TDB2Factory;
 
 import com.khub.exceptions.InvalidConfigurationException;
 
@@ -27,6 +27,6 @@ public class TDBHandler {
         if (path == null || path.isEmpty()) {
             throw new InvalidConfigurationException("The given URL is null or empty");
         }
-        return TDBFactory.createDataset(path);
+        return TDB2Factory.connectDataset(path);
     }
 }
