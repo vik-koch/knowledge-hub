@@ -27,16 +27,17 @@ public class JenaRunner {
      */
     public void run(Properties configuration) {
         importResources(configuration);
+        importOntology(configuration);
     }
 
     /**
      * Imports RDF resources to Apache Jena Dataset
-     * @param configuration
+     * @param configuration - {@code Properties} object
      */
-    public void importResources(Properties configuration) {
+    private void importResources(Properties configuration) {
         try {
             Dataset tdb = TDBHandler.getDataset(configuration);
-            
+
             String path = configuration.getProperty("mappings.path");
             Path outputDir = Paths.get(path + File.separator + "output");
 
@@ -53,17 +54,38 @@ public class JenaRunner {
                 tdb.executeWrite(()->{
                     RDFDataMgr.read(tdb, absolutePath + File.separator + fileName);
                 });
-                tdb.commit();
                 logger.log(Level.INFO, "Finished reading " + fileName + " dataset");
 
             });
             tdb.end();
 
         } catch (InvalidConfigurationException e) {
-            logger.log(Level.SEVERE, "Unable to start the jena runner", e);
+            logger.log(Level.SEVERE, "Invalid configuration provided", e);
             return;
         } catch (IOException e) {
             logger.log(Level.SEVERE, "No files for import were found", e);
+            return;
+        }
+    }
+
+    /**
+     * Imports RDF resources to Apache Jena Dataset
+     * @param configuration - {@code Properties} object
+     */
+    private void importOntology(Properties configuration) {
+        try {
+            Dataset tdb = TDBHandler.getDataset(configuration);
+            String absolutePath = new File(configuration.get("ontology.path").toString()).getAbsolutePath();
+
+            logger.log(Level.INFO, "Reading ontology");
+            tdb.executeWrite(()->{
+                RDFDataMgr.read(tdb, absolutePath);
+            });
+            logger.log(Level.INFO, "Finished reading ontology");
+            tdb.end();
+
+        } catch (InvalidConfigurationException e) {
+            logger.log(Level.SEVERE, "Invalid configuration provided", e);
             return;
         }
     }

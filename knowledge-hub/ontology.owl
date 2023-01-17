@@ -51,8 +51,6 @@
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
-        <rdfs:domain rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#FirstLevelPage"/>
-        <rdfs:domain rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#SubPage"/>
         <rdfs:range rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GlobalSpace"/>
     </owl:ObjectProperty>
     
@@ -163,15 +161,6 @@
     
 
 
-    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#CommunitySpace -->
-
-    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#CommunitySpace">
-        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GlobalSpace"/>
-        <rdfs:comment xml:lang="en">A space with information about a community</rdfs:comment>
-    </owl:Class>
-    
-
-
     <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Company -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Company">
@@ -185,6 +174,15 @@
     <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#CompanyEvent">
         <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Event"/>
         <rdfs:comment xml:lang="en">A company-wide event that can concern any company including this one</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ConfluenceGroup -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ConfluenceGroup">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#KnowledgeArtifact"/>
+        <rdfs:comment xml:lang="en">A Confluence Group that includes spaces, pages and members</rdfs:comment>
     </owl:Class>
     
 
@@ -244,11 +242,11 @@
     
 
 
-    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#FirstLevelPage -->
+    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GlobalPage -->
 
-    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#FirstLevelPage">
+    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GlobalPage">
         <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Page"/>
-        <owl:disjointWith rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#SubPage"/>
+        <owl:disjointWith rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#PersonalPage"/>
         <rdfs:comment xml:lang="en">A main page in a Confluence space</rdfs:comment>
     </owl:Class>
     
@@ -378,15 +376,6 @@
     
 
 
-    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#OtherSpace -->
-
-    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#OtherSpace">
-        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GlobalSpace"/>
-        <rdfs:comment xml:lang="en">An unclassified space serving a different purpose</rdfs:comment>
-    </owl:Class>
-    
-
-
     <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Page -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Page">
@@ -448,15 +437,6 @@
     
 
 
-    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ProjectSpace -->
-
-    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ProjectSpace">
-        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GlobalSpace"/>
-        <rdfs:comment xml:lang="en">A space with information about a project</rdfs:comment>
-    </owl:Class>
-    
-
-
     <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ProjectTeam -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ProjectTeam">
@@ -511,29 +491,11 @@
     
 
 
-    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#SubPage -->
-
-    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#SubPage">
-        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Page"/>
-        <rdfs:comment xml:lang="en">A Confluence page that is subordinate to another page</rdfs:comment>
-    </owl:Class>
-    
-
-
     <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Team -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Team">
         <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Group"/>
         <rdfs:comment xml:lang="en">A group of people aiming a certain goal</rdfs:comment>
-    </owl:Class>
-    
-
-
-    <!-- http://www.semanticweb.org/khub/ontologies/2022/11/ontology#TeamSpace -->
-
-    <owl:Class rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#TeamSpace">
-        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#GlobalSpace"/>
-        <rdfs:comment xml:lang="en">A space with information about a team</rdfs:comment>
     </owl:Class>
     
 
@@ -622,15 +584,6 @@
             <rdf:Description rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#OtherGroup"/>
             <rdf:Description rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ProjectTeam"/>
             <rdf:Description rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#Team"/>
-        </owl:members>
-    </rdf:Description>
-    <rdf:Description>
-        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
-        <owl:members rdf:parseType="Collection">
-            <rdf:Description rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#CommunitySpace"/>
-            <rdf:Description rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#OtherSpace"/>
-            <rdf:Description rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#ProjectSpace"/>
-            <rdf:Description rdf:about="http://www.semanticweb.org/khub/ontologies/2022/11/ontology#TeamSpace"/>
         </owl:members>
     </rdf:Description>
     <rdf:Description>
