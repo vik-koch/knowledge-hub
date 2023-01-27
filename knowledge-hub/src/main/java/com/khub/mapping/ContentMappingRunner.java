@@ -91,8 +91,8 @@ public class ContentMappingRunner {
                         }
                     }
                 }
+                tdb.end();
             }
-            tdb.end();
 
         } catch (InvalidConfigurationException e) {
             logger.log(Level.SEVERE, "Invalid configuration provided", e);
