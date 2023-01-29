@@ -20,7 +20,7 @@ import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QuerySolution;
 import org.apache.jena.query.ReadWrite;
 import org.apache.jena.query.ResultSet;
-
+import org.apache.jena.rdf.model.Model;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -45,6 +45,7 @@ public class ContentMappingRunner {
         // Prepares dataset
         try {
             Dataset tdb = TDBHandler.getDataset(configuration);
+            Model model = tdb.getUnionModel();
 
             String path = configuration.getProperty("content.mappings.path");
 
@@ -77,7 +78,7 @@ public class ContentMappingRunner {
                 String outputFile = absolutePath + File.separator + "csvs" + File.separator + fileName + ".csv";
 
                 tdb.begin(ReadWrite.READ);
-                try (QueryExecution qExec = QueryExecution.dataset(tdb).query(queryString).build()) {
+                try (QueryExecution qExec = QueryExecution.model(model).query(queryString).build()) {
                     ResultSet result = qExec.execSelect();
                     while (result.hasNext()) {
                         QuerySolution solution = result.nextSolution();

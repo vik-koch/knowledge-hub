@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,15 +45,14 @@ public class RMLMapper {
         String collectionName = collection.getNamespace().getCollectionName();
         logger.log(Level.INFO, "Starting to export the collection " + collectionName);
 
-        List<String> output = new ArrayList<String>();
-        output.add("[");
+        List<String> content = new ArrayList<String>();
 
         // Converts each BSON to JSON String
         for (Document document : collection.find()) {
-            output.add(document.toJson());
+            content.add(document.toJson());
         }
 
-        output.add("]");
+        List<String> output = Arrays.asList("[", String.join(",\n", content), "]");
 
         try {
             Files.write(Paths.get(path + File.separator + "jsons" + File.separator + collectionName + ".json"), output);
