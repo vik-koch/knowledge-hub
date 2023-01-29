@@ -8,7 +8,7 @@
 
 :TriplesMap a rr:TriplesMap ;
   rml:logicalSource [
-    rml:source "jsons/commentaries.json" ;
+    rml:source "jsons/posts.json" ;
     rml:referenceFormulation ql:JSONPath ;
     rml:iterator "$.[*]"
 ] .
@@ -27,14 +27,14 @@
 :TriplesMap rr:predicateObjectMap [
   rr:predicate khub:ancestor ;
   rr:objectMap [
-    rr:template "http://semanticweb.org/ontologies/khub#{ancestors[*]}"
+    rr:template "http://semanticweb.org/ontologies/khub#{ancestors}"
   ]
 ] .
 
 :TriplesMap rr:predicateObjectMap [
   rr:predicate rdf:type ;
   rr:objectMap [
-    rr:constant khub:Commentary
+    rr:constant khub:Post
   ]
 ] .
 

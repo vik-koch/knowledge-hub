@@ -1,4 +1,5 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix rml: <http://semweb.mmlab.be/ns/rml#> .
 @prefix ql: <http://semweb.mmlab.be/ns/ql#> .
@@ -8,47 +9,33 @@
 
 :TriplesMap a rr:TriplesMap ;
   rml:logicalSource [
-    rml:source "jsons/commentaries.json" ;
+    rml:source "jsons/spaces.json" ;
     rml:referenceFormulation ql:JSONPath ;
     rml:iterator "$.[*]"
-] .
+  ] .
 
 :TriplesMap rr:subjectMap [
   rr:template "http://semanticweb.org/ontologies/khub#{_id}"
 ] .
 
 :TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:author ;
+  rr:predicate owl:sameAs ;
   rr:objectMap [
-    rr:template "http://semanticweb.org/ontologies/khub#{createdBy}"
-  ]
-] .
-
-:TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:ancestor ;
-  rr:objectMap [
-    rr:template "http://semanticweb.org/ontologies/khub#{ancestors[*]}"
+    rr:template "http://semanticweb.org/ontologies/khub#{name}"
   ]
 ] .
 
 :TriplesMap rr:predicateObjectMap [
   rr:predicate rdf:type ;
   rr:objectMap [
-    rr:constant khub:Commentary
+    rr:constant khub:Space
   ]
 ] .
 
 :TriplesMap rr:predicateObjectMap [
   rr:predicate khub:title ;
   rr:objectMap [
-    rml:reference "title"
-  ]
-] .
-
-:TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:content ;
-  rr:objectMap [
-    rml:reference "content"
+    rml:reference "name"
   ]
 ] .
 
@@ -56,19 +43,5 @@
   rr:predicate khub:link ;
   rr:objectMap [
     rml:reference "link"
-  ]
-] .
-
-:TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:creationTime ;
-  rr:objectMap [
-    rml:reference "createdAt"
-  ]
-] .
-
-:TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:lastUpdateTime ;
-  rr:objectMap [
-    rml:reference "lastUpdatedAt"
   ]
 ] .
