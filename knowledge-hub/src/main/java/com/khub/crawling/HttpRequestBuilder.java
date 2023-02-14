@@ -1,4 +1,4 @@
-package com.khub.misc;
+package com.khub.crawling;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -6,20 +6,19 @@ import java.net.http.HttpRequest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-// Wrapper class for HttpRequest Builder
 public class HttpRequestBuilder {
 
-    private static final Logger logger = Logger.getLogger(Configuration.class.getName());
+    private static final Logger logger = Logger.getLogger(HttpRequestBuilder.class.getName());
 
     // Prevents instantiation
     private HttpRequestBuilder() {
     }
 
     /**
-     * Builds and returns an {@code HttpRequest}
-     * @param uri - request {@code URI}
-     * @param headers - request headers as name value pairs 
-     * @return a new {@code HttpRequest}
+     * Builds and returns an {@link HttpRequest}
+     * @param uri - the request {@code URI} as {@link String}
+     * @param headers - the request headers as name value pairs 
+     * @return the built {@link HttpRequest}
      */
     public static HttpRequest build(String uri, String... headers) {
         try {
@@ -31,9 +30,10 @@ public class HttpRequestBuilder {
             return request;
 
         } catch (URISyntaxException e) {
-            logger.log(Level.SEVERE, "Invalid request URI format", e);
+            logger.log(Level.SEVERE, "Invalid request URI format for " + uri);
         }
 
         return null;
     }
+
 }
