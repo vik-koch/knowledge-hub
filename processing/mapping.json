@@ -1,0 +1,50 @@
+{
+    "_id": [
+        "_id"
+    ],
+    "type": [
+        "type",
+        "messageType"
+    ],
+    "name": [
+        "name",
+        "displayName"
+    ],
+    "username": [
+        "personalSpace.key"
+    ],
+    "email": [
+        "email"
+    ],
+    "title": [
+        "title",
+        "subject"
+    ],
+    "link" : [
+        "_links.webui",
+        "personalSpace._links.webui",
+        "webUrl"
+    ],
+    "content": [
+        "body.storage.value",
+        "body.content",
+        "description"
+    ],
+    "author": [
+        "history.createdBy.username",
+        "from.user.displayName"
+    ],
+    "creationTime": [
+        "history.createdDate",
+        "createdDateTime"
+    ],
+    "lastUpdateTime": [
+        "history.lastUpdated.when",
+        "lastEditedDateTime"
+    ],
+    "ancestor": [
+        "ancestor",
+        "ancestors[*].id",
+        "channelIdentity.channelId"
+    ]
+}

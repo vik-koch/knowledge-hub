@@ -17,10 +17,10 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
-import com.khub.misc.MongoConnector;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -72,7 +72,7 @@ public class MetadataProcessor {
      * Starts the {@link MetadataProcessor} for processing metadata fields from all collections in 
      * {@code sourceDatabase} and writes the processed {@code JSON} output to {@code outputDatabase}.
      * Processing extracts and unifies fields as defined in the {@code JSON} mapping.
-     * @param sourceDatabase - the {@link MongoDatabase} to write data from
+     * @param sourceDatabase - the {@link MongoDatabase} to read data from
      * @param outputDatabase - the {@link MongoDatabase} to write data to
      */
     public void run(MongoDatabase sourceDatabase, MongoDatabase outputDatabase) {
@@ -89,10 +89,10 @@ public class MetadataProcessor {
                 MongoCollection<Document> sourceCollection = sourceDatabase.getCollection(collectionName);
                 MongoCollection<Document> outputCollection = outputDatabase.getCollection(collectionName);
 
-                List<JsonElement> source = MongoConnector.convertToJsonElements(sourceCollection);
+                List<JsonElement> source = convertToJsonElements(sourceCollection);
                 List<JsonElement> data = process(source);
         
-                List<Document> output = MongoConnector.convertToDocuments(data);
+                List<Document> output = convertToBsonDocuments(data);
                 outputCollection.insertMany(output);
 
                 logger.info("Processed data for collection \"" + collectionName + "\"");
@@ -137,6 +137,38 @@ public class MetadataProcessor {
         }
 
         return output;
+    }
+
+    /**
+     * Converts the given {@link MongoCollection} of {@code BSON}
+     * {@link Document}s to the {@link List} of {@link JsonElement}s
+     * @param documents - the {@link Document}s to convert to {@link JsonElement}s
+     * @return the {@link List} with {@code JSON} data
+     */
+    private List<JsonElement> convertToJsonElements(MongoCollection<Document> documents) {
+        List<JsonElement> elements = new ArrayList<JsonElement>();
+
+        for (Document document : documents.find()) {
+            elements.add(JsonParser.parseString(document.toJson()));
+        }
+
+        return elements;
+    }
+
+    /**
+     * Converts the given {@link List} of {@link JsonElement}s to
+     * the {@link List} of {@code BSON} {@link Document}s 
+     * @param elements - the {@link JsonElement}s to convert to {@link Document}s
+     * @return the {@link List} with {@code BSON} data
+     */
+    private List<Document> convertToBsonDocuments(List<JsonElement> elements) {
+        List<Document> documents = new ArrayList<Document>();
+
+        for (JsonElement element : elements) {
+            documents.add(Document.parse(element.toString()));
+        }
+
+        return documents;
     }
 
     /**
