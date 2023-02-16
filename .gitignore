@@ -32,6 +32,9 @@ target/
 dataset/
 
 # RML Mappings folders
-mappings/output/
-mappings/jsons/
-content-mappings/
+metadata/source/
+metadata/output/
+content/
+
+# Configuration folder
+config/

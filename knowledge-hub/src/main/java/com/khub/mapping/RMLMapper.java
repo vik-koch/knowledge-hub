@@ -1,97 +1,54 @@
 package com.khub.mapping;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
 import java.util.logging.Logger;
 
-import org.bson.Document;
+import com.khub.misc.DockerRunner;
 
-import com.mongodb.client.MongoCollection;
-
-import be.ugent.rml.Executor;
-import be.ugent.rml.records.RecordsFactory;
-import be.ugent.rml.store.QuadStore;
-import be.ugent.rml.store.QuadStoreFactory;
-import be.ugent.rml.store.RDF4JStore;
-
-/**
- * Mapper for converting semi-structured data to RDF
- */
 public class RMLMapper {
 
-    protected final Logger logger = Logger.getLogger(this.getClass().getName());
-    private String path = null;
+    private final Logger logger = Logger.getLogger(getClass().getName());
 
-    // Constructor
-    public RMLMapper(String path) {
-        this.path = path;
+    private final Path mappingsPath;
+    private final Path dockerPath;
+
+    public RMLMapper(Path mappingsPath, Path dockerPath) {
+        this.mappingsPath = mappingsPath;
+        this.dockerPath = dockerPath;
     }
 
     /**
-     * Exports MongoDB BSON collection to a JSON file in the given {@code path}
-     * @param collection - MongoCollection with BSON documents
+     * Executes {@code JSON}-to-{@code RML} mapping for the mapping file
+     * with the provided {@code filename} located in {@code mappingPath}
+     * @param filename - the mapping filename
+     * @param outputDirectoryName - the name of the output folder
      */
-    public void exportCollection(MongoCollection<Document> collection) {
-        String collectionName = collection.getNamespace().getCollectionName();
-        logger.log(Level.INFO, "Starting to export the collection " + collectionName);
-
-        List<String> content = new ArrayList<String>();
-
-        // Converts each BSON to JSON String
-        for (Document document : collection.find()) {
-            content.add(document.toJson());
-        }
-
-        List<String> output = Arrays.asList("[", String.join(",\n", content), "]");
-
+    public void execute(String filename, String outputDirectoryName) {
         try {
-            Files.write(Paths.get(path + File.separator + "jsons" + File.separator + collectionName + ".json"), output);
-            logger.log(Level.INFO, "The collection " + collectionName + " was successfully exported");
-        } catch (IOException e) {
-            logger.log(Level.SEVERE, "Unable to export the collection " + collectionName, e);
-        }
-    }
+            logger.info("Starting to map the file \"" + filename + "\"");
 
-    /**
-     * Executes mapping for the given TTL mapping file
-     * @param mappingName - name of mapping file
-     */
-    public void executeMapping(String mappingName) {
-        try (FileWriter out = new FileWriter(path + File.separator + "output" + File.separator + mappingName + ".ttl")) {
-            File mapping = new File(path + File.separator + mappingName + ".ttl");
-            logger.log(Level.INFO, "Starting to map the file " + mappingName);
+            String volume = mappingsPath.toRealPath(LinkOption.NOFOLLOW_LINKS) + ":/data";
+            String output = outputDirectoryName + File.separator + filename;
+            String format = "turtle";
 
-            if (!mapping.isFile()) {
-                throw new FileNotFoundException("No file found at " + path);
+            String[] command = {"docker-compose", "run", "--rm",
+                                "-v", volume, "rml-mapper", "-m", filename, "-o", output, "-s", format };
+
+            Process process = DockerRunner.runCommand(dockerPath, command);
+
+            if (process.waitFor() == 0) {
+                logger.info("The file \"" + filename + "\" was successfully mapped");
+            } else {
+                logger.severe("Unable to map the file \"" + filename + "\"");
             }
 
-            // Loads the mapping in a QuadStore and creates a RecordsFactory
-            QuadStore rmlStore = QuadStoreFactory.read(new FileInputStream(mapping));
-            RecordsFactory factory = new RecordsFactory(mapping.getParent());
-
-            // Creates an output QuadStore and copies prefixes
-            QuadStore result = new RDF4JStore();
-            result.copyNameSpaces(rmlStore);
-
-            // Creates a mapping Executor and runs it
-            Executor executor = new Executor(rmlStore, factory, result, null, null);
-            executor.execute(null);
-
-            // Generates output file
-            result.write(out, "turtle");
-            logger.log(Level.INFO, "The file " + mappingName + " was successfully mapped");
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Unable to map the file " + mappingName, e);
+        } catch (IOException | SecurityException | InterruptedException e) {
+            logger.severe("An error occured while trying to map \"" + filename + "\"");
         }
     }
+
 }
