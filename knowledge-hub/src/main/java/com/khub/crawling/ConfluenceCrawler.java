@@ -20,8 +20,8 @@ import com.google.gson.JsonParser;
 
 public class ConfluenceCrawler extends AbstractCrawler {
 
-    public ConfluenceCrawler(URL endpoint, AuthenticationHeader requestHeader) {
-        super(endpoint, requestHeader);
+    public ConfluenceCrawler(URL confluenceEndpoint, AuthenticationHeader requestHeader) {
+        super(confluenceEndpoint, requestHeader);
     }
 
     /**
@@ -54,9 +54,11 @@ public class ConfluenceCrawler extends AbstractCrawler {
             try {
                 String groupKey = group.getAsJsonObject().get("name").getAsString().replace(" ", "%20");
                 String requestUrl = endpoint + "group/" + groupKey + "/member?limit=9999&expand=personalSpace";
-    
+
                 for (JsonElement jsonElement : retrieve(requestUrl)) {
-                    users.add(jsonElement.getAsJsonObject());
+                    if (jsonElement.getAsJsonObject().has("personalSpace")) {
+                        users.add(jsonElement);
+                    }
                 }
             } catch (Exception e) { }
         });

@@ -29,7 +29,6 @@ public class TeamsCrawler extends AbstractCrawler {
      * {@code Teams} data includes teams, channels and posts
      * @return the retrieved {@code Teams} data
      */
-    @Override
     public Map<String, List<JsonElement>> run() {
 
         List<JsonElement> teams = retrieveTeams();
