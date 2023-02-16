@@ -10,11 +10,9 @@
         "name",
         "displayName"
     ],
-    "username": [
-        "personalSpace.key"
-    ],
     "email": [
-        "email"
+        "email",
+        "mail"
     ],
     "title": [
         "title",
@@ -31,7 +29,7 @@
         "description"
     ],
     "author": [
-        "history.createdBy.username",
+        "history.createdBy.displayName",
         "from.user.displayName"
     ],
     "creationTime": [

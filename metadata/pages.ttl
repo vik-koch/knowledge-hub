@@ -8,7 +8,7 @@
 
 :TriplesMap a rr:TriplesMap ;
   rml:logicalSource [
-    rml:source "jsons/posts.json" ;
+    rml:source "source/pages.json" ;
     rml:referenceFormulation ql:JSONPath ;
     rml:iterator "$.[*]"
 ] .
@@ -20,21 +20,21 @@
 :TriplesMap rr:predicateObjectMap [
   rr:predicate khub:author ;
   rr:objectMap [
-    rr:template "http://semanticweb.org/ontologies/khub#{createdBy}"
+    rr:template "http://semanticweb.org/ontologies/khub#{author}"
   ]
 ] .
 
 :TriplesMap rr:predicateObjectMap [
   rr:predicate khub:ancestor ;
   rr:objectMap [
-    rr:template "http://semanticweb.org/ontologies/khub#{ancestors}"
+    rr:template "http://semanticweb.org/ontologies/khub#{ancestor[*]}"
   ]
 ] .
 
 :TriplesMap rr:predicateObjectMap [
   rr:predicate rdf:type ;
   rr:objectMap [
-    rr:constant khub:Post
+    rr:constant khub:Page
   ]
 ] .
 
@@ -46,13 +46,6 @@
 ] .
 
 :TriplesMap rr:predicateObjectMap [
-  rr:predicate khub:content ;
-  rr:objectMap [
-    rml:reference "content"
-  ]
-] .
-
-:TriplesMap rr:predicateObjectMap [
   rr:predicate khub:link ;
   rr:objectMap [
     rml:reference "link"
@@ -60,15 +53,22 @@
 ] .
 
 :TriplesMap rr:predicateObjectMap [
+  rr:predicate khub:content ;
+  rr:objectMap [
+    rml:reference "content"
+  ]
+] .
+
+:TriplesMap rr:predicateObjectMap [
   rr:predicate khub:creationTime ;
   rr:objectMap [
-    rml:reference "createdAt"
+    rml:reference "creationTime"
   ]
 ] .
 
 :TriplesMap rr:predicateObjectMap [
   rr:predicate khub:lastUpdateTime ;
   rr:objectMap [
-    rml:reference "lastUpdatedAt"
+    rml:reference "lastUpdateTime"
   ]
 ] .
