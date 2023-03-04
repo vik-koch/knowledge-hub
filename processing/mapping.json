@@ -24,7 +24,7 @@
         "webUrl"
     ],
     "content": [
-        "body.storage.value",
+        "body.view.value",
         "body.content",
         "description"
     ],
@@ -43,6 +43,7 @@
     "ancestor": [
         "ancestor",
         "ancestors[*].id",
-        "channelIdentity.channelId"
+        "channelIdentity.channelId",
+        "space.id"
     ]
 }
