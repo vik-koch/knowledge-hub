@@ -25,29 +25,29 @@ import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-public class MetadataProcessor {
+public class JSONProcessor {
 
-    private static final Logger logger = Logger.getLogger(MetadataProcessor.class.getName());
+    private static final Logger logger = Logger.getLogger(JSONProcessor.class.getName());
 
-    // Metadata jsonPaths that should be filtered and renamed
+    // Field jsonPaths that should be filtered and renamed
     private final Map<String, List<String>> mappings;
 
     // Confluence links are retrieved as short form w/o domain name
     private final String confluenceBaseUrl;
 
-    private MetadataProcessor(Map<String, List<String>> mappings, String confluenceBaseUrl) {
+    private JSONProcessor(Map<String, List<String>> mappings, String confluenceBaseUrl) {
         this.mappings = mappings;
         this.confluenceBaseUrl = confluenceBaseUrl;
     }
 
     /**
-     * Returns an instance of {@link MetadataProcessor} if the {@code mapping} file was
+     * Returns an instance of {@link JSONProcessor} if the {@code mapping} file was
      * successfully read from the given {@code processingPath}, null otherwise
      * @param processingPath - the {@link Path} to the {@code JSON} mapping file
      * @param confluenceEndpoint - the {@code Confluence} URL for extending links
-     * @return the {@link MetadataProcessor}
+     * @return the {@link JSONProcessor}
      */
-    public static MetadataProcessor of(Path processingPath, URL confluenceEndpoint) {
+    public static JSONProcessor of(Path processingPath, URL confluenceEndpoint) {
         try {
             String jsonString = Files.readString(processingPath);
             Type mapType = new TypeToken<HashMap<String, List<String>>>() {}.getType();
@@ -56,7 +56,7 @@ public class MetadataProcessor {
             String confluenceBaseUrl = confluenceEndpoint != null 
                 ? confluenceEndpoint.getProtocol() + "://" + confluenceEndpoint.getHost() + "/wiki"
                 : "";
-            return new MetadataProcessor(mappings, confluenceBaseUrl);
+            return new JSONProcessor(mappings, confluenceBaseUrl);
 
         } catch (IOException | SecurityException e) {
             logger.severe("Unable to read the provided mapping file at \"" + processingPath + "\"");
@@ -69,7 +69,7 @@ public class MetadataProcessor {
     }
 
     /**
-     * Starts the {@link MetadataProcessor} for processing metadata fields from all collections in 
+     * Starts the {@link JSONProcessor} for processing retrieved fields from all collections in 
      * {@code sourceDatabase} and writes the processed {@code JSON} output to {@code outputDatabase}.
      * Processing extracts and unifies fields as defined in the {@code JSON} mapping.
      * @param sourceDatabase - the {@link MongoDatabase} to read data from
@@ -83,7 +83,7 @@ public class MetadataProcessor {
             collectionNames.add(collectionName);
         }
 
-        // Concurrently processes metadata jsonPaths for each collection
+        // Concurrently processes field jsonPaths for each collection
         collectionNames.parallelStream().forEach(collectionName -> {
             try {
                 MongoCollection<Document> sourceCollection = sourceDatabase.getCollection(collectionName);
@@ -130,7 +130,28 @@ public class MetadataProcessor {
                 if (result != null && jsonPath.contains("_links.webui")) {
                     result = new JsonPrimitive(confluenceBaseUrl + result.getAsJsonPrimitive().getAsString());
                 }
-                object.add(jsonPaths.get(jsonPath), result);
+
+                // Combines result to array if another result
+                // was found for the same json path
+                String member = jsonPaths.get(jsonPath);
+                if (object.has(member)) {
+                    JsonElement element = object.get(member);
+                    if (!element.isJsonArray()) {
+                        JsonArray array = new JsonArray();
+                        array.add(element);
+                        element = array;
+                        object.remove(member);
+                        object.add(member, element);
+                    };
+                    if (result.isJsonObject()) {
+                        element.getAsJsonArray().add(result);
+                    }
+                    if (result.isJsonArray()) {
+                        element.getAsJsonArray().addAll(result.getAsJsonArray());
+                    }
+                } else {
+                    object.add(member, result);
+                }
             });
 
             output.add(object);

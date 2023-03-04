@@ -32,8 +32,8 @@ target/
 dataset/
 
 # RML Mappings folders
-metadata/source/
-metadata/output/
+knowledge/source/
+knowledge/output/
 content/
 
 # Configuration folder

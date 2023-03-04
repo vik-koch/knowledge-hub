@@ -1,67 +1,44 @@
-package com.khub.mapping;
+package com.khub.exporting;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.bson.Document;
 
-import com.khub.exceptions.FailedPipelineStepException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-public class MetadataMapper {
+public class KnowledgeExporter {
 
     protected final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
-     * Starts {@link MetadataMapper} for {@code JSON}-to-{@code RML} mapping of retrieved
-     * metadata fields using the defined {@code RML} mappings provided in the {@code metadataPath}
-     * and saves the mapped files to the output folder under the same {@link Path}
+     * Starts {@link KnowledgeExporter} for exporting retrieved collections as {@link JSON}
+     * to the folder with {@code outputDirectoryName} under the given {@code knowledgePath}
      * @param database - the {@link MongoDatabase} to read data from
-     * @param metadataPath - the {@link Path} with {@code RML} mappings
-     * @param dockerPath - the {@link Path} to {@code docker-compose.yml}
+     * @param knowledgePath - the {@link Path} for {@code knowledge} data
+     * @param outputDirectoryName - the directory name to save exported files to
      */
-    public void run(MongoDatabase database, Path metadataPath, Path dockerPath) {
-        String sourceDirectoryName = "source";
-        String outputDirectoryName = "output";
-
+    public void run(MongoDatabase database, Path knowledgePath, String outputDirectoryName) {
         try {
             // Retrieves collection names
             List<String> collectionNames = new ArrayList<String>(); 
             database.listCollectionNames().forEach((Consumer<String>) (name -> collectionNames.add(name)));
 
-            Path sourcePath = Files.createDirectories(Paths.get(metadataPath + File.separator + sourceDirectoryName));
+            Path outputPath = Files.createDirectories(knowledgePath.resolve(outputDirectoryName));
 
             // Concurrently export collections
             collectionNames.parallelStream().forEach(collectionName -> {
                 MongoCollection<Document> collection = database.getCollection(collectionName);
-                exportCollection(collection, sourcePath);
-            });
-
-            // Retrieves mapping filenames
-            List<String> filenames = Stream.of(new File(metadataPath.toString()).listFiles())
-                .filter(file -> !file.isDirectory())
-                .map(File::getName)
-                .collect(Collectors.toList());
-
-            Files.createDirectories(Paths.get(metadataPath + File.separator + outputDirectoryName));
-            RMLMapper mapper = new RMLMapper(metadataPath, dockerPath);
-            filenames.parallelStream().forEach(filename -> {
-                mapper.execute(filename, outputDirectoryName);
+                exportCollection(collection, outputPath);
             });
 
         } catch (Exception e) {
-            logger.severe("Unable to create output folders under \"" + metadataPath + "\"");
-            throw new FailedPipelineStepException();
+            logger.severe("Unable to create output folder under \"" + knowledgePath + "\"");
         }
     }
 
@@ -81,7 +58,7 @@ public class MetadataMapper {
             for (Document document : collection.find()) jsonObjects.add(document.toJson());
             List<String> jsonArray = Arrays.asList("[", String.join(",\n", jsonObjects), "]");
 
-            Path filename = Paths.get(exportPath + File.separator + collectionName + ".json");
+            Path filename = exportPath.resolve(collectionName + ".json");
             Files.write(filename, jsonArray);
 
             logger.info("The collection \"" + collectionName + "\" was successfully exported");

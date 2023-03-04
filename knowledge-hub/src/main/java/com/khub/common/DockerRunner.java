@@ -1,4 +1,4 @@
-package com.khub.misc;
+package com.khub.common;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,5 +37,5 @@ public class DockerRunner {
             return null;
         }
     }
-    
+
 }

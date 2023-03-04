@@ -103,8 +103,7 @@ public class ConfluenceCrawler extends AbstractCrawler {
             try {
                 String spaceKey = space.getAsJsonObject().get("key").getAsString();
                 String requestUrl = endpoint + "space/" + spaceKey + "/content/page?type=page&limit=9999"
-                    + "&expand=body.storage,children.comment,children.attachment,ancestors,"
-                    + "history.contributors.publishers.users,history.lastUpdated";
+                    + "&expand=body.view,children.comment,ancestors,space,history";
                 pages.addAll(retrieve(requestUrl));
 
             } catch (Exception e) { }     
@@ -136,9 +135,10 @@ public class ConfluenceCrawler extends AbstractCrawler {
                 if (commentsCount != 0) {
                     String pageKey = page.getAsJsonObject().get("id").getAsString();
                     String requestUrl = endpoint + "content/" + pageKey + "/child/comment?limit=9999"
-                        + "&expand=body.storage,ancestors,history.contributors.publishers."
-                        + "users,history.lastUpdated";
-                    comments.addAll(retrieve(requestUrl));
+                        + "&expand=body.view,ancestors,history";
+                    List<JsonElement> result = retrieve(requestUrl);
+                    result.forEach(element -> element.getAsJsonObject().addProperty("ancestor", pageKey));
+                    comments.addAll(result);
                 }
             } catch (Exception e) { } 
         });
