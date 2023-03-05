@@ -12,12 +12,12 @@ import org.bson.Document;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-public class KnowledgeExporter {
+public class MongoExporter {
 
     protected final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
-     * Starts {@link KnowledgeExporter} for exporting retrieved collections as {@link JSON}
+     * Starts {@link MongoExporter} for exporting retrieved collections as {@link JSON}
      * to the folder with {@code outputDirectoryName} under the given {@code knowledgePath}
      * @param database - the {@link MongoDatabase} to read data from
      * @param knowledgePath - the {@link Path} for {@code knowledge} data

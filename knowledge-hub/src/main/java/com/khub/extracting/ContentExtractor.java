@@ -1,4 +1,4 @@
-package com.khub.exporting;
+package com.khub.extracting;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -28,26 +28,26 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.khub.common.FilesHelper;
 
-public class ContentExporter {
+public class ContentExtractor {
 
-    protected final static Logger logger = Logger.getLogger(ContentExporter.class.getName());
+    protected final static Logger logger = Logger.getLogger(ContentExtractor.class.getName());
 
     private final Dataset tdb;
 
-    private ContentExporter(Dataset tdb) {
+    private ContentExtractor(Dataset tdb) {
         this.tdb = tdb;
     }
 
     /**
-     * Returns an instance of {@link ContentExporter} if 
+     * Returns an instance of {@link ContentExtractor} if 
      * the given {@tdbPath} has a non-empty TDB store in it
      * @param tdbPath - the {@link Path} to the TDB store
-     * @return the {@link ContentExporter}
+     * @return the {@link ContentExtractor}
      */
-    public static ContentExporter of(Path tdbPath) {
+    public static ContentExtractor of(Path tdbPath) {
         Dataset tdb = TDB2Factory.connectDataset(tdbPath.toString());
         if (TDB2Factory.isTDB2(tdb)) {
-            return new ContentExporter(tdb);
+            return new ContentExtractor(tdb);
         } else {
             logger.severe("The given dataset under \"" + tdbPath + "\" is empty");
             return null;
@@ -55,16 +55,20 @@ public class ContentExporter {
     }
 
     /**
-     * Starts {@link ContentExporter} for exporting document content as {@link JSON}
+     * Starts {@link ContentExtractor} for extracting document content as {@link JSON}
      * to the folder with {@code outputDirectoryName} under the given {@code contentPath}
      * @param contentPath - the {@link Path} for {@code content} data
      * @param queriesDirectoryName - the directory name to import queries from
-     * @param outputDirectoryName - the directory name to save exported files to
+     * @param outputDirectoryName - the directory name to save extracted files to
      */
     public void run(Path contentPath, String queriesDirectoryName, String outputDirectoryName) {
 
+        Path queriesPath;
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
         try {
             Files.createDirectories(contentPath.resolve(outputDirectoryName));
+            queriesPath = contentPath.resolve(queriesDirectoryName);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Unable to create an output folder under \"" + outputDirectoryName + "\"");
             return;
@@ -73,16 +77,14 @@ public class ContentExporter {
         // Prepare for iteration
         Model model = tdb.getUnionModel();
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        List<String> filenames = FilesHelper.getFilenamesForPath(queriesPath);
 
-        try {
-            Path queriesPath = contentPath.resolve(queriesDirectoryName);
-            List<String> filenames = FilesHelper.getFilenamesForPath(queriesPath);
-            for (String filename : filenames) {
-
+        for (String filename : filenames) {
+            try {
                 Path queryPath = queriesPath.resolve(filename);
                 if (!Files.exists(queryPath)) continue;
 
-                Map<String, Object> resultMap = new HashMap<String, Object>();
+                resultMap.clear();
                 String queryString = Files.readString(queryPath, StandardCharsets.UTF_8);
 
                 try (QueryExecution qExec = QueryExecution.model(model).query(queryString).build()) {
@@ -113,18 +115,22 @@ public class ContentExporter {
                         }
                     });
                 }
+            } catch (Exception e) {
+                logger.severe("Unable to get content for the \"" + filename + "\" file");
+                break;
+            }
 
+            try {
                 // Convert maps to JSON and write to file
                 filename = filename.substring(0, filename.lastIndexOf('.')) + ".json";
                 Path outputFilePath = contentPath.resolve(outputDirectoryName).resolve(filename);
                 try (BufferedWriter writer = Files.newBufferedWriter(outputFilePath, StandardCharsets.UTF_8)) {
                     gson.toJson(resultMap, writer);
+                    logger.info("Extracted and saved content for the \"" + filename + "\" file");
                 }
+            } catch (Exception e) {
+                logger.severe("Unable to write content for the \"" + filename + "\" file");
             }
-
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Unable to ");
-            return;
         }
     }
 
