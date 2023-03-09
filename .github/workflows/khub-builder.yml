@@ -21,3 +21,13 @@ jobs:
         run: |
           cd khub-builder
           mvn --batch-mode --update-snapshots package
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: khub-builder
+          path: |
+            ./khub-builder/target/*.jar
+            ./knowledge/
+            ./ontology/
+            ./processing/
