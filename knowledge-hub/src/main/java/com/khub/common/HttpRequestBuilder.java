@@ -1,9 +1,8 @@
-package com.khub.crawling;
+package com.khub.common;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpRequest;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class HttpRequestBuilder {
@@ -19,8 +18,9 @@ public class HttpRequestBuilder {
      * @param uri - the request {@code URI} as {@link String}
      * @param headers - the request headers as name value pairs 
      * @return the built {@link HttpRequest}
+     * @throws URISyntaxException - if the given uri is falformed
      */
-    public static HttpRequest build(String uri, String... headers) {
+    public static HttpRequest build(String uri, String... headers) throws URISyntaxException {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                 .GET()
@@ -29,11 +29,10 @@ public class HttpRequestBuilder {
                 .build();
             return request;
 
-        } catch (URISyntaxException e) {
-            logger.log(Level.SEVERE, "Invalid request URI format for " + uri);
+        } catch (URISyntaxException | NullPointerException | IllegalArgumentException e) {
+            logger.warning("Invalid request URI format for \"" + uri + "\"");
+            throw new URISyntaxException(uri, e.getMessage());
         }
-
-        return null;
     }
 
 }

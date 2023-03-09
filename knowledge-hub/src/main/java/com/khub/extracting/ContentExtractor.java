@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.jena.query.Dataset;
@@ -61,7 +60,7 @@ public class ContentExtractor {
      * @param queriesDirectoryName - the directory name to import queries from
      * @param outputDirectoryName - the directory name to save extracted files to
      */
-    public void run(Path contentPath, String queriesDirectoryName, String outputDirectoryName) {
+    public boolean run(Path contentPath, String queriesDirectoryName, String outputDirectoryName) {
 
         Path queriesPath;
         Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -70,8 +69,8 @@ public class ContentExtractor {
             Files.createDirectories(contentPath.resolve(outputDirectoryName));
             queriesPath = contentPath.resolve(queriesDirectoryName);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Unable to create an output folder under \"" + outputDirectoryName + "\"");
-            return;
+            logger.severe("Unable to create an output folder under \"" + outputDirectoryName + "\"");
+            return false;
         }
 
         // Prepare for iteration
@@ -132,6 +131,8 @@ public class ContentExtractor {
                 logger.severe("Unable to write content for the \"" + filename + "\" file");
             }
         }
+
+        return true;
     }
 
     /**

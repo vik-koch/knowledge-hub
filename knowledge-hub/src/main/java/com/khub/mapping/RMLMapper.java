@@ -26,8 +26,9 @@ public class RMLMapper {
      * the mapped files to the folder with {@code outputDirectoryName} under the same {@link Path}
      * @param mappingsPath - the {@link Path} to mappings files
      * @param outputDirectoryName - the directory name to save mapped files to
+     * @return true if the step runned successfully, false otherwise
      */
-    public void run(Path mappingsPath, String outputDirectoryName) {
+    public boolean run(Path mappingsPath, String outputDirectoryName) {
         try {
             List<String> filenames = FilesHelper.getFilenamesForPath(mappingsPath);
             Files.createDirectories(mappingsPath.resolve(outputDirectoryName));
@@ -38,9 +39,11 @@ public class RMLMapper {
                     execute(absoluteMappingsPath, filename, outputDirectoryName);
                 }
             });
+            return true;
 
         } catch (Exception e) {
             logger.severe("Unable to create output folders under \"" + mappingsPath.resolve(outputDirectoryName) + "\"");
+            return false;
         }
     }
 

@@ -22,8 +22,9 @@ public class MongoExporter {
      * @param database - the {@link MongoDatabase} to read data from
      * @param knowledgePath - the {@link Path} for {@code knowledge} data
      * @param outputDirectoryName - the directory name to save exported files to
+     * @return true if the step runned successfully, false otherwise
      */
-    public void run(MongoDatabase database, Path knowledgePath, String outputDirectoryName) {
+    public boolean run(MongoDatabase database, Path knowledgePath, String outputDirectoryName) {
         try {
             // Retrieves collection names
             List<String> collectionNames = new ArrayList<String>(); 
@@ -36,9 +37,11 @@ public class MongoExporter {
                 MongoCollection<Document> collection = database.getCollection(collectionName);
                 exportCollection(collection, outputPath);
             });
+            return true;
 
         } catch (Exception e) {
             logger.severe("Unable to create output folder under \"" + knowledgePath + "\"");
+            return false;
         }
     }
 

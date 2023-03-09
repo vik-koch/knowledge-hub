@@ -1,6 +1,7 @@
 package com.khub.crawling;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -10,13 +11,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.khub.common.AuthenticationHeader;
+import com.khub.common.HttpRequestBuilder;
 
 public class ConfluenceCrawler extends AbstractCrawler {
 
@@ -64,9 +66,9 @@ public class ConfluenceCrawler extends AbstractCrawler {
         });
 
         if (!users.isEmpty()) {
-            logger.log(Level.INFO, users.size() + " Confluence users were retrieved");
+            logger.info(users.size() + " Confluence users were retrieved");
         } else {
-            logger.log(Level.WARNING, "No Confluence users were retrieved");
+            logger.warning("No Confluence users were retrieved");
         }
 
         return new ArrayList<JsonElement>(users);
@@ -82,9 +84,9 @@ public class ConfluenceCrawler extends AbstractCrawler {
         List<JsonElement> spaces = retrieve(requestUrl);
 
         if (!spaces.isEmpty()) {
-            logger.log(Level.INFO, spaces.size() + " Confluence spaces were retrieved");
+            logger.info(spaces.size() + " Confluence spaces were retrieved");
         } else {
-            logger.log(Level.WARNING, "No Confluence spaces were retrieved");
+            logger.warning("No Confluence spaces were retrieved");
         }
 
         return spaces;
@@ -110,9 +112,9 @@ public class ConfluenceCrawler extends AbstractCrawler {
         });
 
         if (!pages.isEmpty()) {
-            logger.log(Level.INFO, pages.size() + " Confluence pages were retrieved");
+            logger.info(pages.size() + " Confluence pages were retrieved");
         } else {
-            logger.log(Level.WARNING, "No Confluence pages were retrieved");
+            logger.warning("No Confluence pages were retrieved");
         }
 
         return pages;
@@ -144,9 +146,9 @@ public class ConfluenceCrawler extends AbstractCrawler {
         });
 
         if (!comments.isEmpty()) {
-            logger.log(Level.INFO, comments.size() + " Confluence comments were retrieved");
+            logger.info(comments.size() + " Confluence comments were retrieved");
         } else {
-            logger.log(Level.WARNING, "No Confluence comments were retrieved");
+            logger.warning("No Confluence comments were retrieved");
         }
 
         return comments;
@@ -159,8 +161,8 @@ public class ConfluenceCrawler extends AbstractCrawler {
      * @return the response
      */
     private List<JsonElement> retrieve(String requestUrl) {
-        HttpRequest request = HttpRequestBuilder.build(requestUrl, requestHeader.toNameValuePair());
         try {
+            HttpRequest request = HttpRequestBuilder.build(requestUrl, requestHeader.toNameValuePair());
             HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
             JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
             JsonArray jsonArray = jsonObject.getAsJsonArray("results");
@@ -169,10 +171,13 @@ public class ConfluenceCrawler extends AbstractCrawler {
             }
 
         } catch (InterruptedException | IllegalArgumentException | IOException  | SecurityException  e) {
-            logger.log(Level.SEVERE, "Unable to send a request and/or receive a response for request \"" + requestUrl + "\"");
+            logger.severe("Unable to send a request and/or receive a response for request \"" + requestUrl + "\"");
 
         } catch (NullPointerException | JsonParseException | ClassCastException | IllegalStateException  e) {
-            logger.log(Level.SEVERE, "Retrieved malformed JSON format for request \"" + requestUrl + "\"");
+            logger.severe("Retrieved malformed JSON format for request \"" + requestUrl + "\"");
+                
+        } catch (URISyntaxException e) {
+            // Do nothing
         }
 
         return List.of();

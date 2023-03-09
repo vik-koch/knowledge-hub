@@ -3,9 +3,9 @@ package com.khub.crawling;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -16,6 +16,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import com.khub.common.AuthenticationHeader;
+import com.khub.common.HttpRequestBuilder;
 
 public class TeamsCrawler extends AbstractCrawler {
 
@@ -48,9 +50,9 @@ public class TeamsCrawler extends AbstractCrawler {
         List<JsonElement> teams = retrieve(requestUrl);
 
         if (!teams.isEmpty()) {
-            logger.log(Level.INFO, teams.size() + " Teams teams were retrieved");
+            logger.info(teams.size() + " Teams teams were retrieved");
         } else {
-            logger.log(Level.WARNING, "No Teams teams were retrieved");
+            logger.warning("No Teams teams were retrieved");
         }
 
         return teams;
@@ -79,9 +81,9 @@ public class TeamsCrawler extends AbstractCrawler {
         });
 
         if (!channels.isEmpty()) {
-            logger.log(Level.INFO, channels.size() + " Teams channels were retrieved");
+            logger.info(channels.size() + " Teams channels were retrieved");
         } else {
-            logger.log(Level.WARNING, "No Teams channels were retrieved");
+            logger.warning("No Teams channels were retrieved");
         }
 
         return channels;
@@ -112,9 +114,9 @@ public class TeamsCrawler extends AbstractCrawler {
         });
 
         if (!posts.isEmpty()) {
-            logger.log(Level.INFO, posts.size() + " Teams posts were retrieved");
+            logger.info(posts.size() + " Teams posts were retrieved");
         } else {
-            logger.log(Level.WARNING, "No Teams posts were retrieved");
+            logger.warning("No Teams posts were retrieved");
         }
 
         return posts;
@@ -152,10 +154,13 @@ public class TeamsCrawler extends AbstractCrawler {
             return jsonArray.asList();
 
         } catch (InterruptedException | IllegalArgumentException | IOException  | SecurityException  e) {
-            logger.log(Level.SEVERE, "Unable to send a request and/or receive a response for request \"" + requestUrl + "\"");
+            logger.severe("Unable to send a request and/or receive a response for request \"" + requestUrl + "\"");
 
         } catch (NullPointerException | JsonParseException | ClassCastException | IllegalStateException  e) {
-            logger.log(Level.SEVERE, "Retrieved malformed JSON format for request \"" + requestUrl + "\"");
+            logger.severe("Retrieved malformed JSON format for request \"" + requestUrl + "\"");
+        
+        } catch (URISyntaxException e) {
+            // Do nothing
         }
 
         return List.of();

@@ -1,4 +1,4 @@
-package com.khub.crawling;
+package com.khub.common;
 
 import java.util.Base64;
 import java.util.Objects;
