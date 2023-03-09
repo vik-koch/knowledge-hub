@@ -7,7 +7,6 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.khub.crawling.AuthenticationHeader;
 import com.mongodb.ConnectionString;
 
 public class Configuration {

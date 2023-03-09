@@ -27,16 +27,21 @@ public class ResourceProvider {
      * @return the {@link Properties} or null
      */
     public static Properties loadProperties(Path configPath) {
-        Properties configuration = new Properties();
         try {
+            logger.info("Loading application configuration...");
+            Properties configuration = new Properties();
+
             if (!Files.exists(configPath)) {
                 copyFromResourceToPath(PROPERTIES_RESOURCE, configPath);
             }
             configuration.load(new FileInputStream(configPath.toFile()));
+
+            logger.info("Configuration is successfully loaded");
+            return configuration;
         } catch (Exception e) {
-            logger.severe("Unable to read the configuration from \"" + configPath + "\"");
+            logger.severe("Unable to load the configuration from \"" + configPath + "\"");
+            return null;
         }
-        return configuration;
     }
 
     /**
@@ -48,6 +53,7 @@ public class ResourceProvider {
      */
     public static Process startDockerCompose(Path dockerPath) {
         try {
+            logger.info("Starting Docker Compose service...");
             if (!Files.exists(dockerPath)) {
                 copyFromResourceToPath(DOCKER_COMPOSE_RESOURCE, dockerPath);
             }
@@ -57,17 +63,20 @@ public class ResourceProvider {
 
             // Check if process terminated with an error
             if (docker != null && !docker.isAlive() && docker.exitValue() != 0) {
-                String line;
                 BufferedReader errorReader = docker.errorReader();
+                StringBuilder errorMessage = new StringBuilder();
+                String line;
                 while ((line = errorReader.readLine()) != null) {
-                    logger.severe(line);
+                    errorMessage.append(line);
                 }
-                return null;
+                throw new Exception(errorMessage.toString());
             }
+            logger.info("Docker Compose started successfully");
             return docker;
 
         } catch (Exception e) {
-            logger.severe("Unable to start docker-compose from \"" + dockerPath + "\"");
+            logger.severe("Unable to start Docker Compose from \"" + dockerPath + "\"");
+            logger.severe(e.getMessage());
             return null;
         }
     }
