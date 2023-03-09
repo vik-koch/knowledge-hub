@@ -34,7 +34,7 @@ public abstract class AbstractCrawler implements Crawler {
      * Starts the {@link Crawler} and writes retrieved data to
      * collections in the provided {@link MongoDatabase}. 
      * @param database - the {@link MongoDatabase} to write data to
-     * @return true if the step runned successfully, false otherwise
+     * @return true, if the step runned successfully, false otherwise
      */
     public boolean run(MongoDatabase database) {
         int retrievedDataSize = 0;

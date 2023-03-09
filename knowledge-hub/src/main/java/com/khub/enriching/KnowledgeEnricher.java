@@ -53,7 +53,7 @@ public class KnowledgeEnricher {
      * @param ontologyIri - the ontology IRI for knowledge artifacts
      * @param contentPredicate - the predicate name of knowledge artifacts' content
      * @param keywordPredicate - the predicate name for new keywords triples
-     * @return true if the step runned successfully, false otherwise
+     * @return true, if the step runned successfully, false otherwise
      */
     public boolean run(String contentModelName, String knowledgeModelName, String keywordsModelName, 
                     URL ontologyIri, String contentPredicate, String keywordPredicate) {

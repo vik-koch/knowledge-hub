@@ -22,7 +22,7 @@ public class MongoExporter {
      * @param database - the {@link MongoDatabase} to read data from
      * @param knowledgePath - the {@link Path} for {@code knowledge} data
      * @param outputDirectoryName - the directory name to save exported files to
-     * @return true if the step runned successfully, false otherwise
+     * @return true, if the step runned successfully, false otherwise
      */
     public boolean run(MongoDatabase database, Path knowledgePath, String outputDirectoryName) {
         try {

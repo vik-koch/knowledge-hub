@@ -132,7 +132,7 @@ public class AppRunner {
     /**
      * Logs final information upon finishing the step execution
      * @param stepName - the name of a {@link PipelineStep}
-     * @param result - true, if the step was runned successfully
+     * @param result - true, if the step runned successfully, false otherwise
      */
     private void logOnStepFinish(String stepName, boolean result) {
         if (result == true) {
@@ -144,7 +144,7 @@ public class AppRunner {
 
     /**
      * Runs the {@link com.khub.crawling.AbstractCrawler AbstractCrawler}
-     * @param result - true, if the step was runned successfully
+     * @param result - true, if the step runned successfully, false otherwise
      */
     private boolean crawlKnowledge() {
         String databaseName = getCurrentDate() + rawDataSuffix;
@@ -180,7 +180,7 @@ public class AppRunner {
 
     /**
      * Runs the {@link com.khub.processing.JSONProcessor JSONProcessor}
-     * @param result - true, if the step was runned successfully
+     * @param result - true, if the step runned successfully, false otherwise
      */
     private boolean processKnowledge() {
         String sourceDatabaseName = getCurrentDate() + rawDataSuffix;
@@ -195,7 +195,7 @@ public class AppRunner {
 
     /**
      * Runs the {@link com.khub.exporting.MongoExporter MongoExporter}
-     * @param result - true, if the step was runned successfully
+     * @param result - true, if the step runned successfully, false otherwise
      */
     private boolean exportKnowledge() {
         String databaseName = getCurrentDate() + processedDataSuffix;
@@ -207,7 +207,7 @@ public class AppRunner {
 
     /**
      * Runs the {@link com.khub.mapping.RMLMapper RMLMapper} for knowledge mapping
-     * @param result - true, if the step was runned successfully
+     * @param result - true, if the step runned successfully, false otherwise
      */
     private boolean mapKnowledge() {
         RMLMapper mapper = new RMLMapper(config.dockerPath);
@@ -216,7 +216,7 @@ public class AppRunner {
 
     /**
      * Runs the {@link com.khub.importing.TDBImporter TDBImporter} for knowledge importing
-     * @param result - true, if the step was runned successfully
+     * @param result - true, if the step runned successfully, false otherwise
      */
     private boolean importKnowledge() {
         TDBImporter importer = TDBImporter.of(config.tdbPath);
@@ -225,7 +225,7 @@ public class AppRunner {
 
     /**
      * Runs the {@link com.khub.importing.TDBImporter TDBImporter} for ontology importing
-     * @param result - true, if the step was runned successfully
+     * @param result - true, if the step runned successfully, false otherwise
      */
     private boolean importOntology() {
         TDBImporter importer = TDBImporter.of(config.tdbPath);
@@ -234,7 +234,7 @@ public class AppRunner {
 
     /**
      * Runs the {@link com.khub.extracting.ContentExtractor ContentExtractor} for content extracting
-     * @param result - true, if the step was runned successfully
+     * @param result - true, if the step runned successfully, false otherwise
      */
     private boolean extractContent() {
         ContentExtractor extractor = ContentExtractor.of(config.tdbPath);
@@ -243,7 +243,7 @@ public class AppRunner {
 
     /**
      * Runs the {@link com.khub.mapping.RMLMapper RMLMapper} for content mapping
-     * @param result - true, if the step was runned successfully
+     * @param result - true, if the step runned successfully, false otherwise
      */
     private boolean mapContent() {
         RMLMapper mapper = new RMLMapper(config.dockerPath);
@@ -252,7 +252,7 @@ public class AppRunner {
 
     /**
      * Runs the {@link com.khub.importing.TDBImporter TDBImporter} for content importing
-     * @param result - true, if the step was runned successfully
+     * @param result - true, if the step runned successfully, false otherwise
      */
     private boolean importContent() {
         TDBImporter importer = TDBImporter.of(config.tdbPath);
@@ -261,7 +261,7 @@ public class AppRunner {
 
     /**
      * Runs the {@link com.khub.enriching.KnowledgeEnricher KnowledgeEnricher}
-     * @param result - true, if the step was runned successfully
+     * @param result - true, if the step runned successfully, false otherwise
      */
     private boolean enrichKnowledgeGraph() {
         KnowledgeEnricher enricher = KnowledgeEnricher.of(config.tdbPath);

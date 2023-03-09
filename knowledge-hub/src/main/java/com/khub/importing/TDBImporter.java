@@ -45,7 +45,7 @@ public class TDBImporter {
      * {@link Model} with the given {@code modelName} in the TDB store
      * @param rdfPath - the {@link Path} to import from
      * @param modelName - the name of the {@link Model}
-     * @return true if the step runned successfully, false otherwise
+     * @return true, if the step runned successfully, false otherwise
      */
     public boolean importRDF(Path rdfPath, String modelName) {
         Path outputPath = rdfPath.resolve("output");
@@ -58,7 +58,7 @@ public class TDBImporter {
      * {@link Model} with the given {@code modelName} in the TDB store
      * @param owlPath - the {@link Path} to import from
      * @param modelName - the name of the {@link Model}
-     * @return true if the step runned successfully, false otherwise
+     * @return true, if the step runned successfully, false otherwise
      */
     public boolean importOWL(Path owlPath, String modelName) {
         OntModel model = ModelFactory.createOntologyModel();
@@ -71,7 +71,7 @@ public class TDBImporter {
      * @param path - the {@link Path} to import from
      * @param model - the {@link Model} to import to
      * @param modelName - the name of the {@link Model}
-     * @return true if the step runned successfully, false otherwise
+     * @return true, if the step runned successfully, false otherwise
      */
     private boolean importResources(Path path, Model model, String modelName) {
         try {

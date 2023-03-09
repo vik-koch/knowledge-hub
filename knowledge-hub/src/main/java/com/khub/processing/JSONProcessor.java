@@ -77,7 +77,7 @@ public class JSONProcessor {
      * Processing extracts and unifies fields as defined in the {@code JSON} mapping.
      * @param sourceDatabase - the {@link MongoDatabase} to read data from
      * @param outputDatabase - the {@link MongoDatabase} to write data to
-     * @return true if the step runned successfully, false otherwise
+     * @return true, if the step runned successfully, false otherwise
      */
     public boolean run(MongoDatabase sourceDatabase, MongoDatabase outputDatabase) {
 

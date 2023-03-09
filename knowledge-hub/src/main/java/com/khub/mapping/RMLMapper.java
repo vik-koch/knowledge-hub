@@ -26,7 +26,7 @@ public class RMLMapper {
      * the mapped files to the folder with {@code outputDirectoryName} under the same {@link Path}
      * @param mappingsPath - the {@link Path} to mappings files
      * @param outputDirectoryName - the directory name to save mapped files to
-     * @return true if the step runned successfully, false otherwise
+     * @return true, if the step runned successfully, false otherwise
      */
     public boolean run(Path mappingsPath, String outputDirectoryName) {
         try {
