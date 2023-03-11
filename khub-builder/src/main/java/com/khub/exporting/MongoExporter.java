@@ -53,7 +53,6 @@ public class MongoExporter {
      */
     private void exportCollection(MongoCollection<Document> collection, Path exportPath) {
         String collectionName = collection.getNamespace().getCollectionName();
-        logger.info("Starting to export the collection \"" + collectionName + "\"");
 
         try {
             // Converts BSON collection to JSON array

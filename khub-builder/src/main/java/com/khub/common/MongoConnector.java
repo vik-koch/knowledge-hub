@@ -28,7 +28,6 @@ public class MongoConnector {
      */
     public static MongoClient getClient(ConnectionString connectionString) throws MongoException {
         try {
-            logger.info("Connecting to MongoDB...");
             MongoClient mongoClient = MongoClients.create(connectionString);
             MongoDatabase database = mongoClient.getDatabase("admin");
             database.runCommand(new BsonDocument("ping", new BsonInt64(1)));

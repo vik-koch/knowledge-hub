@@ -78,7 +78,7 @@ public abstract class AbstractCrawler implements Crawler {
         // Inserts BSON documents to collection
         try {
             collection.insertMany(documents);
-            logger.info(data.size() + " documents were sucessfully inserted into the \"" + collection.getNamespace() + "\" collection");
+            logger.info(data.size() + " documents were successfully inserted into the \"" + collection.getNamespace() + "\" collection");
         } catch (MongoException e) {
             logger.severe("Unable to insert the \"" + collection.getNamespace() + "\" collection");
         }

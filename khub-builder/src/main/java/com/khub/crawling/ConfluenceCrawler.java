@@ -36,6 +36,7 @@ public class ConfluenceCrawler extends AbstractCrawler {
 
         List<JsonElement> users = retrieveUsers();
         List<JsonElement> spaces = retrieveSpaces();
+        logger.info("Started to retrieve Confluence pages, please have patience...");
         List<JsonElement> pages = retrievePages(spaces);
         List<JsonElement> comments = retrieveComments(pages);
 
@@ -171,10 +172,10 @@ public class ConfluenceCrawler extends AbstractCrawler {
             }
 
         } catch (InterruptedException | IllegalArgumentException | IOException  | SecurityException  e) {
-            logger.severe("Unable to send a request and/or receive a response for request \"" + requestUrl + "\"");
+            logger.warning("Unable to send a request and/or receive a response for request \"" + requestUrl + "\"");
 
         } catch (NullPointerException | JsonParseException | ClassCastException | IllegalStateException  e) {
-            logger.severe("Retrieved malformed JSON format for request \"" + requestUrl + "\"");
+            logger.warning("Retrieved malformed JSON format for request \"" + requestUrl + "\"");
                 
         } catch (URISyntaxException e) {
             // Do nothing

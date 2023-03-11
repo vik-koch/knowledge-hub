@@ -78,6 +78,11 @@ public class ContentExtractor {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         List<String> filenames = FilesHelper.getFilenamesForPath(queriesPath);
 
+        if (filenames.size() == 0) {
+            logger.severe("No queries for content extraction were found at \"" + contentPath + "\"");
+            return false;
+        }
+
         for (String filename : filenames) {
             try {
                 Path queryPath = queriesPath.resolve(filename);

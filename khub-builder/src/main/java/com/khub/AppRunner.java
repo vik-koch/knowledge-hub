@@ -36,7 +36,7 @@ public class AppRunner {
     private static final Logger logger = Logger.getLogger(AppRunner.class.getName());
 
     // Pipeline steps iterator
-    private Iterator<PipelineStep> steps = Arrays.asList(PipelineStep.values()).iterator();
+    private Iterator<PipelineStep> steps;
 
     private enum PipelineResult {
         FINISHED,
@@ -60,6 +60,7 @@ public class AppRunner {
     private PipelineResult runPipeline(PipelineStep currentState) {
 
         String currentStepName = currentState.toString();
+
         logOnStepStart(currentStepName);
 
         boolean stepResult = switch(currentState) {
@@ -126,7 +127,7 @@ public class AppRunner {
      * @param stepName - the name of a {@link PipelineStep}
      */
     private void logOnStepStart(String stepName) {
-        logger.info("--- Starting the " + stepName + " step... ---");
+        logger.info("# Starting the " + stepName + " step...");
     }
 
     /**
@@ -136,9 +137,9 @@ public class AppRunner {
      */
     private void logOnStepFinish(String stepName, boolean result) {
         if (result == true) {
-            logger.info("--- The " + stepName + " step is successfully finished ---");
+            logger.info("# The " + stepName + " step is successfully finished");
         } else {
-            logger.severe("--- The " + stepName + " step failed ---");
+            logger.severe("# The " + stepName + " step failed");
         }
     }
 
@@ -335,7 +336,7 @@ public class AppRunner {
                 break;
             
             case 0:
-                currentStep = steps.next();
+                currentStep = stepList.get(0);
                 break;
         }
 
@@ -352,25 +353,27 @@ public class AppRunner {
         // Initialise configuration
         Path configPath = Paths.get("./config/config.properties");
         Properties properties = ResourceProvider.loadProperties(configPath);
-        if (properties == null) {
-            System.out.println("Unable to initialise application configuration at \"" + configPath + "\"");
-            System.exit(1);
-        }
 
+        if (properties == null) System.exit(1);
         config = new Configuration(properties);
+
+        // Set iterators for the next steps
+        steps = stepList.subList(stepList.indexOf(currentStep) + 1, stepList.size()).iterator();
+
+        // Runs pipeline
         PipelineResult result = runPipeline(currentStep);
 
         if (result == PipelineResult.FAILED) {
-            System.out.println("Finished due to an error");
+            logger.info("Finished on \"" + currentStep + "\" due to an error");
             System.exit(1);
         }
 
-        System.out.println("Finished with success");
+        logger.info("Finished with success");
         System.exit(0);
     }
 
     public static void main(String[] args) {
-        System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tF %1$tr] %3$s %4$s:  %5$s %n");
+        System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tF %1$tT] %4$s:\t%5$s %n");
         AppRunner app = new AppRunner();
         app.run(args);
     }

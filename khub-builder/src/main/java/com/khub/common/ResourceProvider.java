@@ -28,7 +28,6 @@ public class ResourceProvider {
      */
     public static Properties loadProperties(Path configPath) {
         try {
-            logger.info("Loading application configuration...");
             Properties configuration = new Properties();
 
             if (!Files.exists(configPath)) {
@@ -36,8 +35,9 @@ public class ResourceProvider {
             }
             configuration.load(new FileInputStream(configPath.toFile()));
 
-            logger.info("Configuration is successfully loaded");
+            logger.info("Configuration is successfully initialized");
             return configuration;
+
         } catch (Exception e) {
             logger.severe("Unable to load the configuration from \"" + configPath + "\"");
             return null;
@@ -53,7 +53,6 @@ public class ResourceProvider {
      */
     public static Process startDockerCompose(Path dockerPath) {
         try {
-            logger.info("Starting Docker Compose service...");
             if (!Files.exists(dockerPath)) {
                 copyFromResourceToPath(DOCKER_COMPOSE_RESOURCE, dockerPath);
             }

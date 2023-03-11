@@ -66,9 +66,19 @@ public class KnowledgeEnricher {
             Model contentModel = tdb.getNamedModel(contentModelName);
             tdb.executeRead(() -> contentResources.putAll(retrieveContentResources(contentModel)));
 
+            if (contentResources.size() == 0) {
+                logger.severe("No content resources were found");
+                return false;
+            }
+
             // Get knowledge artifacts with content as plain text
             Model knowledgeModel = tdb.getNamedModel(knowledgeModelName);
             tdb.executeRead(() -> knowledgeArtifacts.putAll(retrieveKnowledgeArtifacts(knowledgeModel, ontologyIri, contentPredicate)));
+
+            if (knowledgeArtifacts.size() == 0) {
+                logger.severe("No knowledge artifacts were found");
+                return false;
+            }
 
             // Iterator for progress logging
             Map<Integer, Integer> map = new HashMap<Integer, Integer>();

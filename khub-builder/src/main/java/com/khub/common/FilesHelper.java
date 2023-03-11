@@ -30,7 +30,7 @@ public class FilesHelper {
             .collect(Collectors.toList());
 
         } catch (SecurityException | IOException e) {
-            logger.severe("Unable to retrieve files under \"" + path + "\"");
+            logger.warning("Unable to retrieve files under \"" + path + "\"");
             return List.of();
         }
     }
