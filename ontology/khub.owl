@@ -24,7 +24,7 @@
     <!-- http://semanticweb.org/ontologies/khub#ancestor -->
 
     <owl:ObjectProperty rdf:about="http://semanticweb.org/ontologies/khub#ancestor">
-        <rdfs:subPropertyOf rdf:resource="http://semanticweb.org/ontologies/khub#neighbour"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <owl:inverseOf rdf:resource="http://semanticweb.org/ontologies/khub#descendant"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
         <rdfs:domain rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
@@ -37,7 +37,7 @@
     <!-- http://semanticweb.org/ontologies/khub#author -->
 
     <owl:ObjectProperty rdf:about="http://semanticweb.org/ontologies/khub#author">
-        <rdfs:subPropertyOf rdf:resource="http://semanticweb.org/ontologies/khub#neighbour"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
@@ -51,7 +51,7 @@
     <!-- http://semanticweb.org/ontologies/khub#descendant -->
 
     <owl:ObjectProperty rdf:about="http://semanticweb.org/ontologies/khub#descendant">
-        <rdfs:subPropertyOf rdf:resource="http://semanticweb.org/ontologies/khub#neighbour"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
         <rdfs:domain rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
         <rdfs:range rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
@@ -60,18 +60,10 @@
     
 
 
-    <!-- http://semanticweb.org/ontologies/khub#neighbour -->
-
-    <owl:ObjectProperty rdf:about="http://semanticweb.org/ontologies/khub#neighbour">
-        <rdfs:comment xml:lang="en">Denotes the first nearest neighbour node</rdfs:comment>
-    </owl:ObjectProperty>
-    
-
-
     <!-- http://semanticweb.org/ontologies/khub#reference -->
 
     <owl:ObjectProperty rdf:about="http://semanticweb.org/ontologies/khub#reference">
-        <rdfs:subPropertyOf rdf:resource="http://semanticweb.org/ontologies/khub#neighbour"/>
+        <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
         <rdfs:domain rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
@@ -95,7 +87,9 @@
     <!-- http://semanticweb.org/ontologies/khub#content -->
 
     <owl:DatatypeProperty rdf:about="http://semanticweb.org/ontologies/khub#content">
+        <rdfs:domain rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment xml:lang="en">The content of the knowledge artifact</rdfs:comment>
     </owl:DatatypeProperty>
     
 
@@ -106,14 +100,6 @@
         <rdfs:domain rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
         <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
         <rdfs:comment xml:lang="en">The creation time of a knowledge artifact</rdfs:comment>
-    </owl:DatatypeProperty>
-    
-
-
-    <!-- http://semanticweb.org/ontologies/khub#keyword -->
-
-    <owl:DatatypeProperty rdf:about="http://semanticweb.org/ontologies/khub#keyword">
-        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
     </owl:DatatypeProperty>
     
 
@@ -215,6 +201,8 @@
 
     <owl:Class rdf:about="http://semanticweb.org/ontologies/khub#Person">
         <rdfs:comment xml:lang="en">An individual who is the main actor in knowledge sharing</rdfs:comment>
+        <rdfs:label xml:lang="de">Person</rdfs:label>
+        <rdfs:label xml:lang="en">Person</rdfs:label>
     </owl:Class>
     
 
