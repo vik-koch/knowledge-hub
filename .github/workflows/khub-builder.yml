@@ -19,7 +19,7 @@ jobs:
 
       - name: Build with Maven
         run: |
-          cd khub-builder
+          cd ./khub-builder
           mvn --batch-mode --update-snapshots package
 
       - name: Publish Artifacts
@@ -27,7 +27,13 @@ jobs:
         with:
           name: khub-builder
           path: |
-            ./khub-builder/target/*.jar
+            ./khub-builder/target/*-full.jar
+
+      - name: Publish Resources
+        uses: actions/upload-artifact@v3
+        with:
+          name: khub-builder
+          path: |
             ./knowledge/
             ./ontology/
             ./processing/
