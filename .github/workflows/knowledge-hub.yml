@@ -38,14 +38,11 @@ jobs:
       # Knowledge Hub Explorer
       - name: Download Dependencies
         run: |
-          fuseki=jena-fuseki-docker-4.7.0.zip
-          wget https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki-docker/4.7.0/$fuseki
-          unzip ./$fuseki
           mkdir fuseki
-          cp "./$fuseki/Dockerfile" "./fuseki/Dockerfile"
-          cp "./$fuseki/download.sh" "./fuseki/download.sh"
-          cp "./$fuseki/entrypoint.sh" "./fuseki/entrypoint.sh"
-          cp "./$fuseki/log4j2.properties" "./fuseki/log4j2.properties"
+          wget https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki-docker/4.7.0/jena-fuseki-docker-4.7.0.zip
+          unzip -j ./jena-fuseki-docker-4.7.0.zip -d ./fuseki          
+          cd ./fuseki
+          rm LICENSE && rm NOTICE && rm README.md && rm docker-compose.yaml
 
       - name: Publish Artifact
         uses: actions/upload-artifact@v3
