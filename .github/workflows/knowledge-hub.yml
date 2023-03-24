@@ -3,8 +3,8 @@ name: Knowledge Hub Builder CI
 on: [push]
 
 jobs:
-  build:
-    name: Package khub-builder
+  khub-builder:
+    name: KHub Builder
     runs-on: ubuntu-latest
 
     steps:
@@ -17,23 +17,27 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Build with Maven
+      - name: Build KHub Builder
         run: |
           cd ./khub-builder
           mvn --batch-mode --update-snapshots package
 
-      - name: Publish Artifacts
+      - name: Publish Artifact
         uses: actions/upload-artifact@v3
         with:
           name: khub-builder
           path: |
-            ./khub-builder/target/*-full.jar
+            ./khub-builder/target/*.jar
+
+      - name: Copy Resources
+        run: |
+          cp "./khub-builder/src/main/resources/config.properties" "./configuration/config.properties"
+          cp "./khub-builder/src/main/resources/docker-compose.yml" "./resources/docker-compose.yml"
 
       - name: Publish Resources
         uses: actions/upload-artifact@v3
         with:
           name: khub-builder
           path: |
-            ./knowledge/
-            ./ontology/
-            ./processing/
+            ./configuration/
+            ./resources/
