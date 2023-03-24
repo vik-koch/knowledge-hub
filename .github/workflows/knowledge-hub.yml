@@ -1,4 +1,4 @@
-name: Knowledge Hub Builder CI
+name: Knowledge Hub CI
 
 on: [push]
 
