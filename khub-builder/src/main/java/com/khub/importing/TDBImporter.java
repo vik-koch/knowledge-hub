@@ -1,11 +1,11 @@
 package com.khub.importing;
 
-import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.apache.jena.dboe.DBOpEnvException;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.rdf.model.Model;
@@ -32,12 +32,12 @@ public class TDBImporter {
      */
     public static TDBImporter of(Path tdbPath) {
         try {
-            Files.createDirectories(tdbPath);
+            FilesHelper.createDirectories(tdbPath);
             return new TDBImporter(TDB2Factory.connectDataset(tdbPath.toString()));
-        } catch (Exception e) {
-            logger.severe("Unable to create the TDB store directory at \"" + tdbPath + "\"");
-            return null;
+        } catch (DBOpEnvException e) {
+            logger.severe("The TDB store at \"" + tdbPath + "\" is locked");
         }
+        return null;
     }
 
     /**
@@ -75,6 +75,15 @@ public class TDBImporter {
      */
     private boolean importResources(Path path, Model model, String modelName) {
         try {
+            // Remove previous data from the model
+            tdb.execute(() -> {
+                long size = model.size();
+                if (size != 0) {
+                    logger.info("Removed " + size + " entries from the \"" + modelName + "\" model");
+                    model.removeAll();
+                }
+            });
+
             List<String> filenames = FilesHelper.getFilenamesForPath(path);
 
             if (filenames.size() == 0) {
@@ -94,6 +103,8 @@ public class TDBImporter {
                     }
                 });
             }
+
+            tdb.executeRead(() -> logger.info("Added " + model.size() + " entries to the \"" + modelName + "\" model"));
             return true;
 
         } catch (InvalidPathException | SecurityException e) {
