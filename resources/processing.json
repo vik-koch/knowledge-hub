@@ -42,8 +42,9 @@
     ],
     "ancestor": [
         "ancestor",
-        "ancestors[*].id",
-        "channelIdentity.channelId",
-        "space.id"
+        "teamId",
+        "pageId",
+        "postId",
+        "channelIdentity.channelId"
     ]
 }
