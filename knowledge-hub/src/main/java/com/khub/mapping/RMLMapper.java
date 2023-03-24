@@ -55,7 +55,7 @@ public class RMLMapper {
         output.add("]");
 
         try {
-            Files.write(Paths.get(path + File.separator + collectionName + ".json"), output);
+            Files.write(Paths.get(path + File.separator + "jsons" + File.separator + collectionName + ".json"), output);
             logger.log(Level.INFO, "The collection " + collectionName + " was successfully exported");
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Unable to export the collection " + collectionName, e);
@@ -67,7 +67,7 @@ public class RMLMapper {
      * @param mappingName - name of mapping file
      */
     public void executeMapping(String mappingName) {
-        try (FileWriter out = new FileWriter(path + File.separator + "_" + mappingName + "-output.ttl")) {
+        try (FileWriter out = new FileWriter(path + File.separator + "output" + File.separator + mappingName + ".ttl")) {
             File mapping = new File(path + File.separator + mappingName + ".ttl");
             logger.log(Level.INFO, "Starting to map the file " + mappingName);
 

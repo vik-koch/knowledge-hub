@@ -21,9 +21,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-/**
- * Runner for crawling processes
- */
 public class CrawlingRunner {
 
     protected final Logger logger = Logger.getLogger(this.getClass().getName());

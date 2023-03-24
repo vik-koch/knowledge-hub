@@ -9,7 +9,7 @@
 
 :TriplesMap a rr:TriplesMap;
   rml:logicalSource [
-    rml:source "commentaries.json";
+    rml:source "jsons/commentaries.json";
     rml:referenceFormulation ql:JSONPath;
     rml:iterator "$.[*]"
   ].

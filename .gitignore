@@ -27,3 +27,10 @@ target/
 
 # VS Code folder
 .vscode/
+
+# Apache Jena TBD folder
+knowledge-hub/dataset/
+
+# RML Mappings folders
+knowledge-hub/mappings/output/
+knowledge-hub/mappings/jsons/

@@ -9,7 +9,7 @@
 
 :TriplesMap a rr:TriplesMap;
   rml:logicalSource [
-    rml:source "personalPages.json";
+    rml:source "jsons/personalPages.json";
     rml:referenceFormulation ql:JSONPath;
     rml:iterator "$.[*]"
   ].
