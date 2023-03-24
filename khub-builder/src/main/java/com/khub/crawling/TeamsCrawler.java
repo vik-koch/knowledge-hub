@@ -21,6 +21,8 @@ import com.khub.common.HttpRequestBuilder;
 
 public class TeamsCrawler extends AbstractCrawler {
 
+    public final String teamId = "teamId";
+
     public TeamsCrawler(URL teamsEndpoint, AuthenticationHeader requestHeader) {
         super(teamsEndpoint, requestHeader);
     }
@@ -45,16 +47,13 @@ public class TeamsCrawler extends AbstractCrawler {
      * @return the list of {@code Teams} teams
      */
     private List<JsonElement> retrieveTeams() {
+        String taskName = "MS Teams teams";
+        logOnTaskStart(taskName);
 
         String requestUrl = this.endpoint + "v1.0/me/joinedTeams";
         List<JsonElement> teams = retrieve(requestUrl);
 
-        if (!teams.isEmpty()) {
-            logger.info(teams.size() + " Teams teams were retrieved");
-        } else {
-            logger.warning("No Teams teams were retrieved");
-        }
-
+        logOnTaskFinish(taskName, teams);
         return teams;
     }
 
@@ -66,26 +65,31 @@ public class TeamsCrawler extends AbstractCrawler {
      */
     private List<JsonElement> retrieveChannels(List<JsonElement> teams) {
         List<JsonElement> channels = new ArrayList<JsonElement>();
+        String taskName = "MS Teams channels";
+        logOnTaskStart(taskName);
 
         teams.parallelStream().forEach(team -> {
-            try {
-                String teamKey = team.getAsJsonObject().get("id").getAsString();
-                String requestUrl = this.endpoint + "v1.0/teams/" + teamKey + "/channels";
+            if (team.isJsonObject()) {
+                JsonObject teamObject = team.getAsJsonObject();
+                try {
+                    String teamKey = teamObject.get("id").getAsString();
+                    String requestUrl = this.endpoint + "v1.0/teams/" + teamKey + "/channels";
 
-                for (JsonElement channel : retrieve(requestUrl)) {
-                    // Enrich channel data by team identity
-                    channel.getAsJsonObject().addProperty("ancestor", teamKey);
-                    channels.add(channel);
+                    List<JsonElement> result = retrieve(requestUrl);
+                    for (JsonElement channel : result) {
+                        // Inject the correct first ancestor
+                        channel.getAsJsonObject().addProperty(this.teamId, teamKey);
+                        channels.add(channel);
+                    }
+                    logOnSuccess(taskName, teams, team, result);
+
+                } catch (Exception e) {
+                    logger.warning("Unable to crawl " + taskName + " for team id \"" + teamObject.get("id") + "\"");
                 }
-            } catch (Exception e) { }
+            }
         });
 
-        if (!channels.isEmpty()) {
-            logger.info(channels.size() + " Teams channels were retrieved");
-        } else {
-            logger.warning("No Teams channels were retrieved");
-        }
-
+        logOnTaskFinish(taskName, channels);
         return channels;
     }
 
@@ -97,28 +101,33 @@ public class TeamsCrawler extends AbstractCrawler {
      */
     private List<JsonElement> retrievePosts(List<JsonElement> channels) {
         List<JsonElement> posts = new ArrayList<JsonElement>();
+        String taskName = "MS Teams posts";
+        logOnTaskStart(taskName);
 
         channels.parallelStream().forEach(channel -> {
-            try {
-                String teamKey = channel.getAsJsonObject().get("ancestor").getAsString();
-                String channelKey = channel.getAsJsonObject().get("id").getAsString();
-                String requestUrl = this.endpoint + "v1.0/teams/" + teamKey + "/channels/" 
-                    + channelKey + "/messages?top=100";
+            if (channel.isJsonObject()) {
+                JsonObject channelObject = channel.getAsJsonObject();
+                try {
+                    String teamKey = channelObject.get(this.teamId).getAsString();
+                    String channelKey = channelObject.get("id").getAsString();
+                    String requestUrl = this.endpoint + "v1.0/teams/" + teamKey + "/channels/" 
+                        + channelKey + "/messages?top=100";
 
-                for (JsonElement post : retrieve(requestUrl)) {
-                    if (post.getAsJsonObject().get("messageType").getAsString().equals("message")) {
-                        posts.add(post);
+                    List<JsonElement> result = retrieve(requestUrl);
+                    for (JsonElement post : result) {
+                        if (post.getAsJsonObject().get("messageType").getAsString().equals("message")) {
+                            posts.add(post);
+                        }
                     }
+                    logOnSuccess(taskName, channels, channel, result);
+
+                } catch (Exception e) {
+                    logger.warning("Unable to crawl " + taskName + " for channel id " + channelObject.get("id") + " and team id " + channelObject.get(this.teamId) + "");
                 }
-            } catch (Exception e) { }
+            }
         });
 
-        if (!posts.isEmpty()) {
-            logger.info(posts.size() + " Teams posts were retrieved");
-        } else {
-            logger.warning("No Teams posts were retrieved");
-        }
-
+        logOnTaskFinish(taskName, posts);
         return posts;
     }
 

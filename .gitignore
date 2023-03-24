@@ -25,28 +25,22 @@ hs_err_pid*
 # Maven target folder
 target/
 
+# React Dependencies
+node_modules/
+
 # VS Code folder
 .vscode/
 
 # Apache Jena TBD folder
-dataset/
+databases/
 
-# RML Mappings folders
-knowledge/source/
-knowledge/output/
-content/
+# KHub Builder Resources
+resources/knowledge/*/
+resources/content/
+resources/queries/
+resources/ontology/*
+!resources/ontology/khub.owl
 
-# Configuration folder
-config/
-
-# Ontology folder
-ontology/*
-!ontology/khub.owl
-
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-khub-explorer/node_modules
 khub-explorer/.pnp
 
 # testing

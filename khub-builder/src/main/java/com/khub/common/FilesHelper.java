@@ -35,4 +35,17 @@ public class FilesHelper {
         }
     }
 
+    /**
+     * Checks if the given {@code path} exists and tries to create directories for it
+     * @param path - the {@link Path} to create directory for
+     * @return the given {@link Path}, if a directory exists or was created, null otherwise
+     */
+    public static Path createDirectories(Path path) {
+        try {
+            return Files.createDirectories(path);
+        } catch (Exception e) {
+            logger.severe("Unable to create output folders under \"" + path + "\"");
+            return null;
+        }
+    }
 }

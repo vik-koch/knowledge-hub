@@ -1,7 +1,6 @@
 package com.khub.extracting;
 
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.apache.jena.dboe.DBOpEnvException;
 import org.apache.jena.query.Dataset;
 import org.apache.jena.query.QueryExecution;
 import org.apache.jena.query.QuerySolution;
@@ -38,40 +38,31 @@ public class ContentExtractor {
     }
 
     /**
-     * Returns an instance of {@link ContentExtractor} if 
-     * the given {@tdbPath} has a non-empty TDB store in it
+     * Returns an instance of {@link ContentExtractor} if the given {@tdbPath}
+     * is valid and the TDB store directory can be created
      * @param tdbPath - the {@link Path} to the TDB store
      * @return the {@link ContentExtractor}
      */
     public static ContentExtractor of(Path tdbPath) {
-        Dataset tdb = TDB2Factory.connectDataset(tdbPath.toString());
-        if (TDB2Factory.isTDB2(tdb)) {
-            return new ContentExtractor(tdb);
-        } else {
-            logger.severe("The given dataset under \"" + tdbPath + "\" is empty");
-            return null;
+        try {
+            FilesHelper.createDirectories(tdbPath);
+            return new ContentExtractor(TDB2Factory.connectDataset(tdbPath.toString()));
+        } catch (DBOpEnvException e) {
+            logger.severe("The TDB store at \"" + tdbPath + "\" is locked");
         }
+        return null;
     }
 
     /**
      * Starts {@link ContentExtractor} for extracting document content as {@link JSON}
      * to the folder with {@code outputDirectoryName} under the given {@code contentPath}
      * @param contentPath - the {@link Path} for {@code content} data
-     * @param queriesDirectoryName - the directory name to import queries from
+     * @param queriesPath - the {@link Path} for queries to retrieve {@code content} data
      * @param outputDirectoryName - the directory name to save extracted files to
      */
-    public boolean run(Path contentPath, String queriesDirectoryName, String outputDirectoryName) {
+    public boolean run(Path contentPath, Path queriesPath, String outputDirectoryName) {
 
-        Path queriesPath;
         Map<String, Object> resultMap = new HashMap<String, Object>();
-
-        try {
-            Files.createDirectories(contentPath.resolve(outputDirectoryName));
-            queriesPath = contentPath.resolve(queriesDirectoryName);
-        } catch (IOException e) {
-            logger.severe("Unable to create an output folder under \"" + outputDirectoryName + "\"");
-            return false;
-        }
 
         // Prepare for iteration
         Model model = tdb.getUnionModel();
@@ -80,6 +71,11 @@ public class ContentExtractor {
 
         if (filenames.size() == 0) {
             logger.severe("No queries for content extraction were found at \"" + contentPath + "\"");
+            return false;
+        }
+
+        Path outputPath = FilesHelper.createDirectories(contentPath.resolve(outputDirectoryName));
+        if (outputPath == null) {
             return false;
         }
 
@@ -133,7 +129,7 @@ public class ContentExtractor {
                     logger.info("Extracted and saved content for the \"" + filename + "\" file");
                 }
             } catch (Exception e) {
-                logger.severe("Unable to write content for the \"" + filename + "\" file");
+                logger.severe("Unable to extract content for the \"" + filename + "\" file");
             }
         }
 
