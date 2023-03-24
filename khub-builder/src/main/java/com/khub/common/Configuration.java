@@ -157,8 +157,7 @@ public class Configuration {
     }
 
     private void logInvalidPropertyValue(String key) {
-        logger.info("Invalid or null value for \"" 
-            + key + "\" is provided. Default value is used instead");
+        logger.info("Invalid or null value for \"" + key + "\" is provided");
     }
 
 }

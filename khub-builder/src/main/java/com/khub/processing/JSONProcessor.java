@@ -99,7 +99,7 @@ public class JSONProcessor {
                 List<Document> output = convertToBsonDocuments(data);
                 outputCollection.insertMany(output);
 
-                logger.info("Processed data for collection \"" + collectionName + "\"");
+                logger.info("Processed data from the collection \"" + collectionName + "\"");
 
             } catch (IllegalArgumentException | MongoException e) {
                 exceptionCount++;

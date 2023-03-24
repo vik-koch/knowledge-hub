@@ -76,14 +76,22 @@ public class TDBImporter {
     private boolean importResources(Path path, Model model, String modelName) {
         try {
             List<String> filenames = FilesHelper.getFilenamesForPath(path);
-            Path absolutePath = path.toAbsolutePath();
+
+            if (filenames.size() == 0) {
+                logger.severe("No files for import were found at \"" + path + "\"");
+                return false;
+            }
 
             for (String filename : filenames) {
                 tdb.executeWrite(() -> {
-                    model.read(absolutePath.resolve(filename).toString());
-                    tdb.addNamedModel(modelName, model);
+                    try {
+                        model.read(path.toAbsolutePath().resolve(filename).toString());
+                        tdb.addNamedModel(modelName, model);
 
-                    logger.info("Imported \"" + filename + "\" to the \"" + modelName + "\" model");
+                        logger.info("Imported \"" + filename + "\" to the \"" + modelName + "\" model");
+                    } catch (Exception e) {
+                        logger.severe("An error was thrown during transaction execution: " + e.getMessage());
+                    }
                 });
             }
             return true;

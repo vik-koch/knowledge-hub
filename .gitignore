@@ -38,3 +38,7 @@ content/
 
 # Configuration folder
 config/
+
+# Ontology folder
+ontology/*
+!ontology/khub.owl

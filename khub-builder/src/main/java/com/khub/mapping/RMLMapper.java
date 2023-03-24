@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.khub.common.DockerRunner;
 import com.khub.common.FilesHelper;
@@ -31,12 +33,33 @@ public class RMLMapper {
     public boolean run(Path mappingsPath, String outputDirectoryName) {
         try {
             List<String> filenames = FilesHelper.getFilenamesForPath(mappingsPath);
+
+            if (filenames.size() == 0) {
+                logger.severe("No mapping files were found at \"" + mappingsPath + "\"");
+                return false;
+            }
+
             Files.createDirectories(mappingsPath.resolve(outputDirectoryName));
+
             Path absoluteMappingsPath = mappingsPath.toRealPath(LinkOption.NOFOLLOW_LINKS);
+            Pattern pattern = Pattern.compile("source\s*\"(.*)\"");
 
             filenames.parallelStream().forEach(filename -> {
                 if (filename.endsWith(".ttl")) {
-                    execute(absoluteMappingsPath, filename, outputDirectoryName);
+                    try {
+                        Path filePath = absoluteMappingsPath.resolve(filename);
+                        String content = Files.readString(filePath);
+                        Matcher matcher = pattern.matcher(content);
+                        matcher.find();
+                        Path sourcePath = mappingsPath.resolve((matcher.group(1)));
+                        if (Files.exists(sourcePath)) {
+                            execute(absoluteMappingsPath, filename, outputDirectoryName);
+                        } else {
+                            logger.warning("Unable to find the source file at \"" + sourcePath + "\"");
+                        }
+                    } catch (Exception e) {
+                        logger.warning("Unable to parse the source file given in \"" + filename + "\"");
+                    }
                 }
             });
             return true;

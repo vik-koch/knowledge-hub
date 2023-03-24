@@ -154,10 +154,10 @@ public class TeamsCrawler extends AbstractCrawler {
             return jsonArray.asList();
 
         } catch (InterruptedException | IllegalArgumentException | IOException  | SecurityException  e) {
-            logger.severe("Unable to send a request and/or receive a response for request \"" + requestUrl + "\"");
+            logger.warning("Unable to send a request and/or receive a response for request \"" + requestUrl + "\"");
 
         } catch (NullPointerException | JsonParseException | ClassCastException | IllegalStateException  e) {
-            logger.severe("Retrieved malformed JSON format for request \"" + requestUrl + "\"");
+            logger.warning("Retrieved malformed JSON format for request \"" + requestUrl + "\"");
         
         } catch (URISyntaxException e) {
             // Do nothing
