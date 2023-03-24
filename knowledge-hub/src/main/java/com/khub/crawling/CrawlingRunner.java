@@ -24,20 +24,19 @@ import com.mongodb.client.MongoDatabase;
 /**
  * Runner for crawling processes
  */
-public class CrawlerRunner {
+public class CrawlingRunner {
 
     protected final Logger logger = Logger.getLogger(this.getClass().getName());
 
     /**
      * Runs crawling process for {@see ConfluenceCrawler} and {@see TeamsCrawler} and writes
-     * the retrieved data in {@code MongoDB} instance in {@code rawdata} database
-     * @param configuration - 
-     * @throws InvalidConfigurationException
+     * the retrieved data in {@code MongoDB} instance in {@code raw_data} database
+     * @param configuration - {@code Properties} object
      */
     public void run(Properties configuration) {
         // Prepares mongo database
         MongoClient mongoClient = MongoConnector.getClient(configuration);
-        MongoDatabase database = mongoClient.getDatabase("rawdata");
+        MongoDatabase database = mongoClient.getDatabase("raw_data");
 
         // Starts Confluence Crawler
         try {
@@ -100,7 +99,7 @@ public class CrawlerRunner {
     public static void main(String[] args) throws InvalidConfigurationException {
         String configPath = String.join(File.separator, "knowledge-hub", "src", "main", "resources", "config.properties");
         Properties configuration = Configuration.initialize(configPath);
-        CrawlerRunner cr = new CrawlerRunner();
+        CrawlingRunner cr = new CrawlingRunner();
         cr.run(configuration);
     }
 }
