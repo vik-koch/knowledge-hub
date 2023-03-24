@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import java.util.logging.Logger;
 import org.bson.Document;
 
+import com.khub.common.FilesHelper;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
@@ -25,24 +26,22 @@ public class MongoExporter {
      * @return true, if the step runned successfully, false otherwise
      */
     public boolean run(MongoDatabase database, Path knowledgePath, String outputDirectoryName) {
-        try {
-            // Retrieves collection names
-            List<String> collectionNames = new ArrayList<String>(); 
-            database.listCollectionNames().forEach((Consumer<String>) (name -> collectionNames.add(name)));
+        // Retrieves collection names
+        List<String> collectionNames = new ArrayList<String>(); 
+        database.listCollectionNames().forEach((Consumer<String>) (name -> collectionNames.add(name)));
 
-            Path outputPath = Files.createDirectories(knowledgePath.resolve(outputDirectoryName));
-
-            // Concurrently export collections
-            collectionNames.parallelStream().forEach(collectionName -> {
-                MongoCollection<Document> collection = database.getCollection(collectionName);
-                exportCollection(collection, outputPath);
-            });
-            return true;
-
-        } catch (Exception e) {
-            logger.severe("Unable to create output folder under \"" + knowledgePath + "\"");
+        Path outputPath = FilesHelper.createDirectories(knowledgePath.resolve(outputDirectoryName));
+        if (outputPath == null) {
             return false;
         }
+
+        // Concurrently export collections
+        collectionNames.parallelStream().forEach(collectionName -> {
+            MongoCollection<Document> collection = database.getCollection(collectionName);
+            exportCollection(collection, outputPath);
+        });
+
+        return true;
     }
 
     /**
