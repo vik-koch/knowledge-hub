@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DockerRunner {
@@ -33,7 +32,7 @@ public class DockerRunner {
             return process;
 
         } catch (InterruptedException | IOException e) {
-            logger.log(Level.SEVERE, "Failed to start docker-compose");
+            logger.severe("Failed to run the given command: \"" + command + "\"");
             return null;
         }
     }

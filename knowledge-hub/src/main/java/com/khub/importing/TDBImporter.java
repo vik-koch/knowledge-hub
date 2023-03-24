@@ -36,8 +36,8 @@ public class TDBImporter {
             return new TDBImporter(TDB2Factory.connectDataset(tdbPath.toString()));
         } catch (Exception e) {
             logger.severe("Unable to create the TDB store directory at \"" + tdbPath + "\"");
+            return null;
         }
-        return null;
     }
 
     /**
@@ -45,11 +45,12 @@ public class TDBImporter {
      * {@link Model} with the given {@code modelName} in the TDB store
      * @param rdfPath - the {@link Path} to import from
      * @param modelName - the name of the {@link Model}
+     * @return true, if the step runned successfully, false otherwise
      */
-    public void importRDF(Path rdfPath, String modelName) {
+    public boolean importRDF(Path rdfPath, String modelName) {
         Path outputPath = rdfPath.resolve("output");
         Model model = tdb.getNamedModel(modelName);
-        importResources(outputPath, model, modelName);
+        return importResources(outputPath, model, modelName);
     }
 
     /**
@@ -57,10 +58,11 @@ public class TDBImporter {
      * {@link Model} with the given {@code modelName} in the TDB store
      * @param owlPath - the {@link Path} to import from
      * @param modelName - the name of the {@link Model}
+     * @return true, if the step runned successfully, false otherwise
      */
-    public void importOWL(Path owlPath, String modelName) {
+    public boolean importOWL(Path owlPath, String modelName) {
         OntModel model = ModelFactory.createOntologyModel();
-        importResources(owlPath, model, modelName);
+        return importResources(owlPath, model, modelName);
     }
 
     /**
@@ -69,8 +71,9 @@ public class TDBImporter {
      * @param path - the {@link Path} to import from
      * @param model - the {@link Model} to import to
      * @param modelName - the name of the {@link Model}
+     * @return true, if the step runned successfully, false otherwise
      */
-    private void importResources(Path path, Model model, String modelName) {
+    private boolean importResources(Path path, Model model, String modelName) {
         try {
             List<String> filenames = FilesHelper.getFilenamesForPath(path);
             Path absolutePath = path.toAbsolutePath();
@@ -83,9 +86,11 @@ public class TDBImporter {
                     logger.info("Imported \"" + filename + "\" to the \"" + modelName + "\" model");
                 });
             }
+            return true;
 
         } catch (InvalidPathException | SecurityException e) {
             logger.severe("Unable to read files from \"" + path + "\" directory");
+            return false;
         }
     }
 

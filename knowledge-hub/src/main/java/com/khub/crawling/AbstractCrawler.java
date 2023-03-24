@@ -11,6 +11,7 @@ import org.bson.Document;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.khub.common.AuthenticationHeader;
 import com.mongodb.MongoException;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -33,14 +34,21 @@ public abstract class AbstractCrawler implements Crawler {
      * Starts the {@link Crawler} and writes retrieved data to
      * collections in the provided {@link MongoDatabase}. 
      * @param database - the {@link MongoDatabase} to write data to
+     * @return true, if the step runned successfully, false otherwise
      */
-    public void run(MongoDatabase database) {
+    public boolean run(MongoDatabase database) {
+        int retrievedDataSize = 0;
 
         Map<String, List<JsonElement>> data = run();
         for (String collectionName : data.keySet()) {
             MongoCollection<Document> collection = database.getCollection(collectionName);
-            importCollection(collection, data.get(collectionName));
+
+            List<JsonElement> collectionData = data.get(collectionName);
+            retrievedDataSize += collectionData.size();
+            importCollection(collection, collectionData);
         }
+
+        return retrievedDataSize != 0;
     }
 
     /**

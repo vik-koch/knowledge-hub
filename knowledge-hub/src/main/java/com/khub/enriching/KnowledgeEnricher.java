@@ -39,8 +39,8 @@ public class KnowledgeEnricher {
             return new KnowledgeEnricher(TDB2Factory.connectDataset(tdbPath.toString()));
         } catch (Exception e) {
             logger.severe("Unable to create the TDB store directory at \"" + tdbPath + "\"");
+            return null;
         }
-        return null;
     }
 
     /**
@@ -53,8 +53,9 @@ public class KnowledgeEnricher {
      * @param ontologyIri - the ontology IRI for knowledge artifacts
      * @param contentPredicate - the predicate name of knowledge artifacts' content
      * @param keywordPredicate - the predicate name for new keywords triples
+     * @return true, if the step runned successfully, false otherwise
      */
-    public void run(String contentModelName, String knowledgeModelName, String keywordsModelName, 
+    public boolean run(String contentModelName, String knowledgeModelName, String keywordsModelName, 
                     URL ontologyIri, String contentPredicate, String keywordPredicate) {
 
         Map<RDFNode, String> contentResources = new HashMap<RDFNode, String>();
@@ -93,10 +94,11 @@ public class KnowledgeEnricher {
                     logger.info("Processed " + map.get(index) + "% of all knowledge artifacts");
                 }
             }
+            return true;
 
         } catch (Exception e) {
             logger.severe("Unable to enrich the knowledge graph");
-            return;
+            return false;
         }
     }
 

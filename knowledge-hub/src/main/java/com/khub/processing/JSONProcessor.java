@@ -35,6 +35,9 @@ public class JSONProcessor {
     // Confluence links are retrieved as short form w/o domain name
     private final String confluenceBaseUrl;
 
+    // Count of possible exceptions during processing
+    private int exceptionCount = 0;
+
     private JSONProcessor(Map<String, List<String>> mappings, String confluenceBaseUrl) {
         this.mappings = mappings;
         this.confluenceBaseUrl = confluenceBaseUrl;
@@ -60,7 +63,7 @@ public class JSONProcessor {
 
         } catch (IOException | SecurityException e) {
             logger.severe("Unable to read the provided mapping file at \"" + processingPath + "\"");
-            
+
         } catch (JsonSyntaxException e) {
             logger.severe("The provided mapping file at \"" + processingPath + "\" has invalid syntax");
         }
@@ -74,8 +77,9 @@ public class JSONProcessor {
      * Processing extracts and unifies fields as defined in the {@code JSON} mapping.
      * @param sourceDatabase - the {@link MongoDatabase} to read data from
      * @param outputDatabase - the {@link MongoDatabase} to write data to
+     * @return true, if the step runned successfully, false otherwise
      */
-    public void run(MongoDatabase sourceDatabase, MongoDatabase outputDatabase) {
+    public boolean run(MongoDatabase sourceDatabase, MongoDatabase outputDatabase) {
 
         // Retrieves collection names from source database
         List<String> collectionNames = new ArrayList<String>(); 
@@ -83,8 +87,8 @@ public class JSONProcessor {
             collectionNames.add(collectionName);
         }
 
-        // Concurrently processes field jsonPaths for each collection
-        collectionNames.parallelStream().forEach(collectionName -> {
+        // Processes field jsonPaths for each collection
+        collectionNames.forEach(collectionName -> {
             try {
                 MongoCollection<Document> sourceCollection = sourceDatabase.getCollection(collectionName);
                 MongoCollection<Document> outputCollection = outputDatabase.getCollection(collectionName);
@@ -98,9 +102,12 @@ public class JSONProcessor {
                 logger.info("Processed data for collection \"" + collectionName + "\"");
 
             } catch (IllegalArgumentException | MongoException e) {
+                exceptionCount++;
                 logger.severe("Unable to process data for collection \"" + collectionName + "\"");
             }
         });
+
+        return !(collectionNames.size() == exceptionCount);
     }
 
     /**
