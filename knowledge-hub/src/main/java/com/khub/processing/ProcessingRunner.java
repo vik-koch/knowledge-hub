@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bson.Document;
@@ -29,7 +30,13 @@ public class ProcessingRunner {
      */
     public void run(Properties configuration) {
         // Prepares mongo databases
-        MongoClient mongoClient = MongoConnector.getClient(configuration);
+        MongoClient mongoClient = null;
+        try {
+            mongoClient = MongoConnector.getClient(configuration);
+        } catch (InvalidConfigurationException e) {
+            logger.log(Level.SEVERE, "Unable to start a Crawling runner", e);
+            return;
+        }
         MongoDatabase sourceDataBase = mongoClient.getDatabase("raw_data");
         MongoDatabase outputDataBase = mongoClient.getDatabase("processed_data");
 

@@ -22,7 +22,7 @@ public class MetadataProcessor {
         Map.entry("mediaType", Arrays.asList("metadata.mediaType")),
         Map.entry("name", Arrays.asList("name", "displayName")),
         Map.entry("username", Arrays.asList("username")),
-        Map.entry("title", Arrays.asList("title, subject")),
+        Map.entry("title", Arrays.asList("title", "subject")),
         Map.entry("group", Arrays.asList("group")),
         Map.entry("replyToId", Arrays.asList("replyToId")),
         Map.entry("mentions", Arrays.asList("mentions[*].mentionText")),

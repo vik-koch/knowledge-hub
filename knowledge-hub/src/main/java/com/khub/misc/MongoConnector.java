@@ -2,6 +2,7 @@ package com.khub.misc;
 
 import java.util.Properties;
 
+import com.khub.exceptions.InvalidConfigurationException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 
@@ -18,10 +19,13 @@ public class MongoConnector {
      * Returns a {@code MongoClient} instance created from the parsed {@code Properties}
      * @param configuration - {@code Properties} object
      * @return a {@code MongoClient} instance
+     * @throws InvalidConfigurationException
      */
-    public static MongoClient getClient(Properties configuration) {
+    public static MongoClient getClient(Properties configuration) throws InvalidConfigurationException {
         String url = configuration.getProperty(URL_KEY);
-        System.out.println(url);
+        if (url == null || url.isEmpty()) {
+            throw new InvalidConfigurationException("The given URL is null or empty");
+        }
         return MongoClients.create(url);
     }
 }

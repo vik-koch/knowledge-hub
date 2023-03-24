@@ -35,7 +35,13 @@ public class CrawlingRunner {
      */
     public void run(Properties configuration) {
         // Prepares mongo database
-        MongoClient mongoClient = MongoConnector.getClient(configuration);
+        MongoClient mongoClient = null;
+        try {
+            mongoClient = MongoConnector.getClient(configuration);
+        } catch (InvalidConfigurationException e) {
+            logger.log(Level.SEVERE, "Unable to start a Crawling runner", e);
+            return;
+        }
         MongoDatabase database = mongoClient.getDatabase("raw_data");
 
         // Starts Confluence Crawler
