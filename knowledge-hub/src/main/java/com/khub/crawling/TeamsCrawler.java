@@ -1,7 +1,8 @@
 package com.khub.crawling;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -28,9 +29,10 @@ public class TeamsCrawler extends Crawler {
     private static final String HEADER_KEY = "Authorization";
     private static final String PAYLOAD_KEY = "Bearer";
 
-    private HashSet<JsonElement> teams = new HashSet<JsonElement>();
-    private HashSet<JsonElement> channels = new HashSet<JsonElement>();
-    private HashSet<JsonElement> messagesWithReplies = new HashSet<JsonElement>();
+    private List<JsonElement> teams = new ArrayList<JsonElement>();
+    private List<JsonElement> channels = new ArrayList<JsonElement>();
+    private List<JsonElement> messages = new ArrayList<JsonElement>();
+    private List<JsonElement> replies = new ArrayList<JsonElement>();
 
     // Constructor
     private TeamsCrawler(String url, String[] header) {
@@ -61,51 +63,52 @@ public class TeamsCrawler extends Crawler {
 
     /**
      * Runs the retrieval process from MS Teams that cascades over teams, channels and messages from MS Teams.
-     * @return all retrieved data as {@code HashMap} of {@code HashSets} with {@code JsonElements}
+     * @return all retrieved data as {@code HashMap} of {@code Lists} with {@code JsonElements}
      */
 
-    // TODO: Replace for-each loops with concurrent threads
-    // TODO: Retrieve more SharePoint data Exchange Calendar events
-    public HashMap<String, HashSet<JsonElement>> run() {
+    // TODO: Retrieve more SharePoint data like Exchange Calendar events
+    public HashMap<String, List<JsonElement>> run() {
         logger.log(Level.INFO, "Retrieval of MS Teams content started");
 
         teams.clear();
         channels.clear();
-        messagesWithReplies.clear();
+        messages.clear();
+        replies.clear();
 
         teams.addAll(retrieveTeams());
 
-        for (JsonElement team : teams) {
+        teams.parallelStream().forEach(team -> {
             String teamId = team.getAsJsonObject().get("id").getAsString();
-            HashSet<JsonElement> teamChannels = retrieveChannels(teamId);
+            List<JsonElement> teamChannels = retrieveChannels(teamId);
             channels.addAll(teamChannels);
 
-            for (JsonElement channel : teamChannels) {
+            teamChannels.parallelStream().forEach(channel -> {
                 String channelId = channel.getAsJsonObject().get("id").getAsString();
-                messagesWithReplies.addAll(retrieveMessagesWithReplies(teamId, channelId));
-            }
-        }
+                List<List<JsonElement>> messagesWithReplies = retrieveMessagesWithReplies(teamId, channelId);
+                messages.addAll(messagesWithReplies.get(0));
+                replies.addAll(messagesWithReplies.get(1));
+            });
+        });
 
         logger.log(Level.INFO, "Retrieval of MS Teams content finished");
-        logger.log(Level.INFO, "Retrieved " + teams.size() + " teams, "+ channels.size() 
-            + " channels and " + messagesWithReplies.size() + " messages");
 
-        return new HashMap<String, HashSet<JsonElement>>() {{
-                put("teams", teams);
-                put("channels", channels);
-                put("messagesWithReplies", messagesWithReplies);
-        }};
+        HashMap<String, List<JsonElement>> jsonElements = new HashMap<String, List<JsonElement>>();
+        jsonElements.put("teams", teams);
+        jsonElements.put("channels", channels);
+        jsonElements.put("messages", messages);
+        jsonElements.put("replies", replies);
+        return jsonElements;
     }
 
     /**
      * Retrieves all teams from MS Teams, of which the request sender is member as {@code JSON}
-     * @return a {@code HashSet} with teams as {@code JSON} objects
+     * @return a {@code List} with teams as {@code JSON} objects
      */
-    private HashSet<JsonElement> retrieveTeams() {
-        HashSet<JsonElement> teams = new HashSet<JsonElement>();
+    private List<JsonElement> retrieveTeams() {
+        List<JsonElement> teams = new ArrayList<JsonElement>();
 
         String uri = this.url + "v1.0/me/joinedTeams";
-        teams.addAll(retrieve(uri).asList());
+        teams.addAll(retrieve(uri));
 
         if (!teams.isEmpty()) {
             logger.log(Level.INFO, teams.size() + " teams were retrieved");
@@ -119,13 +122,17 @@ public class TeamsCrawler extends Crawler {
     /**
      * Retrieves all channels for the given team from MS Teams as {@code JSON}
      * @param teamId - the ID of the team
-     * @return a {@code HashSet} with channels as {@code JSON} objects
+     * @return a {@code List} with channels as {@code JSON} objects
      */
-    private HashSet<JsonElement> retrieveChannels(String teamId) {
-        HashSet<JsonElement> channels = new HashSet<JsonElement>();
+    private List<JsonElement> retrieveChannels(String teamId) {
+        List<JsonElement> channels = new ArrayList<JsonElement>();
 
         String uri = this.url + "v1.0/teams/" + teamId + "/channels";
-        channels.addAll(retrieve(uri).asList());
+        List<JsonElement> jsonElements = retrieve(uri);
+        for (JsonElement jsonElement : jsonElements) {
+            jsonElement.getAsJsonObject().addProperty("teamId", teamId);
+            channels.add(jsonElement);
+        }
 
         if (!channels.isEmpty()) {
             logger.log(Level.INFO, channels.size() + " team channels for team with ID " + teamId + " were retrieved");
@@ -140,23 +147,44 @@ public class TeamsCrawler extends Crawler {
      * Retrieves all messages with replies for the given channel from MS Teams as {@code JSON}
      * @param teamId - the ID of the team
      * @param channelId - the ID of the channel
-     * @return a {@code HashSet} with messages and replies as {@code JSON} objects
+     * @return a {@code List} with messages and replies as {@code JSON} objects
      */
-    private HashSet<JsonElement> retrieveMessagesWithReplies(String teamId, String channelId) {
-        HashSet<JsonElement> messages = new HashSet<JsonElement>();
+    private List<List<JsonElement>> retrieveMessagesWithReplies(String teamId, String channelId) {
+        List<JsonElement> messages = new ArrayList<JsonElement>();
+        List<JsonElement> replies = new ArrayList<JsonElement>();
 
-        String uri = this.url + "v1.0/teams/" + teamId + "/channels/" + channelId + "/messages?$expand=replies";
-        List<JsonElement> list = retrieve(uri).asList();
-        list.removeIf(message -> (!message.getAsJsonObject().get("messageType").getAsString().equals("message")));
-        messages.addAll(list);
+        String uri = this.url + "v1.0/teams/" + teamId + "/channels/" + channelId + "/messages?$expand=replies&top=100";
+        List<JsonElement> jsonElements = retrieve(uri);
+
+        for (JsonElement jsonElement : jsonElements) {
+            JsonObject message = jsonElement.getAsJsonObject();
+            if (!message.get("messageType").getAsString().equals("message")) {
+                continue;
+            }
+
+            JsonArray replyArray = message.getAsJsonArray("replies");
+            if (replyArray.size() != 0) {
+                replyArray.forEach(reply -> {
+                    if (reply.getAsJsonObject().get("messageType").getAsString().equals("message")) {
+                        replies.add(reply);
+                    }
+                });
+                message.remove("replies@odata.count");
+            }
+
+            message.remove("replies");
+            message.remove("replies@odata.context");
+            messages.add(jsonElement);
+        }
 
         if (!messages.isEmpty()) {
-            logger.log(Level.INFO, messages.size() + " messages for channel with ID " + channelId + " were retrieved");
+            logger.log(Level.INFO, messages.size() + " messages and " + replies.size() +
+                       " replies for channel with ID " + channelId + " were retrieved");
         } else {
             logger.log(Level.WARNING, "No messages for channel with ID " + channelId + " were retrieved");
         }
 
-        return messages;
+        return Arrays.asList(messages, replies);
     }
 
     /**
@@ -166,7 +194,7 @@ public class TeamsCrawler extends Crawler {
      * @param uri - specific request {@code URI}
      * @return response as {@code JsonArray} or null if failed
      */
-    private JsonArray retrieve(String uri) {
+    private List<JsonElement> retrieve(String uri) {
         JsonArray jsonArray = new JsonArray();
 
         try {
@@ -181,7 +209,7 @@ public class TeamsCrawler extends Crawler {
                 uri = nextLink != null ? nextLink.getAsString() : null;
             } while (uri != null);
 
-            return jsonArray;
+            return jsonArray.asList();
 
         } catch (InterruptedException | IOException e) {
             logger.log(Level.SEVERE, "Unable to send a request and/or receive a response", e);

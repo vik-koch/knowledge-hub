@@ -37,14 +37,14 @@ public class CrawlerRunner {
     public void run(Properties configuration) {
         // Prepares mongo database
         MongoClient mongoClient = MongoConnector.getClient(configuration);
-        MongoDatabase database = mongoClient.getDatabase("rawdata3");
+        MongoDatabase database = mongoClient.getDatabase("rawdata");
 
         // Starts Confluence Crawler
         try {
             ConfluenceCrawler confluenceCrawler = ConfluenceCrawler.of(configuration);
-            Map<String, HashSet<JsonElement>> confluenceData = confluenceCrawler.run();
+            Map<String, List<JsonElement>> confluenceData = confluenceCrawler.run();
             for (String name : confluenceData.keySet()) {
-                writeToDb(database, name, confluenceData.get(name));
+                writeToDb(database, name, new HashSet<>(confluenceData.get(name)));
             }
         } catch (InvalidConfigurationException e) {
             logger.log(Level.SEVERE, "Unable to start a Confluence crawler", e);
@@ -53,9 +53,9 @@ public class CrawlerRunner {
         // Starts Teams Crawler
         try {
             TeamsCrawler teamsCrawler = TeamsCrawler.of(configuration);
-            Map<String, HashSet<JsonElement>> teamsData = teamsCrawler.run();
+            Map<String, List<JsonElement>> teamsData = teamsCrawler.run();
             for (String name : teamsData.keySet()) {
-                writeToDb(database, name, teamsData.get(name));
+                writeToDb(database, name, new HashSet<>(teamsData.get(name)));
             }
         } catch (InvalidConfigurationException e) {
             logger.log(Level.SEVERE, "Unable to start a Teams crawler", e);
@@ -80,8 +80,10 @@ public class CrawlerRunner {
         // Converts JSON to BSON document
         for (JsonElement jsonElement : data) {
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            jsonObject.addProperty("_id", jsonObject.get("id").getAsString());
-            jsonObject.remove("id");
+            if (jsonObject.has("id")) {
+                jsonObject.addProperty("_id", jsonObject.get("id").getAsString());
+                jsonObject.remove("id");
+            }
             documents.add(Document.parse(jsonObject.toString()));
         }
 
