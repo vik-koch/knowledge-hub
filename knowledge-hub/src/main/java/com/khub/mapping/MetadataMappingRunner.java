@@ -27,7 +27,7 @@ public class MetadataMappingRunner {
     /**
      * Runs metadata mapping process for collections from {@code MongoDB} database
      * named {@code processed_data} and writes mapped files to the path under
-     * {@code mappings.path} given in {@code configuration}
+     * {@code mappings.path/output} given in {@code configuration}
      * @param configuration - {@code Properties} object
      */
     public void run(Properties configuration) {
@@ -54,6 +54,7 @@ public class MetadataMappingRunner {
             Files.createDirectories(Paths.get(path + File.separator + "output"));
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Unable to create output folders", e);
+            return;
         }
 
         // Concurrently processes metadata fields for each collection
