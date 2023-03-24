@@ -31,43 +31,42 @@ public class RMLMapper {
      * @return true, if the step runned successfully, false otherwise
      */
     public boolean run(Path mappingsPath, String outputDirectoryName) {
-        try {
-            List<String> filenames = FilesHelper.getFilenamesForPath(mappingsPath);
 
-            if (filenames.size() == 0) {
-                logger.severe("No mapping files were found at \"" + mappingsPath + "\"");
-                return false;
-            }
-
-            Files.createDirectories(mappingsPath.resolve(outputDirectoryName));
-
-            Path absoluteMappingsPath = mappingsPath.toRealPath(LinkOption.NOFOLLOW_LINKS);
-            Pattern pattern = Pattern.compile("source\s*\"(.*)\"");
-
-            filenames.parallelStream().forEach(filename -> {
-                if (filename.endsWith(".ttl")) {
-                    try {
-                        Path filePath = absoluteMappingsPath.resolve(filename);
-                        String content = Files.readString(filePath);
-                        Matcher matcher = pattern.matcher(content);
-                        matcher.find();
-                        Path sourcePath = mappingsPath.resolve((matcher.group(1)));
-                        if (Files.exists(sourcePath)) {
-                            execute(absoluteMappingsPath, filename, outputDirectoryName);
-                        } else {
-                            logger.warning("Unable to find the source file at \"" + sourcePath + "\"");
-                        }
-                    } catch (Exception e) {
-                        logger.warning("Unable to parse the source file given in \"" + filename + "\"");
-                    }
-                }
-            });
-            return true;
-
-        } catch (Exception e) {
-            logger.severe("Unable to create output folders under \"" + mappingsPath.resolve(outputDirectoryName) + "\"");
+        List<String> filenames = FilesHelper.getFilenamesForPath(mappingsPath);
+        if (filenames.size() == 0) {
+            logger.severe("No mapping files were found at \"" + mappingsPath + "\"");
             return false;
         }
+
+        Path outputPath = FilesHelper.createDirectories(mappingsPath.resolve(outputDirectoryName));
+        if (outputPath == null) {
+            return false;
+        }
+
+        logger.info("Retrieved " + filenames.size() + " mapping files: " + String.join(", ", filenames));
+        Pattern pattern = Pattern.compile("source\s*\"(.*)\"");
+
+        filenames.parallelStream().forEach(filename -> {
+            if (filename.endsWith(".ttl")) {
+                try {
+                    Path absoluteMappingsPath = mappingsPath.toRealPath(LinkOption.NOFOLLOW_LINKS);
+                    Path filePath = absoluteMappingsPath.resolve(filename);
+                    String content = Files.readString(filePath);
+                    Matcher matcher = pattern.matcher(content);
+                    matcher.find();
+                    Path sourcePath = mappingsPath.resolve((matcher.group(1)));
+                    if (Files.exists(sourcePath)) {
+                        execute(absoluteMappingsPath, filename, outputDirectoryName);
+                    } else {
+                        logger.warning("Unable to find the source file at \"" + sourcePath + "\"");
+                    }
+                } catch (Exception e) {
+                    logger.warning("Unable to parse the source file given in \"" + filename + "\"");
+                }
+            }
+        });
+
+        return true;
     }
 
     /**
@@ -95,6 +94,8 @@ public class RMLMapper {
             } else {
                 logger.severe("Unable to map the file \"" + filename + "\"");
             }
+
+            process.destroy();
 
         } catch (SecurityException | InterruptedException e) {
             logger.severe("An error occured while trying to map \"" + filename + "\"");
