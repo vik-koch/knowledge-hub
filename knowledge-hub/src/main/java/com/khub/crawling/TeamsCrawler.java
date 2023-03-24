@@ -1,5 +1,6 @@
 package com.khub.crawling;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
@@ -18,7 +19,7 @@ import com.khub.exceptions.InvalidConfigurationException;
 import com.khub.misc.HttpRequestBuilder;
 
 /**
- * Teams API Crawler
+ * MS Teams API Crawler
  */
 public class TeamsCrawler extends Crawler {
 
@@ -60,9 +61,12 @@ public class TeamsCrawler extends Crawler {
 
     /**
      * Runs the retrieval process from MS Teams that cascades over teams, channels and messages from MS Teams.
-     * TODO: Replace for-each loop with threads
+     * @return all retrieved data as {@code HashMap} of {@code HashSets} with {@code JsonElements}
      */
-    public void run() {
+
+    // TODO: Replace for-each loops with concurrent threads
+    // TODO: Retrieve more SharePoint data Exchange Calendar events
+    public HashMap<String, HashSet<JsonElement>> run() {
         logger.log(Level.INFO, "Retrieval of MS Teams content started");
 
         teams.clear();
@@ -85,6 +89,12 @@ public class TeamsCrawler extends Crawler {
         logger.log(Level.INFO, "Retrieval of MS Teams content finished");
         logger.log(Level.INFO, "Retrieved " + teams.size() + " teams, "+ channels.size() 
             + " channels and " + messagesWithReplies.size() + " messages");
+
+        return new HashMap<String, HashSet<JsonElement>>() {{
+                put("teams", teams);
+                put("channels", channels);
+                put("messagesWithReplies", messagesWithReplies);
+        }};
     }
 
     /**
@@ -181,17 +191,5 @@ public class TeamsCrawler extends Crawler {
         }
 
         return null;
-    }
-
-    public HashSet<JsonElement> getTeams() {
-        return teams;
-    }
-
-    public HashSet<JsonElement> getChannels() {
-        return channels;
-    }
-
-    public HashSet<JsonElement> getMessagesWithReplies() {
-        return messagesWithReplies;
     }
 }
