@@ -42,3 +42,15 @@ config/
 # Ontology folder
 ontology/*
 !ontology/khub.owl
+
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+khub-explorer/node_modules
+khub-explorer/.pnp
+
+# testing
+khub-explorer/coverage
+
+# production
+khub-explorer/build
