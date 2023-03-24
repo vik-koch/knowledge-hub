@@ -5,10 +5,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.khub</groupId>
-  <artifactId>knowledge-hub</artifactId>
+  <artifactId>khub-builder</artifactId>
   <version>1.0-SNAPSHOT</version>
 
-  <name>knowledge-hub</name>
+  <name>Knowledge Hub Builder</name>
   <url>https://github.com/vik-koch/knowledge-hub</url>
 
   <properties>
