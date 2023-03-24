@@ -97,9 +97,15 @@ public class JSONProcessor {
                 List<JsonElement> data = process(source);
         
                 List<Document> output = convertToBsonDocuments(data);
-                outputCollection.insertMany(output);
 
-                logger.info("Processed data from the collection \"" + collectionName + "\"");
+                long size = outputCollection.countDocuments();
+                if (size != 0) {
+                    outputCollection.deleteMany(new Document());
+                    logger.warning("The collection \"" + collectionName + "\" was not empty, removed " + size + " documents");
+                }
+
+                outputCollection.insertMany(output);
+                logger.info(data.size() + " documents were successfully inserted into the collection \"" + collectionName + "\"");
 
             } catch (IllegalArgumentException | MongoException e) {
                 exceptionCount++;
