@@ -34,7 +34,7 @@ public class ProcessingRunner {
         try {
             mongoClient = MongoConnector.getClient(configuration);
         } catch (InvalidConfigurationException e) {
-            logger.log(Level.SEVERE, "Unable to start a Crawling runner", e);
+            logger.log(Level.SEVERE, "Unable to start the processing runner", e);
             return;
         }
         MongoDatabase sourceDataBase = mongoClient.getDatabase("raw_data");
