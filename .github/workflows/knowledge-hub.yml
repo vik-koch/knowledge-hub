@@ -1,0 +1,62 @@
+name: Knowledge Hub Builder CI
+
+on: [push]
+
+jobs:
+  khub:
+    name: Knowledge Hub
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      # Knowledge Hub Builder
+      - name: Build KHub Builder
+        run: |
+          cd ./khub-builder
+          mvn --batch-mode --update-snapshots package
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: knowledge-hub
+          path: |
+            ./khub-builder/target/*.jar
+
+      - name: Copy Resources
+        run: |
+          cp "./khub-builder/src/main/resources/config.properties" "./configuration/config.properties"
+          cp "./khub-builder/src/main/resources/docker-compose.yml" "./resources/docker-compose.yml"
+
+      # Knowledge Hub Explorer
+      - name: Download Dependencies
+        run: |
+          mkdir fuseki
+          wget https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki-docker/4.7.0/jena-fuseki-docker-4.7.0.zip
+          unzip -j ./jena-fuseki-docker-4.7.0.zip -d ./fuseki          
+          cd ./fuseki
+          rm LICENSE && rm NOTICE && rm README.md && rm docker-compose.yaml
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: knowledge-hub
+          path: |
+            ./khub-explorer-compose.yaml
+
+      # Common Resources
+      - name: Publish Resources
+        uses: actions/upload-artifact@v3
+        with:
+          name: knowledge-hub
+          path: |
+            ./configuration/
+            ./resources/
+            ./fuseki/

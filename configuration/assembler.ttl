@@ -1,0 +1,59 @@
+## Licensed under the terms of http://www.apache.org/licenses/LICENSE-2.0
+
+PREFIX :        <#>
+PREFIX fuseki:  <http://jena.apache.org/fuseki#>
+PREFIX rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs:    <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX ja:      <http://jena.hpl.hp.com/2005/11/Assembler#>
+PREFIX tdb2:    <http://jena.apache.org/2016/tdb#>
+PREFIX text:	<http://jena.apache.org/text#>
+PREFIX khub:	<http://semanticweb.org/ontologies/khub#>
+
+:service a fuseki:Service ;
+    fuseki:name "dataset" ;
+	fuseki:serviceQuery "" , "query" , "sparql" ;
+    fuseki:dataset :text_dataset .
+
+:dataset_tdb2 a tdb2:DatasetTDB2 ;
+    tdb2:location "/fuseki/databases/tdb" ;
+    tdb2:unionDefaultGraph true .
+
+:dataset a ja:RDFDataset ;
+    ja:defaultGraph :model_inf .
+
+:model_inf a ja:InfModel ;
+     ja:baseModel :graph ;
+     ja:reasoner [
+         ja:reasonerURL <http://jena.hpl.hp.com/2003/OWLMicroFBRuleReasoner>
+     ] .
+
+:graph a tdb2:GraphTDB ;
+    tdb2:dataset :dataset_tdb2 ;
+	tdb2:graphName <urn:x-arq:UnionGraph> .
+
+:text_dataset a text:TextDataset ;
+    text:dataset   :dataset ;
+    text:index     :indexLucene .
+
+:indexLucene a text:TextIndexLucene ;
+    text:directory "/fuseki/databases/index" ;
+    text:entityMap :entMap ;
+	text:propLists (
+		[ text:propListProp khub:search ;
+		  text:props ( khub:title
+					   rdfs:label ) ]
+	) ;
+    text:storeValues true .
+
+:entMap a text:EntityMap ;
+    text:defaultField     "title" ;
+    text:entityField      "uri" ;
+    text:uidField         "uid" ;
+	text:langField        "lang" ;
+    text:graphField       "graph" ;
+    text:map (
+		[ text:field "title" ;
+          text:predicate khub:title ]
+		[ text:field "label" ;
+          text:predicate rdfs:label ]
+    ) .
