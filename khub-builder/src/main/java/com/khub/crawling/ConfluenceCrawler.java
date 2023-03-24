@@ -22,6 +22,9 @@ import com.khub.common.HttpRequestBuilder;
 
 public class ConfluenceCrawler extends AbstractCrawler {
 
+    public final String spaceId = "spaceId";
+    public final String pageId = "pageId";
+
     public ConfluenceCrawler(URL confluenceEndpoint, AuthenticationHeader requestHeader) {
         super(confluenceEndpoint, requestHeader);
     }
@@ -36,7 +39,6 @@ public class ConfluenceCrawler extends AbstractCrawler {
 
         List<JsonElement> users = retrieveUsers();
         List<JsonElement> spaces = retrieveSpaces();
-        logger.info("Started to retrieve Confluence pages, please have patience...");
         List<JsonElement> pages = retrievePages(spaces);
         List<JsonElement> comments = retrieveComments(pages);
 
@@ -49,14 +51,16 @@ public class ConfluenceCrawler extends AbstractCrawler {
      */
     private List<JsonElement> retrieveUsers() {
         Set<JsonElement> users = new HashSet<JsonElement>();
-
-        String groupRequestUrl = endpoint + "group?limit=9999";
+        String taskName = "Confluence users";
+        logOnTaskStart(taskName);
+        
+        String groupRequestUrl = endpoint + "rest/api/group?limit=100";
         List<JsonElement> groups = retrieve(groupRequestUrl);
 
         groups.parallelStream().forEach(group -> {
             try {
                 String groupKey = group.getAsJsonObject().get("name").getAsString().replace(" ", "%20");
-                String requestUrl = endpoint + "group/" + groupKey + "/member?limit=9999&expand=personalSpace";
+                String requestUrl = endpoint + "rest/api/group/" + groupKey + "/member?limit=100&expand=personalSpace";
 
                 for (JsonElement jsonElement : retrieve(requestUrl)) {
                     if (jsonElement.getAsJsonObject().has("personalSpace")) {
@@ -66,12 +70,7 @@ public class ConfluenceCrawler extends AbstractCrawler {
             } catch (Exception e) { }
         });
 
-        if (!users.isEmpty()) {
-            logger.info(users.size() + " Confluence users were retrieved");
-        } else {
-            logger.warning("No Confluence users were retrieved");
-        }
-
+        logOnTaskFinish(taskName, users);
         return new ArrayList<JsonElement>(users);
     }
 
@@ -80,16 +79,20 @@ public class ConfluenceCrawler extends AbstractCrawler {
      * @return the list of {@code Confluence} spaces
      */
     private List<JsonElement> retrieveSpaces() {
+        String taskName = "Confluence spaces";
+        logOnTaskStart(taskName);
 
-        String requestUrl = this.endpoint + "space?type=global&limit=9999";
+        String requestUrl = endpoint + "rest/api/space?type=global&limit=9999";
         List<JsonElement> spaces = retrieve(requestUrl);
-
-        if (!spaces.isEmpty()) {
-            logger.info(spaces.size() + " Confluence spaces were retrieved");
-        } else {
-            logger.warning("No Confluence spaces were retrieved");
-        }
-
+        spaces.forEach(element -> {
+            JsonObject object = element.getAsJsonObject();
+            String spaceHomepageUrl = object.getAsJsonObject("_expandable").get("homepage").getAsString();
+            String spaceHomepageId = spaceHomepageUrl.substring(spaceHomepageUrl.lastIndexOf('/') + 1);
+            object.remove("id");
+            object.addProperty("id", spaceHomepageId);
+        });
+        
+        logOnTaskFinish(taskName, spaces);
         return spaces;
     }
 
@@ -101,23 +104,48 @@ public class ConfluenceCrawler extends AbstractCrawler {
      */
     private List<JsonElement> retrievePages(List<JsonElement> spaces) {
         List<JsonElement> pages = new ArrayList<JsonElement>();
+        String taskName = "Confluence pages";
+        logOnTaskStart(taskName);
 
         spaces.parallelStream().forEach(space -> {
-            try {
-                String spaceKey = space.getAsJsonObject().get("key").getAsString();
-                String requestUrl = endpoint + "space/" + spaceKey + "/content/page?type=page&limit=9999"
-                    + "&expand=body.view,children.comment,ancestors,space,history";
-                pages.addAll(retrieve(requestUrl));
+            if (space.isJsonObject()) {
+                JsonObject spaceObject = space.getAsJsonObject();
+                try {
+                    String spaceKey = spaceObject.get("key").getAsString();                
+                    String spaceId = spaceObject.get("id").getAsString();
+                    String requestUrl = endpoint + "rest/api/space/" + spaceKey + "/content/page?type=page&limit=100"
+                        + "&expand=body.view,children.comment,ancestors,history.lastUpdated";
 
-            } catch (Exception e) { }     
+                    List<JsonElement> result = retrieve(requestUrl);
+                    for (JsonElement element : result) {
+                        JsonObject object = element.getAsJsonObject();
+
+                        // Remove the top level space page with aggregated content
+                        if (object.get("id").getAsString().equals(spaceId)) {
+                            continue;
+                        }
+
+                        JsonArray ancestors = object.get("ancestors").getAsJsonArray();
+
+                        // Inject the correct first ancestor
+                        String ancestor = ancestors.size() < 1
+                            ? "" 
+                            : ancestors.get(ancestors.size() - 1).getAsJsonObject().get("id").getAsString();
+
+                            object.addProperty("ancestor", ancestor);
+
+                        object.addProperty(this.spaceId, spaceId);
+                        pages.add(element);
+                    }
+                    logOnSuccess(taskName, spaces, space, result);
+
+                } catch (Exception e) {
+                    logger.warning("Unable to crawl " + taskName + " for space id " + spaceObject.get("id"));
+                }
+            }
         });
 
-        if (!pages.isEmpty()) {
-            logger.info(pages.size() + " Confluence pages were retrieved");
-        } else {
-            logger.warning("No Confluence pages were retrieved");
-        }
-
+        logOnTaskFinish(taskName, pages);
         return pages;
     }
 
@@ -129,29 +157,56 @@ public class ConfluenceCrawler extends AbstractCrawler {
      */
     private List<JsonElement> retrieveComments(List<JsonElement> pages) {
         List<JsonElement> comments = new ArrayList<JsonElement>();
+        String taskName = "Confluence comments";
+        logOnTaskStart(taskName);
 
-        pages.parallelStream().forEach(page -> {
-            try {
-                JsonObject children = page.getAsJsonObject().getAsJsonObject("children");
-                int commentsCount = children.getAsJsonObject("comment").get("size").getAsInt();
-    
-                if (commentsCount != 0) {
-                    String pageKey = page.getAsJsonObject().get("id").getAsString();
-                    String requestUrl = endpoint + "content/" + pageKey + "/child/comment?limit=9999"
-                        + "&expand=body.view,ancestors,history";
-                    List<JsonElement> result = retrieve(requestUrl);
-                    result.forEach(element -> element.getAsJsonObject().addProperty("ancestor", pageKey));
-                    comments.addAll(result);
+        // Extract pages with comments
+        List<JsonElement> pagesWithComments = new ArrayList<JsonElement>();
+        for (JsonElement page : pages) {
+            if (page.isJsonObject()) {
+                JsonObject pageObject = page.getAsJsonObject();
+                JsonObject children = pageObject.getAsJsonObject("children");
+                if (children == null) {
+                    continue;
                 }
-            } catch (Exception e) { } 
-        });
 
-        if (!comments.isEmpty()) {
-            logger.info(comments.size() + " Confluence comments were retrieved");
-        } else {
-            logger.warning("No Confluence comments were retrieved");
+                int commentsCount = children.getAsJsonObject("comment").get("size").getAsInt();
+                if (commentsCount > 0) {
+                    pagesWithComments.add(page);
+                }
+            }
         }
 
+        logger.info("Only " + pagesWithComments.size() + " from " + pages.size() + " pages have comments");
+
+        pagesWithComments.parallelStream().forEach(page -> {
+            if (page.isJsonObject()) {
+                JsonObject pageObject = page.getAsJsonObject();
+                try {
+                    String pageKey = pageObject.get("id").getAsString();
+                    String requestUrl = endpoint + "rest/api/content/" + pageKey + "/child/comment?limit=100"
+                        + "&expand=body.view,ancestors,history.lastUpdated";
+
+                    String spaceId = pageObject.get(this.spaceId).getAsString();
+
+                    List<JsonElement> result = retrieve(requestUrl);
+                    for (JsonElement element : result) {
+                        JsonObject object = element.getAsJsonObject();
+
+                        // Inject the correct first ancestor
+                        object.addProperty(this.pageId, pageKey);
+                        object.addProperty(this.spaceId, spaceId);
+                        comments.add(element);
+                    }
+                    logOnSuccess(taskName, pagesWithComments, page, result);
+
+                } catch (Exception e) {
+                    logger.warning("Unable to crawl" + taskName + " for page id " + pageObject.get("id"));
+                }
+            }
+        });
+
+        logOnTaskFinish(taskName, comments);
         return comments;
     }
 
@@ -162,14 +217,20 @@ public class ConfluenceCrawler extends AbstractCrawler {
      * @return the response
      */
     private List<JsonElement> retrieve(String requestUrl) {
+        JsonArray jsonArray = new JsonArray();
         try {
-            HttpRequest request = HttpRequestBuilder.build(requestUrl, requestHeader.toNameValuePair());
-            HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-            JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
-            JsonArray jsonArray = jsonObject.getAsJsonArray("results");
-            if (jsonArray != null) {
-                return jsonArray.asList();
-            }
+            do {
+                HttpRequest request = HttpRequestBuilder.build(requestUrl, requestHeader.toNameValuePair());
+                HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+                JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
+
+                jsonArray.addAll(jsonObject.getAsJsonArray("results"));
+
+                JsonElement nextRequestUrl = jsonObject.getAsJsonObject("_links").get("next");
+                requestUrl = nextRequestUrl != null ? endpoint + nextRequestUrl.getAsString() : null;
+            } while (requestUrl != null);
+
+            return jsonArray.asList();
 
         } catch (InterruptedException | IllegalArgumentException | IOException  | SecurityException  e) {
             logger.warning("Unable to send a request and/or receive a response for request \"" + requestUrl + "\"");
