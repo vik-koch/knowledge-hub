@@ -1,0 +1,257 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://semanticweb.org/ontologies/khub#"
+     xml:base="http://semanticweb.org/ontologies/khub"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#">
+    <owl:Ontology rdf:about="http://semanticweb.org/ontologies/khub"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#ancestor -->
+
+    <owl:ObjectProperty rdf:about="http://semanticweb.org/ontologies/khub#ancestor">
+        <rdfs:subPropertyOf rdf:resource="http://semanticweb.org/ontologies/khub#neighbour"/>
+        <owl:inverseOf rdf:resource="http://semanticweb.org/ontologies/khub#descendant"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
+        <rdfs:domain rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:range rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:comment xml:lang="en">Denotes the ancestor (superordinate channel, team, space, etc.) of a knowledge artifact</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#author -->
+
+    <owl:ObjectProperty rdf:about="http://semanticweb.org/ontologies/khub#author">
+        <rdfs:subPropertyOf rdf:resource="http://semanticweb.org/ontologies/khub#neighbour"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#FunctionalProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+        <rdfs:domain rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:range rdf:resource="http://semanticweb.org/ontologies/khub#Person"/>
+        <rdfs:comment xml:lang="en">Denotes the author of a knowledge artifact</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#descendant -->
+
+    <owl:ObjectProperty rdf:about="http://semanticweb.org/ontologies/khub#descendant">
+        <rdfs:subPropertyOf rdf:resource="http://semanticweb.org/ontologies/khub#neighbour"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#TransitiveProperty"/>
+        <rdfs:domain rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:range rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:comment xml:lang="en">Denotes the descendant (subordinate channel, message, page, etc.) of a knowledge artifact</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#neighbour -->
+
+    <owl:ObjectProperty rdf:about="http://semanticweb.org/ontologies/khub#neighbour">
+        <rdfs:comment xml:lang="en">Denotes the first nearest neighbour node</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#reference -->
+
+    <owl:ObjectProperty rdf:about="http://semanticweb.org/ontologies/khub#reference">
+        <rdfs:subPropertyOf rdf:resource="http://semanticweb.org/ontologies/khub#neighbour"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AsymmetricProperty"/>
+        <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#IrreflexiveProperty"/>
+        <rdfs:domain rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2002/07/owl#Thing"/>
+        <rdfs:comment xml:lang="en">Denotes the textual reference to another node</rdfs:comment>
+    </owl:ObjectProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#content -->
+
+    <owl:DatatypeProperty rdf:about="http://semanticweb.org/ontologies/khub#content">
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#creationTime -->
+
+    <owl:DatatypeProperty rdf:about="http://semanticweb.org/ontologies/khub#creationTime">
+        <rdfs:domain rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:comment xml:lang="en">The creation time of a knowledge artifact</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#keyword -->
+
+    <owl:DatatypeProperty rdf:about="http://semanticweb.org/ontologies/khub#keyword">
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#lastUpdateTime -->
+
+    <owl:DatatypeProperty rdf:about="http://semanticweb.org/ontologies/khub#lastUpdateTime">
+        <rdfs:domain rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#dateTime"/>
+        <rdfs:comment xml:lang="en">The last update time of a knowledge artifact</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#link -->
+
+    <owl:DatatypeProperty rdf:about="http://semanticweb.org/ontologies/khub#link">
+        <rdfs:domain rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#anyURI"/>
+        <rdfs:comment xml:lang="en">The source URL to the searchable content</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#title -->
+
+    <owl:DatatypeProperty rdf:about="http://semanticweb.org/ontologies/khub#title">
+        <rdfs:domain rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+        <rdfs:comment xml:lang="en">The title of an instance (e.g. knowledge artifact)</rdfs:comment>
+    </owl:DatatypeProperty>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#Channel -->
+
+    <owl:Class rdf:about="http://semanticweb.org/ontologies/khub#Channel">
+        <rdfs:subClassOf rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:comment xml:lang="en">A Microsoft Teams channel that is a part of GroupTeam (MS Teams Team)</rdfs:comment>
+        <rdfs:label xml:lang="en">Channel</rdfs:label>
+        <rdfs:label xml:lang="de">Kanal</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#Commentary -->
+
+    <owl:Class rdf:about="http://semanticweb.org/ontologies/khub#Commentary">
+        <rdfs:subClassOf rdf:resource="http://semanticweb.org/ontologies/khub#Message"/>
+        <rdfs:comment xml:lang="en">A commentary left on a Confluence page</rdfs:comment>
+        <rdfs:label xml:lang="en">Commentary</rdfs:label>
+        <rdfs:label xml:lang="de">Kommentar</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#KnowledgeArtifact -->
+
+    <owl:Class rdf:about="http://semanticweb.org/ontologies/khub#KnowledgeArtifact">
+        <rdfs:comment xml:lang="en">A physical manifestation of knowledge</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#Message -->
+
+    <owl:Class rdf:about="http://semanticweb.org/ontologies/khub#Message">
+        <rdfs:subClassOf rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:comment xml:lang="en">Information present in a brief text form used for direct communications with others</rdfs:comment>
+        <rdfs:label xml:lang="en">Message</rdfs:label>
+        <rdfs:label xml:lang="de">Nachricht</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#Page -->
+
+    <owl:Class rdf:about="http://semanticweb.org/ontologies/khub#Page">
+        <rdfs:subClassOf rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:comment xml:lang="en">A Confluence page presenting information for a certain topic</rdfs:comment>
+        <rdfs:label xml:lang="en">Page</rdfs:label>
+        <rdfs:label xml:lang="de">Seite</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#Person -->
+
+    <owl:Class rdf:about="http://semanticweb.org/ontologies/khub#Person">
+        <rdfs:comment xml:lang="en">An individual who is the main actor in knowledge sharing</rdfs:comment>
+    </owl:Class>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#Post -->
+
+    <owl:Class rdf:about="http://semanticweb.org/ontologies/khub#Post">
+        <rdfs:subClassOf rdf:resource="http://semanticweb.org/ontologies/khub#Message"/>
+        <rdfs:comment xml:lang="en">A message posted in a MS Teams channel</rdfs:comment>
+        <rdfs:label xml:lang="de">Beitrag</rdfs:label>
+        <rdfs:label xml:lang="en">Post</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#Space -->
+
+    <owl:Class rdf:about="http://semanticweb.org/ontologies/khub#Space">
+        <rdfs:subClassOf rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:comment xml:lang="en">A Confluence domain presenting information to a certain topic that consists of multiple pages</rdfs:comment>
+        <rdfs:label xml:lang="de">Space</rdfs:label>
+        <rdfs:label xml:lang="en">Space</rdfs:label>
+    </owl:Class>
+    
+
+
+    <!-- http://semanticweb.org/ontologies/khub#Team -->
+
+    <owl:Class rdf:about="http://semanticweb.org/ontologies/khub#Team">
+        <rdfs:subClassOf rdf:resource="http://semanticweb.org/ontologies/khub#KnowledgeArtifact"/>
+        <rdfs:comment xml:lang="en">A Microsoft Teams Team that includes channels, a SharePoint site and a document collection</rdfs:comment>
+        <rdfs:label xml:lang="de">Team</rdfs:label>
+        <rdfs:label xml:lang="en">Team</rdfs:label>
+    </owl:Class>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.5.9.2019-02-01T07:24:44Z) https://github.com/owlcs/owlapi -->
+

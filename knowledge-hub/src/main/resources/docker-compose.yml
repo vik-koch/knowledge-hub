@@ -9,6 +9,7 @@ services:
       - 27017:27017
     volumes:
       - mongodb_container:/data/db
+    # container_name: khub-mongo
 
   mongo-express:
     image: mongo-express:latest
@@ -20,7 +21,13 @@ services:
     ports:
       - 8081:8081
     depends_on:
-      - mongodb
+      - mongo
+    # container_name: khub-mongo-express
+
+  rml-mapper:
+    image: rmlio/rmlmapper-java:latest
+    restart: always
+    profiles: ["cli-only"]
 
 volumes:
   mongodb_container:
