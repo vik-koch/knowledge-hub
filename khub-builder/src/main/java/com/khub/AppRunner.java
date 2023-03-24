@@ -2,6 +2,8 @@ package com.khub;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -11,11 +13,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
 import java.util.logging.Logger;
 import java.util.stream.Collector;
 
 import com.khub.common.Configuration;
+import com.khub.common.DockerRunner;
 import com.khub.common.MongoConnector;
 import com.khub.common.PipelineStep;
 import com.khub.common.ResourceProvider;
@@ -61,24 +63,31 @@ public class AppRunner {
 
         String currentStepName = currentState.toString();
 
+        Instant startTime = Instant.now();
         logOnStepStart(currentStepName);
 
         boolean stepResult = switch(currentState) {
 
-            case KNOWLEDGE_CRAWLING     -> prepareMongoDb() && crawlKnowledge();
-            case KNOWLEDGE_PROCESSING   -> prepareMongoDb() && processKnowledge();
-            case KNOWLEDGE_EXPORTING    -> prepareMongoDb() && exportKnowledge();
-            case KNOWLEDGE_MAPPING      -> mapKnowledge();
-            case KNOWLEDGE_IMPORTING    -> importKnowledge();
-            case ONTOLOGY_IMPORTING     -> importOntology();
-            case CONTENT_EXTRACTING     -> extractContent();
-            case CONTENT_MAPPING        -> mapContent();
-            case CONTENT_IMPORTING      -> importContent();
-            case KNOWLEDGE_ENRICHING    -> enrichKnowledgeGraph();
+            case KNOWLEDGE_CRAWLING         -> prepareMongoDb() && crawlKnowledge();
+            case KNOWLEDGE_PROCESSING       -> prepareMongoDb() && processKnowledge();
+            case KNOWLEDGE_EXPORTING        -> prepareMongoDb() && exportKnowledge();
+            case KNOWLEDGE_MAPPING          -> mapKnowledge();
+            case KNOWLEDGE_IMPORTING        -> importKnowledge();
+            case ONTOLOGY_IMPORTING         -> importOntology();
+            case CONTENT_EXTRACTING         -> extractContent();
+            case CONTENT_MAPPING            -> mapContent();
+            case CONTENT_IMPORTING          -> importContent();
+            case KNOWLEDGE_GRAPH_ENRICHING  -> enrichKnowledgeGraph();
 
         };
 
-        logOnStepFinish(currentStepName, stepResult);
+        Duration stepDuration = Duration.between(startTime, Instant.now());
+
+        // A step cannot take more than an hour
+        if (stepDuration.toHoursPart() > 0) System.exit(1);
+        
+        String stepDurationString = stepDuration.toMinutesPart() + " minutes and " + stepDuration.toSecondsPart() + " seconds";
+        logOnStepFinish(currentStepName, stepDurationString, stepResult);
 
         if (stepResult) {
             if (steps.hasNext() && runAll) {
@@ -98,7 +107,7 @@ public class AppRunner {
     private boolean prepareMongoDb() {
         // Start Docker Compose
         if (mongoClient == null && (docker == null || !docker.isAlive())) {
-            docker = ResourceProvider.startDockerCompose(config.dockerPath);
+            docker = DockerRunner.startDockerCompose(config.dockerPath);
         }
 
         // Start MongoDB client
@@ -110,6 +119,14 @@ public class AppRunner {
             }
         }
         return true;
+    }
+
+    /**
+     * Disposes the active docker-compose process by stopping the container
+     */
+    private void shutdownDocker() {
+        docker.destroy();
+        DockerRunner.stopDockerCompose(config.dockerPath);
     }
 
     /**
@@ -127,17 +144,19 @@ public class AppRunner {
      * @param stepName - the name of a {@link PipelineStep}
      */
     private void logOnStepStart(String stepName) {
-        logger.info("# Starting the " + stepName + " step...");
+        System.out.println();
+        logger.info("-> Starting the " + stepName + " step...");
     }
 
     /**
      * Logs final information upon finishing the step execution
      * @param stepName - the name of a {@link PipelineStep}
+     * @param duration - the duration of thep step
      * @param result - true, if the step runned successfully, false otherwise
      */
-    private void logOnStepFinish(String stepName, boolean result) {
+    private void logOnStepFinish(String stepName, String duration, boolean result) {
         if (result == true) {
-            logger.info("# The " + stepName + " step is successfully finished");
+            logger.info("# The " + stepName + " step is successfully finished in " + duration);
         } else {
             logger.severe("# The " + stepName + " step failed");
         }
@@ -176,6 +195,7 @@ public class AppRunner {
             logger.warning("Unable to crawl Teams data because endpoint or header configuration is empty");
         }
 
+        if (runAll == false) shutdownDocker();
         return (confluenceResult || teamsResult);
     }
 
@@ -191,7 +211,10 @@ public class AppRunner {
         MongoDatabase outputDatabase = mongoClient.getDatabase(outputDatabaseName);
 
         JSONProcessor processor = JSONProcessor.of(config.processingPath, config.confluenceEndpoint);
-        return processor.run(sourceDatabase, outputDatabase);
+        boolean result = processor.run(sourceDatabase, outputDatabase);
+
+        if (runAll == false) shutdownDocker();
+        return result;
     }
 
     /**
@@ -203,7 +226,10 @@ public class AppRunner {
         MongoDatabase database = mongoClient.getDatabase(databaseName);
 
         MongoExporter exporter = new MongoExporter();
-        return exporter.run(database, config.knowledgePath, "source");
+        boolean result = exporter.run(database, config.knowledgePath, "source");
+
+        shutdownDocker();
+        return result;
     }
 
     /**
@@ -239,7 +265,7 @@ public class AppRunner {
      */
     private boolean extractContent() {
         ContentExtractor extractor = ContentExtractor.of(config.tdbPath);
-        return extractor != null && extractor.run(config.contentPath, "queries", "source");
+        return extractor != null && extractor.run(config.contentPath, config.queriesPath, "source");
     }
 
     /**
@@ -267,7 +293,7 @@ public class AppRunner {
     private boolean enrichKnowledgeGraph() {
         KnowledgeEnricher enricher = KnowledgeEnricher.of(config.tdbPath);
         return enricher != null && enricher.run(config.contentModelName, config.knowledgeModelName, 
-            config.keywordsModelName, config.ontologyIri, config.contentPredicate, config.keywordPredicate);
+            config.referenceModelName, config.ontologyIri, config.contentPredicate, config.titlePredicate, config.referencePredicate);
     }
 
     /**
@@ -275,6 +301,7 @@ public class AppRunner {
      * @param args - the console arguments
      */
     private void run(String[] args) {
+        Instant startTime = Instant.now();
 
         // Prepare data for the console operation
         Map<String, PipelineStep> stepMap = new HashMap<String, PipelineStep>();
@@ -351,7 +378,7 @@ public class AppRunner {
         }
 
         // Initialise configuration
-        Path configPath = Paths.get("./config/config.properties");
+        Path configPath = Paths.get("./configuration/config.properties");
         Properties properties = ResourceProvider.loadProperties(configPath);
 
         if (properties == null) System.exit(1);
@@ -363,17 +390,20 @@ public class AppRunner {
         // Runs pipeline
         PipelineResult result = runPipeline(currentStep);
 
+        Duration stepDuration = Duration.between(startTime, Instant.now());
+        String stepDurationString = stepDuration.toMinutesPart() + " minutes and " + stepDuration.toSecondsPart() + " seconds";
+
         if (result == PipelineResult.FAILED) {
-            logger.info("Finished on \"" + currentStep + "\" due to an error");
+            logger.info("Finished due to an error in " + stepDurationString);
             System.exit(1);
         }
 
-        logger.info("Finished with success");
+        logger.info("Finished with success in " + stepDurationString);
         System.exit(0);
     }
 
     public static void main(String[] args) {
-        System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tF %1$tT] %4$s:\t%5$s %n");
+        System.setProperty("java.util.logging.SimpleFormatter.format", "[%1$tF %1$tT] %4$s: %5$s %n");
         AppRunner app = new AppRunner();
         app.run(args);
     }
