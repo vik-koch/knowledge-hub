@@ -1,0 +1,33 @@
+name: Knowledge Hub Builder CI
+
+on: [push]
+
+jobs:
+  build:
+    name: Package khub-builder
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build with Maven
+        run: |
+          cd khub-builder
+          mvn --batch-mode --update-snapshots package
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: khub-builder
+          path: |
+            ./khub-builder/target/*.jar
+            ./knowledge/
+            ./ontology/
+            ./processing/
