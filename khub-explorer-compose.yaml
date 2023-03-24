@@ -1,0 +1,45 @@
+version: '3.8'
+services:
+  # Fuseki server with text indexing:
+  fuseki:
+    image: fuseki
+    entrypoint: "" # Overrides the default entrypoint
+    # The script first runs Jena TextIndexer for creating Lucene index and then starts the Fuseki server
+    # It uses container environment variables declared in the Dockerfile
+    environment:
+      - JAVA_OPTIONS=-Xmx4096m -Xms2048m
+    command: >
+      sh -c "echo Started to index the dataset... && START=$$(date +%s) &&
+             $$JAVA_HOME/bin/java $$JAVA_OPTIONS -cp $$FUSEKI_JAR jena.textindexer --desc=$$FUSEKI_DIR/configuration/assembler.ttl &&
+             END=$$(date +%s) && echo Finished dataset indexing in $$(($$END-$$START)) seconds &&
+             $$JAVA_HOME/bin/java $$JAVA_OPTIONS -jar $$FUSEKI_JAR --config $$FUSEKI_DIR/configuration/assembler.ttl"
+    build:
+      args: 
+        JENA_VERSION: 4.7.0
+      # Locally uses the downloaded Dockerfile with scripts from 
+      # https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki-server/4.7.0/
+      context: ./jena-fuseki-docker-4.7.0/
+      dockerfile: Dockerfile
+    ports:
+      - "3030:3030"   
+    volumes:
+      - ./configuration:/fuseki/configuration
+      - ./databases:/fuseki/databases
+
+  # Fuseki server without indexing:
+
+  # fuseki:
+  #   image: fuseki
+  #   environment:
+  #     - JAVA_OPTIONS=-Xmx4096m -Xms2048m
+  #   command: [ "--config", "configuration/assembler.ttl" ]
+  #   build:
+  #     args: 
+  #       JENA_VERSION: 4.7.0
+  #     context: ./jena-fuseki-docker-4.7.0/
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - "3030:3030"   
+  #   volumes:
+  #     - ./configuration:/fuseki/configuration
+  #     - ./databases:/fuseki/databases

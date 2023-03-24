@@ -3,8 +3,8 @@ name: Knowledge Hub Builder CI
 on: [push]
 
 jobs:
-  khub-builder:
-    name: KHub Builder
+  khub:
+    name: Knowledge Hub
     runs-on: ubuntu-latest
 
     steps:
@@ -17,6 +17,7 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      # Knowledge Hub Builder
       - name: Build KHub Builder
         run: |
           cd ./khub-builder
@@ -25,7 +26,7 @@ jobs:
       - name: Publish Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: khub-builder
+          name: knowledge-hub
           path: |
             ./khub-builder/target/*.jar
 
@@ -34,10 +35,31 @@ jobs:
           cp "./khub-builder/src/main/resources/config.properties" "./configuration/config.properties"
           cp "./khub-builder/src/main/resources/docker-compose.yml" "./resources/docker-compose.yml"
 
+      # Knowledge Hub Explorer
+      - name: Download Dependencies
+        run: |
+          fuseki=jena-fuseki-docker-4.7.0.zip
+          wget https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki-docker/4.7.0/$fuseki
+          unzip ./$fuseki
+          mkdir fuseki
+          cp "./$fuseki/Dockerfile" "./fuseki/Dockerfile"
+          cp "./$fuseki/download.sh" "./fuseki/download.sh"
+          cp "./$fuseki/entrypoint.sh" "./fuseki/entrypoint.sh"
+          cp "./$fuseki/log4j2.properties" "./fuseki/log4j2.properties"
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: knowledge-hub
+          path: |
+            ./khub-explorer-compose.yaml
+
+      # Common Resources
       - name: Publish Resources
         uses: actions/upload-artifact@v3
         with:
-          name: khub-builder
+          name: knowledge-hub
           path: |
             ./configuration/
             ./resources/
+            ./fuseki/
