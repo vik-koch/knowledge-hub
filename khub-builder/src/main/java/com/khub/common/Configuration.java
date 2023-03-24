@@ -21,27 +21,30 @@ public class Configuration {
     public final URL teamsEndpoint;
     public final AuthenticationHeader teamsHeader;
 
-    public final Path processingPath;
+    public final ConnectionString mongoConnectionString;
 
     public final Path dockerPath;
 
-    public final ConnectionString mongoConnectionString;
+    public final Path processingPath;
 
     public final Path knowledgePath;
     public final Path contentPath;
 
     public final Path ontologyPath;
 
+    public final Path queriesPath;
+
     public final Path tdbPath;
 
     public final String knowledgeModelName;
     public final String ontologyModelName;
     public final String contentModelName;
-    public final String keywordsModelName;
+    public final String referenceModelName;
 
     public final URL ontologyIri;
     public final String contentPredicate;
-    public final String keywordPredicate;
+    public final String titlePredicate;
+    public final String referencePredicate;
 
     public Configuration(Properties properties) {
         this.properties = properties;
@@ -58,27 +61,30 @@ public class Configuration {
         String teamsToken = parseString("teams.token");
         teamsHeader = new AuthenticationHeader(teamsHeaderKey, teamsHeaderValue, teamsToken);
 
-        processingPath = parsePath("processing.path");
+        mongoConnectionString = parseConnectionString("mongo.connection.string");
 
         dockerPath = parsePath("docker.path");
 
-        mongoConnectionString = parseConnectionString("mongo.connection.string");
+        processingPath = parsePath("processing.path");
 
         knowledgePath = parsePath("knowledge.path");
         contentPath = parsePath("content.path");
 
         ontologyPath = parsePath("ontology.path");
 
+        queriesPath = parsePath("queries.path");
+
         tdbPath = parsePath("tdb.path");
 
         knowledgeModelName = parseString("knowledge.model.name");
         ontologyModelName = parseString("ontology.model.name");
         contentModelName = parseString("content.model.name");
-        keywordsModelName = parseString("keywords.model.name");
+        referenceModelName = parseString("reference.model.name");
 
         ontologyIri = parseUrl("ontology.iri");
         contentPredicate = parseString("content.predicate");
-        keywordPredicate = parseString("keyword.predicate");
+        titlePredicate = parseString("title.predicate");
+        referencePredicate = parseString("reference.predicate");
     }
 
     /**

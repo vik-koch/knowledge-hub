@@ -2,20 +2,20 @@ package com.khub.common;
 
 public enum PipelineStep {
 
-    KNOWLEDGE_CRAWLING      ("Knowledge Crawling"),
-    KNOWLEDGE_PROCESSING    ("Knowledge Processing"),
+    KNOWLEDGE_CRAWLING          ("Knowledge Crawling"),
+    KNOWLEDGE_PROCESSING        ("Knowledge Processing"),
 
-    KNOWLEDGE_EXPORTING     ("Knowledge Exporting"),
-    KNOWLEDGE_MAPPING       ("Knowledge Mapping"),
-    KNOWLEDGE_IMPORTING     ("Knowledge Importing"),
+    KNOWLEDGE_EXPORTING         ("Knowledge Exporting"),
+    KNOWLEDGE_MAPPING           ("Knowledge Mapping"),
+    KNOWLEDGE_IMPORTING         ("Knowledge Importing"),
 
-    ONTOLOGY_IMPORTING      ("Ontology Importing"),
+    ONTOLOGY_IMPORTING          ("Ontology Importing"),
 
-    CONTENT_EXTRACTING      ("Content Extracting"),
-    CONTENT_MAPPING         ("Content Mapping"),
-    CONTENT_IMPORTING       ("Content Importing"),
+    CONTENT_EXTRACTING          ("Content Extracting"),
+    CONTENT_MAPPING             ("Content Mapping"),
+    CONTENT_IMPORTING           ("Content Importing"),
 
-    KNOWLEDGE_ENRICHING     ("Knowledge Enriching");
+    KNOWLEDGE_GRAPH_ENRICHING   ("Knowledge Graph Enriching");
 
     private final String name;
 
