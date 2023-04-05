@@ -1,0 +1,24 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX khub: <http://semanticweb.org/ontologies/khub#>
+PREFIX text: <http://jena.apache.org/text#>
+SELECT ?link ?title ?content ?email ?creationTime ?lastUpdateTime
+    (GROUP_CONCAT(DISTINCT STRAFTER(STR(?type), "#"); SEPARATOR=", ") AS ?types)
+    (GROUP_CONCAT(DISTINCT ?ancestor_title; SEPARATOR="///") AS ?ancestor_titles)
+    (GROUP_CONCAT(DISTINCT ?ancestor_link; SEPARATOR="///") AS ?ancestor_links)
+
+WHERE { (?result ?score) text:query (khub:search '$QUERY') .
+    ?result khub:link ?link .
+    ?result rdf:type ?type .
+    OPTIONAL { ?result khub:title ?title } .
+    OPTIONAL { ?result khub:content ?content } .
+    OPTIONAL { ?result khub:email ?email } .
+    OPTIONAL { ?result khub:creationTime ?creationTime } .
+    OPTIONAL { ?result khub:lastUpdateTime ?lastUpdateTime } .
+    OPTIONAL {
+        ?result khub:ancestor+ ?ancestor .
+        ?ancestor khub:title ?ancestor_title ;
+            khub:link ?ancestor_link .
+    }
+}
+
+GROUP BY ?link ?title ?content ?email ?creationTime ?lastUpdateTime
