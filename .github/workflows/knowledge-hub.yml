@@ -26,6 +26,13 @@ jobs:
           cd ./khub-builder
           mvn --batch-mode --update-snapshots package
 
+      - name: Publish KHub Builder
+        uses: actions/upload-artifact@v3
+        with:
+          name: khub-builder
+          path: |
+            ./khub-builder/target/*.jar
+
       - name: Copy Resources
         run: |
           rm -i ./configuration/*
@@ -37,7 +44,6 @@ jobs:
         with:
           name: khub-builder
           path: |
-            ./khub-builder/target/*.jar
             ./configuration/
             ./resources/
 
@@ -60,23 +66,21 @@ jobs:
           npm ci
           npm run build
 
-      - name: Copy Resources
+      - name: Copy KHub Explorer Artifacts
         run: |
           cp -r ./khub-explorer/build ./explorer
           cp ./khub-explorer/Dockerfile ./explorer/Dockerfile
 
-        # Apache Fuseki
-      - name: Download Dependencies
+      - name: Download Fuseki Docker ${{env.FUSEKI_VERSION}}
         run: |
           mkdir fuseki
           wget https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki-docker/${{env.FUSEKI_VERSION}}/jena-fuseki-docker-${{env.FUSEKI_VERSION}}.zip
           unzip -j ./jena-fuseki-docker-${{env.FUSEKI_VERSION}}.zip -d ./fuseki          
-          rm ./fuseki/docker-compose.yaml
 
-      - name: Publish Artifact
+      - name: Publish KHub Explorer
         uses: actions/upload-artifact@v3
         with:
-          name: knowledge-hub-explorer
+          name: khub-explorer
           path: |
             ./configuration/
             ./fuseki/
