@@ -46,7 +46,7 @@ services:
       args:
         - FUSEKI_ENDPOINT=http://localhost:3030/
         - FUSEKI_SERVICE=dataset
-      context: ./explorer/
+      context: .
       dockerfile: Dockerfile
     ports:
       - 3000:3000
