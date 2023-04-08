@@ -3,11 +3,19 @@ import Row from 'react-bootstrap/Row';
 import Stack from 'react-bootstrap/Stack';
 import Pagination from 'react-bootstrap/Pagination';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function SearchResults(props) {
 
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(JSON.parse(window.localStorage.getItem('currentPage')));
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('currentPage', currentPage);
+  }, [currentPage]);
 
   if (props.content) {
     const size = 10;

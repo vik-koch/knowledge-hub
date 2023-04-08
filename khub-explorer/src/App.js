@@ -27,14 +27,38 @@ if (typeof window !== 'undefined') {
 // Main application
 function App() {
 
+  // Query template
   const [queryTemplate, setQueryTemplate] = useState(null);
+
+  const [loading, setLoading] = useState(null);
+  const [error, setError] = useState(false);
+
+  // Fuseki reachability status
   const [reachabilityStatus, setReachabilityStatus] = useState(null);
+  useEffect(() => {
+    setReachabilityStatus(JSON.parse(window.localStorage.getItem('reachabilityStatus')));
+  }, []);
+  useEffect(() => {
+    window.localStorage.setItem('reachabilityStatus', reachabilityStatus);
+  }, [reachabilityStatus]);
 
   // Showable content
   const [content, setContent] = useState(null);
-  const [loading, setLoading] = useState(null);
-  const [error, setError] = useState(false);
+  useEffect(() => {
+    setContent(JSON.parse(window.localStorage.getItem('content')));
+  }, []);
+  useEffect(() => {
+    window.localStorage.setItem('content', JSON.stringify(content));
+  }, [content]);
+
+  // Request duration for statistics
   const [duration, setDuration] = useState(null);
+  useEffect(() => {
+    setDuration(JSON.parse(window.localStorage.getItem('duration')));
+  }, []);
+  useEffect(() => {
+    window.localStorage.setItem('duration', duration);
+  }, [duration]);
 
   // Read query template from public
   useEffect(() => {
