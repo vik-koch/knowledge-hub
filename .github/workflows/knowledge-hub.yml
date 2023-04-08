@@ -86,3 +86,28 @@ jobs:
           path: |
             ./configuration/
             ./explorer/
+
+  khub_full:
+    name: Knowledge Hub
+    needs: [khub_builder, khub-explorer]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: ./artifacts
+
+      - name: Merge Artifacts
+        run: |
+          mkdir ./knowledge-hub
+          cp -r ./khub-builder/. ./khub-explorer/. ./knowledge-hub
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: knowledge-hub
+          path: ./knowledge-hub
