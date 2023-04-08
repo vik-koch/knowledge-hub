@@ -1,62 +1,115 @@
-name: Knowledge Hub CI
+name: Knowledge Hub Pipeline
+on: push
 
-on: [push]
+env:
+  JDK_VERSION: 17
+  NODE_VERSION: 18
+  FUSEKI_VERSION: 4.7.0
 
 jobs:
-  khub:
-    name: Knowledge Hub
+  khub_builder:
+    name: Knowledge Hub Builder
     runs-on: ubuntu-latest
 
     steps:
       - name: Check out
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
+      - name: Set up JDK ${{env.JDK_VERSION}}
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
-          distribution: 'temurin'
+          java-version: ${{env.JDK_VERSION}}
+          distribution: temurin
 
-      # Knowledge Hub Builder
       - name: Build KHub Builder
         run: |
           cd ./khub-builder
           mvn --batch-mode --update-snapshots package
 
-      - name: Publish Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: knowledge-hub
-          path: |
-            ./khub-builder/target/*.jar
-
-      - name: Copy Resources
+      - name: Copy Artifcats
         run: |
-          cp "./khub-builder/src/main/resources/config.properties" "./configuration/config.properties"
-          cp "./khub-builder/src/main/resources/docker-compose.yml" "./resources/docker-compose.yml"
+          mkdir ./configuration
+          cp ./khub-builder/src/main/resources/builder-config.properties ./configuration/builder-config.properties
+          cp ./khub-builder/src/main/resources/docker-compose.yml ./resources/docker-compose.yml
 
-      # Knowledge Hub Explorer
-      - name: Download Dependencies
-        run: |
-          mkdir fuseki
-          wget https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki-docker/4.7.0/jena-fuseki-docker-4.7.0.zip
-          unzip -j ./jena-fuseki-docker-4.7.0.zip -d ./fuseki          
-          cd ./fuseki
-          rm LICENSE && rm NOTICE && rm README.md && rm docker-compose.yaml
+          cp ./khub-builder/target/*.jar .
 
-      - name: Publish Artifact
+      - name: Publish Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: knowledge-hub
+          name: khub-builder
           path: |
-            ./khub-explorer-compose.yaml
-
-      # Common Resources
-      - name: Publish Resources
-        uses: actions/upload-artifact@v3
-        with:
-          name: knowledge-hub
-          path: |
-            ./configuration/
             ./resources/
-            ./fuseki/
+            ./configuration/
+            ./*.jar
+
+  khub_explorer:
+    name: Knowledge Hub Explorer
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js ${{env.NODE_VERSION}}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{env.NODE_VERSION}}
+
+      - name: Build KHub Explorer
+        run: |
+          cd ./khub-explorer
+          npm ci
+          npm run build
+
+      - name: Copy Artifacts
+        run: |
+          mkdir ./explorer
+          cp -r ./khub-explorer/build ./explorer/app
+          cp ./khub-explorer/Dockerfile ./explorer/Dockerfile
+          cp ./khub-explorer/docker-compose.yaml ./explorer/docker-compose.yaml
+
+          mkdir ./configuration
+          cp ./khub-explorer/config/explorer-config.ttl ./configuration/explorer-config.ttl
+
+          printf "@ECHO OFF\ntitle KHub Explorer\ncd ./explorer\ndocker-compose -p knowledge-hub up" > "./start-khub-explorer.bat"
+
+      - name: Download Fuseki Docker ${{env.FUSEKI_VERSION}}
+        run: |
+          mkdir ./explorer/fuseki
+          wget https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki-docker/${{env.FUSEKI_VERSION}}/jena-fuseki-docker-${{env.FUSEKI_VERSION}}.zip
+          unzip -j ./jena-fuseki-docker-${{env.FUSEKI_VERSION}}.zip -d ./explorer/fuseki
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: khub-explorer
+          path: |
+            ./explorer/
+            ./configuration/
+            ./start-khub-explorer.bat
+
+  khub_full:
+    name: Knowledge Hub Complete
+    needs: [khub_builder, khub_explorer]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: ./artifacts
+
+      - name: Merge Artifacts
+        run: |
+          mkdir ./knowledge-hub
+          cp -r ./artifacts/khub-builder/. ./artifacts/khub-explorer/. ./knowledge-hub
+
+      - name: Publish Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: knowledge-hub
+          path: ./knowledge-hub

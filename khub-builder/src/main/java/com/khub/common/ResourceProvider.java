@@ -12,7 +12,7 @@ public class ResourceProvider {
 
     private static final Logger logger = Logger.getLogger(ResourceProvider.class.getName());
 
-    private static final String PROPERTIES_RESOURCE = "/config.properties";
+    private static final String PROPERTIES_RESOURCE = "/builder-config.properties";
 
     // Prevents instantiation
     private ResourceProvider() {

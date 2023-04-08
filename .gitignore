@@ -41,10 +41,7 @@ resources/queries/
 resources/ontology/*
 !resources/ontology/khub.owl
 
+# KHub Explorer
 khub-explorer/.pnp
-
-# testing
 khub-explorer/coverage
-
-# production
 khub-explorer/build

@@ -10,8 +10,15 @@ services:
     # calling the the integrated Jena TextIndexer and then starts the Fuseki server
     # It uses container environment variables declared in the Dockerfile
     command: >
-      sh -c "CONFIG_FILE=$$FUSEKI_DIR/configuration/assembler.ttl
+      sh -c "CONFIG_FILE=$$FUSEKI_DIR/configuration/explorer-config.ttl
+            TDB_DIR=..$$(grep -o 'tdb2:location \"[^\"]*\"' $$CONFIG_FILE | cut -d ' ' -f 2 | tr -d '\"')
             INDEX_DIR=..$$(grep -o 'text:directory \"[^\"]*\"' $$CONFIG_FILE | cut -d ' ' -f 2 | tr -d '\"')
+
+            if [ ! "$$(ls -A $$TDB_DIR)" ]
+            then
+              echo No TDB2 dataset $$TDB_DIR is found
+              exit 1
+            fi
 
             if [ ! "$$(ls -A $$INDEX_DIR)" ]
             then
@@ -37,21 +44,18 @@ services:
     ports:
       - 3030:3030
     volumes:
-      - ./configuration:/fuseki/configuration
-      - ./databases:/fuseki/databases
+      - ../configuration:/fuseki/configuration
+      - ../databases:/fuseki/databases
 
-  khub-explorer:
+  explorer:
     image: khub-explorer
     depends_on:
       - fuseki
     build:
       args:
-        - REACT_APP_FUSEKI_ENDPOINT=http://localhost:3030/
-        - REACT_APP_FUSEKI_SERVICE=dataset
-      context: ./khub-explorer/
+        - FUSEKI_ENDPOINT=http://localhost:3030/
+        - FUSEKI_SERVICE=dataset
+      context: .
       dockerfile: Dockerfile
     ports:
       - 3000:3000
-    volumes:
-      - '.:/app'
-      - '/app/node_modules'
