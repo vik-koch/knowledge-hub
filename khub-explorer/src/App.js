@@ -6,6 +6,7 @@ import Row from 'react-bootstrap/Row';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
+import Spinner from 'react-bootstrap/Spinner';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -27,6 +28,7 @@ function App() {
 
   // Showable content
   const [content, setContent] = useState(null);
+  const [loading, setLoading] = useState(null);
   const [error, setError] = useState(false);
   const [duration, setDuration] = useState(null);
 
@@ -47,6 +49,7 @@ function App() {
     const interval = setInterval(() => {
       fetch(fusekiEndpoint + '/$/ping')
         .then((response) => setReachabilityStatus(response.ok))
+        .catch((_) => setReachabilityStatus(false));
     }, pollingInterval);
     return () => clearInterval(interval);
   }, []);
@@ -60,6 +63,8 @@ function App() {
 
       let query = queryTemplate.replace('$QUERY', event.target[0].value);
       let startTime = new Date();
+      setLoading(true);
+
       await fetch(fusekiEndpoint + '/' + fusekiService, {
         method: 'POST',
         headers: {
@@ -67,13 +72,18 @@ function App() {
         },
         body: query
       }).then(async (response) => {
+        setLoading(false);
+
         if (response.ok) {
           const result = await response.json();
-          setContent(parseSparqlElements(result));
+          const parsedResult = parseSparqlElements(result)
+          setContent(parsedResult);
           setDuration(((new Date() - startTime) / 1000).toFixed(2));
         }
       }).catch(async (rejected) => {
         console.log(rejected);
+        setLoading(false);
+
         setError(true);
         await delay(2000);
         setError(false);
@@ -89,15 +99,21 @@ function App() {
           <Container className='py-3 d-flex justify-content-between' fluid='xxl'>
             <Col className='col-sm-auto'>
               <Stack direction='horizontal' gap={3}>
-                <div><span role='img' aria-label='books'>📚</span> KHub Explorer</div>
+                <div>
+                  {/* eslint-disable-next-line */}
+                  <a href='#' className='text-reset text-decoration-none' onClick={(event) => setContent(null)}>
+                    <span role='img' aria-label='books'>📚</span> KHub Explorer
+                  </a>
+                </div>
                 <Form className="d-flex" onSubmit={handleClick}>
                   <Form.Control type="search" placeholder="Type keywords..." className="me-3" aria-label="Search" />
                   <Button disabled={!reachabilityStatus} variant="primary" type='submit' >Search</Button>
                 </Form>
+                <LoadingSpinner isLoading={loading} />
               </Stack>
             </Col>
             <Col className='col-sm-auto align-self-center'>
-              <Status endpoint={reachabilityStatus} />
+              <Status isReachable={reachabilityStatus} />
             </Col>
           </Container>
         </Col>
@@ -127,7 +143,7 @@ function ErrorMessage(props) {
 }
 
 function Statistics(props) {
-  if (props.size) {
+  if (props.size != null) {
     let text = props.size !== 0 
       ? `Retrived ${props?.size} items in ${props?.duration} seconds`
       : "No search results retrieved";
@@ -138,12 +154,22 @@ function Statistics(props) {
 
 function Status(props) {
   let status = ['🟡', 'Initializing'];
-  if (props.endpoint) {
-    status = props.endpoint === true
+  if (props.isReachable != null) {
+    status = props.isReachable === true
       ? ['🟢', 'Server available']
       : ['🔴', 'Server not reachable']
   }
   return <div title={status[1]}>{status[0]}</div>
+}
+
+function LoadingSpinner(props) {
+  if (props.isLoading) {
+    return (
+      <Spinner animation="border" role="status" variant='primary'>
+        <span className="visually-hidden">Loading...</span>
+      </Spinner>
+    );
+  }
 }
 
 function delay(delay) {
