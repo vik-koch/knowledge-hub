@@ -26,26 +26,25 @@ jobs:
           cd ./khub-builder
           mvn --batch-mode --update-snapshots package
 
-      - name: Publish KHub Builder
-        uses: actions/upload-artifact@v3
-        with:
-          name: khub-builder
-          path: |
-            ./khub-builder/target/*.jar
-
-      - name: Copy Resources
+      - name: Copy Artifcats
         run: |
-          rm -i ./configuration/*
-          cp ./khub-builder/src/main/resources/config.properties ./configuration/config.properties
-          cp ./khub-builder/src/main/resources/docker-compose.yml ./resources/docker-compose.yml
+          mkdir ./builder
+          cp -r ./khub-builder/resources/* ./builder
 
-      - name: Publish Resources
+          mkdir ./configuration
+          cp ./khub-builder/src/main/resources/builder-config.properties ./configuration/builder-config.properties
+          cp ./khub-builder/src/main/resources/docker-compose.yml ./builder/docker-compose.yml
+
+          cp ./khub-builder/target/*.jar .
+
+      - name: Publish Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: khub-builder
           path: |
+            ./builder/
             ./configuration/
-            ./resources/
+            ./*.jar
 
   khub_explorer:
     name: Knowledge Hub Explorer
@@ -66,12 +65,16 @@ jobs:
           npm ci
           npm run build
 
-      - name: Copy KHub Explorer Artifacts
+      - name: Copy Artifacts
         run: |
           mkdir ./explorer
           cp -r ./khub-explorer/build ./explorer/app
           cp ./khub-explorer/Dockerfile ./explorer/Dockerfile
           cp ./khub-explorer/docker-compose.yaml ./explorer/docker-compose.yaml
+
+          mkdir ./configuration
+          cp ./khub-explorer/config/explorer-config.ttl ./configuration/explorer.config.ttl
+
           printf "@ECHO OFF\ntitle KHub Explorer\ncd ./explorer\ndocker-compose -p knowledge-hub up" > "./start-khub-explorer.bat"
 
       - name: Download Fuseki Docker ${{env.FUSEKI_VERSION}}
@@ -80,13 +83,13 @@ jobs:
           wget https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki-docker/${{env.FUSEKI_VERSION}}/jena-fuseki-docker-${{env.FUSEKI_VERSION}}.zip
           unzip -j ./jena-fuseki-docker-${{env.FUSEKI_VERSION}}.zip -d ./explorer/fuseki
 
-      - name: Publish KHub Explorer
+      - name: Publish Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: khub-explorer
           path: |
-            ./configuration/
             ./explorer/
+            ./configuration/
             ./start-khub-explorer.bat
 
   khub_full:

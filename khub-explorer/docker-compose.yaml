@@ -10,7 +10,7 @@ services:
     # calling the the integrated Jena TextIndexer and then starts the Fuseki server
     # It uses container environment variables declared in the Dockerfile
     command: >
-      sh -c "CONFIG_FILE=$$FUSEKI_DIR/configuration/assembler.ttl
+      sh -c "CONFIG_FILE=$$FUSEKI_DIR/configuration/explorer-config.ttl
             TDB_DIR=..$$(grep -o 'tdb2:location \"[^\"]*\"' $$CONFIG_FILE | cut -d ' ' -f 2 | tr -d '\"')
             INDEX_DIR=..$$(grep -o 'text:directory \"[^\"]*\"' $$CONFIG_FILE | cut -d ' ' -f 2 | tr -d '\"')
 

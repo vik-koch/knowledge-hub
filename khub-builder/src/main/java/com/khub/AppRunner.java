@@ -378,7 +378,7 @@ public class AppRunner {
         }
 
         // Initialise configuration
-        Path configPath = Paths.get("./configuration/config.properties");
+        Path configPath = Paths.get("./configuration/builder-config.properties");
         Properties properties = ResourceProvider.loadProperties(configPath);
 
         if (properties == null) System.exit(1);
