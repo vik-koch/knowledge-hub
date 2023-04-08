@@ -113,7 +113,7 @@ public class ConfluenceCrawler extends AbstractCrawler {
                 try {
                     String spaceKey = spaceObject.get("key").getAsString();                
                     String spaceId = spaceObject.get("id").getAsString();
-                    String requestUrl = endpoint + "rest/api/space/" + spaceKey + "/content/page?type=page&limit=100"
+                    String requestUrl = endpoint + "rest/api/space/" + spaceKey + "/content/page?type=page&limit=20"
                         + "&expand=body.view,children.comment,ancestors,history.lastUpdated";
 
                     List<JsonElement> result = retrieve(requestUrl);
