@@ -74,10 +74,9 @@ jobs:
 
       - name: Download Fuseki Docker ${{env.FUSEKI_VERSION}}
         run: |
-          cd ./explorer
-          mkdir fuseki
+          mkdir ./explorer/fuseki
           wget https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki-docker/${{env.FUSEKI_VERSION}}/jena-fuseki-docker-${{env.FUSEKI_VERSION}}.zip
-          unzip -j ./jena-fuseki-docker-${{env.FUSEKI_VERSION}}.zip -d ./fuseki          
+          unzip -j ./jena-fuseki-docker-${{env.FUSEKI_VERSION}}.zip -d ./explorer/fuseki
 
       - name: Publish KHub Explorer
         uses: actions/upload-artifact@v3
@@ -88,7 +87,7 @@ jobs:
             ./explorer/
 
   khub_full:
-    name: Knowledge Hub
+    name: Knowledge Hub Complete
     needs: [khub_builder, khub_explorer]
     runs-on: ubuntu-latest
 
@@ -104,7 +103,7 @@ jobs:
       - name: Merge Artifacts
         run: |
           mkdir ./knowledge-hub
-          cp -r ./khub-builder/. ./khub-explorer/. ./knowledge-hub
+          cp -r ./artifacts/khub-builder/. ./artifacts/khub-explorer/. ./knowledge-hub
 
       - name: Publish Artifacts
         uses: actions/upload-artifact@v3
