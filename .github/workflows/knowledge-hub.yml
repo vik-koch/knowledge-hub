@@ -28,12 +28,9 @@ jobs:
 
       - name: Copy Artifcats
         run: |
-          mkdir ./builder
-          cp -r ./khub-builder/resources/* ./builder
-
           mkdir ./configuration
           cp ./khub-builder/src/main/resources/builder-config.properties ./configuration/builder-config.properties
-          cp ./khub-builder/src/main/resources/docker-compose.yml ./builder/docker-compose.yml
+          cp ./khub-builder/src/main/resources/docker-compose.yml ./resources/docker-compose.yml
 
           cp ./khub-builder/target/*.jar .
 
@@ -42,7 +39,7 @@ jobs:
         with:
           name: khub-builder
           path: |
-            ./builder/
+            ./resources/
             ./configuration/
             ./*.jar
 
@@ -73,7 +70,7 @@ jobs:
           cp ./khub-explorer/docker-compose.yaml ./explorer/docker-compose.yaml
 
           mkdir ./configuration
-          cp ./khub-explorer/config/explorer-config.ttl ./configuration/explorer.config.ttl
+          cp ./khub-explorer/config/explorer-config.ttl ./configuration/explorer-config.ttl
 
           printf "@ECHO OFF\ntitle KHub Explorer\ncd ./explorer\ndocker-compose -p knowledge-hub up" > "./start-khub-explorer.bat"
 

@@ -35,11 +35,11 @@ node_modules/
 databases/
 
 # KHub Builder Resources
-khub-builder/resources/knowledge/*/
-khub-builder/resources/content/
-khub-builder/resources/queries/
-khub-builder/resources/ontology/*
-!khub-builder/resources/ontology/khub.owl
+resources/knowledge/*/
+resources/content/
+resources/queries/
+resources/ontology/*
+!resources/ontology/khub.owl
 
 # KHub Explorer
 khub-explorer/.pnp
