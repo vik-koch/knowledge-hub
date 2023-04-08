@@ -89,7 +89,7 @@ jobs:
 
   khub_full:
     name: Knowledge Hub
-    needs: [khub_builder, khub-explorer]
+    needs: [khub_builder, khub_explorer]
     runs-on: ubuntu-latest
 
     steps:
