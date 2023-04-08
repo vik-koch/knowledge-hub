@@ -12,13 +12,18 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { SearchResults } from './SearchResults';
 import { parseSparqlElements } from './Parser';
 
-//const fusekiEndpoint = process.env.REACT_APP_FUSEKI_ENDPOINT + '/' + process.env.REACT_APP_FUSEKI_SERVICE;
-const fusekiEndpoint = "http://localhost:3030/dataset";
+let fusekiEndpoint, fusekiService;
+const pollingInterval = 3000;
 
+if (typeof window !== 'undefined') {
+  initializeEnvironment();
+}
+
+// Main application
 function App() {
 
   const [queryTemplate, setQueryTemplate] = useState(null);
-  const [endpoint, setEndpoint] = useState(null);
+  const [reachabilityStatus, setReachabilityStatus] = useState(null);
 
   // Showable content
   const [content, setContent] = useState(null);
@@ -31,26 +36,18 @@ function App() {
       const data = await (
         await fetch('/queryTemplate.sparql')
       ).text();
-
       setQueryTemplate(data);
     };
-
+    
     fetchQueryTemplate();
   }, []);
-
+  
   // Poll the fuseki endpoint
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch(process.env.REACT_APP_FUSEKI_ENDPOINT + '/$/ping')
-        .then((response) => {
-          console.log(response);
-          if (response.ok) {
-            setEndpoint(true);
-          } else {
-            setEndpoint(false);
-          }
-        })
-    }, 2000);
+      fetch(fusekiEndpoint + '/$/ping')
+        .then((response) => setReachabilityStatus(response.ok))
+    }, pollingInterval);
     return () => clearInterval(interval);
   }, []);
 
@@ -63,7 +60,7 @@ function App() {
 
       let query = queryTemplate.replace('$QUERY', event.target[0].value);
       let startTime = new Date();
-      await fetch(fusekiEndpoint, {
+      await fetch(fusekiEndpoint + '/' + fusekiService, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/sparql-query',
@@ -76,6 +73,7 @@ function App() {
           setDuration(((new Date() - startTime) / 1000).toFixed(2));
         }
       }).catch(async (rejected) => {
+        console.log(rejected);
         setError(true);
         await delay(2000);
         setError(false);
@@ -94,12 +92,12 @@ function App() {
                 <div><span role='img' aria-label='books'>📚</span> KHub Explorer</div>
                 <Form className="d-flex" onSubmit={handleClick}>
                   <Form.Control type="search" placeholder="Type keywords..." className="me-3" aria-label="Search" />
-                  <Button disabled={!endpoint} variant="primary" type='submit' >Search</Button>
+                  <Button disabled={!reachabilityStatus} variant="primary" type='submit' >Search</Button>
                 </Form>
               </Stack>
             </Col>
             <Col className='col-sm-auto align-self-center'>
-              <Status endpoint={endpoint} />
+              <Status endpoint={reachabilityStatus} />
             </Col>
           </Container>
         </Col>
@@ -150,6 +148,21 @@ function Status(props) {
 
 function delay(delay) {
   return new Promise( res => setTimeout(res, delay) );
+}
+
+function initializeEnvironment() {
+  fusekiEndpoint = process.env.REACT_APP_FUSEKI_ENDPOINT;
+  fusekiService = process.env.REACT_APP_FUSEKI_SERVICE;
+
+  if (!fusekiEndpoint) {
+    console.log('No environment variable for Fuseki endpoint found, the default value is used instead')
+    fusekiEndpoint = 'http://localhost:3030';
+  }
+
+  if (!fusekiService) {
+    console.log('No environment variable for Fuseki service found, the default value is used instead')
+    fusekiService = 'dataset';
+  }
 }
 
 export default App;

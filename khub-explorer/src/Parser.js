@@ -57,8 +57,8 @@ function parseSparqlElement(element) {
                    : content.substring(0, snippetSize) + '...' 
   
     // Ancestors
-    const titles = element.ancestor_titles?.value.split('///');
-    const links = element.ancestor_links?.value.split('///');
+    const titles = element.ancestorTitles?.value.split('///');
+    const links = element.ancestorLinks?.value.split('///');
     if (titles && links && titles?.length === links?.length) {
       const zipped = zipTitleWithLinks(titles, links);
       result.ancestors = zipped.reverse();
