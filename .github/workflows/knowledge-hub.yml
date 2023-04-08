@@ -68,9 +68,11 @@ jobs:
 
       - name: Copy KHub Explorer Artifacts
         run: |
-          cp -r ./khub-explorer/build ./explorer
+          mkdir ./explorer
+          cp -r ./khub-explorer/build ./explorer/app
           cp ./khub-explorer/Dockerfile ./explorer/Dockerfile
           cp ./khub-explorer/docker-compose.yaml ./explorer/docker-compose.yaml
+          printf "@ECHO OFF\ntitle KHub Explorer\ncd ./explorer\ndocker-compose -p knowledge-hub up" > "./start-khub-explorer.bat"
 
       - name: Download Fuseki Docker ${{env.FUSEKI_VERSION}}
         run: |
@@ -85,6 +87,7 @@ jobs:
           path: |
             ./configuration/
             ./explorer/
+            ./start-khub-explorer.bat
 
   khub_full:
     name: Knowledge Hub Complete
