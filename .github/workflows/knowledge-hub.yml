@@ -62,7 +62,7 @@ jobs:
 
       - name: Copy Resources
         run: |
-          cp ./khub-explorer/build ./explorer
+          cp -r ./khub-explorer/build ./explorer
           cp ./khub-explorer/Dockerfile ./explorer/Dockerfile
 
         # Apache Fuseki
