@@ -70,6 +70,7 @@ jobs:
         run: |
           cp -r ./khub-explorer/build ./explorer
           cp ./khub-explorer/Dockerfile ./explorer/Dockerfile
+          cp ./khub-explorer/docker-compose.yaml ./explorer/docker-compose.yaml
 
       - name: Download Fuseki Docker ${{env.FUSEKI_VERSION}}
         run: |
@@ -85,4 +86,3 @@ jobs:
           path: |
             ./configuration/
             ./explorer/
-            ./khub-explorer-compose.yaml
