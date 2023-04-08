@@ -1,17 +1,21 @@
 import { useState, useEffect } from 'react';
-import Alert from 'react-bootstrap/Alert';
+
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Stack from 'react-bootstrap/Stack';
-import Spinner from 'react-bootstrap/Spinner';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { SearchResults } from './SearchResults';
-import { parseSparqlElements } from './Parser';
+import SearchResults from './SearchResults';
+import parseSparqlElements from './Parser';
+
+import ErrorMessage from './utilities/ErrorMessage';
+import LoadingSpinner from './utilities/LoadingSpinner';
+import Statistics from './utilities/Statistics'
+import Status from './utilities/Status'
 
 let fusekiEndpoint, fusekiService;
 const pollingInterval = 3000;
@@ -130,46 +134,6 @@ function App() {
     </Container>
 
   );
-}
-
-function ErrorMessage(props) {
-  if (props.error === true) {
-    return (
-      <Alert variant='warning'>
-        <Alert.Heading>Unable to send a request!</Alert.Heading>
-      </Alert>
-    );
-  }
-}
-
-function Statistics(props) {
-  if (props.size != null) {
-    let text = props.size !== 0 
-      ? `Retrived ${props?.size} items in ${props?.duration} seconds`
-      : "No search results retrieved";
-
-    return <div className='mt-3'>{text}</div>
-  }
-}
-
-function Status(props) {
-  let status = ['🟡', 'Initializing'];
-  if (props.isReachable != null) {
-    status = props.isReachable === true
-      ? ['🟢', 'Server available']
-      : ['🔴', 'Server not reachable']
-  }
-  return <div title={status[1]}>{status[0]}</div>
-}
-
-function LoadingSpinner(props) {
-  if (props.isLoading) {
-    return (
-      <Spinner animation="border" role="status" variant='primary'>
-        <span className="visually-hidden">Loading...</span>
-      </Spinner>
-    );
-  }
 }
 
 function delay(delay) {

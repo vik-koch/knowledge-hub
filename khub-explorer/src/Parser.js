@@ -73,4 +73,4 @@ function parseSparqlElement(element) {
   
 }
 
-export {parseSparqlElements}
+export default parseSparqlElements

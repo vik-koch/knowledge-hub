@@ -119,4 +119,4 @@ function Body(element) {
   return <div>{element.content}</div>
 }
 
-export { SearchResults };
+export default SearchResults
