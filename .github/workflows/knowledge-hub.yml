@@ -15,10 +15,10 @@ jobs:
       - name: Check out
         uses: actions/checkout@v3
 
-      - name: Set up JDK $JDK_VERSION
+      - name: Set up JDK ${{env.JDK_VERSION}}
         uses: actions/setup-java@v3
         with:
-          java-version: $JDK_VERSION
+          java-version: ${{env.JDK_VERSION}}
           distribution: temurin
 
       - name: Build KHub Builder
@@ -49,10 +49,10 @@ jobs:
       - name: Check out
         uses: actions/checkout@v3
 
-      - name: Set up Node.js $NODE_VERSION
+      - name: Set up Node.js ${{env.NODE_VERSION}}
         uses: actions/setup-node@v3
         with:
-          node-version: $NODE_VERSION
+          node-version: ${{env.NODE_VERSION}}
 
       - name: Build KHub Explorer
         run: |
@@ -69,8 +69,8 @@ jobs:
       - name: Download Dependencies
         run: |
           mkdir fuseki
-          wget https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki-docker/$FUSEKI_VERSION/jena-fuseki-docker-$FUSEKI_VERSION.zip
-          unzip -j ./jena-fuseki-docker-$FUSEKI_VERSION.zip -d ./fuseki          
+          wget https://repo1.maven.org/maven2/org/apache/jena/jena-fuseki-docker/${{env.FUSEKI_VERSION}}/jena-fuseki-docker-${{env.FUSEKI_VERSION}}.zip
+          unzip -j ./jena-fuseki-docker-${{env.FUSEKI_VERSION}}.zip -d ./fuseki          
           rm ./fuseki/docker-compose.yaml
 
       - name: Publish Artifact
