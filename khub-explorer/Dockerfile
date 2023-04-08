@@ -1,5 +1,6 @@
 ## Knowledge Hub Explorer Dockerfile
-ARG NODE_VERSION=19
+
+ARG NODE_VERSION=18
 FROM node:${NODE_VERSION}-alpine
 
 ARG KHUB_DIR=/app
@@ -11,12 +12,10 @@ ENV REACT_APP_FUSEKI_ENDPOINT=$FUSEKI_ENDPOINT
 ENV REACT_APP_FUSEKI_SERVICE=$FUSEKI_SERVICE
 
 WORKDIR ${KHUB_DIR}
-
 COPY . .
 
-RUN npm ci
-RUN npm run build
+RUN npm install --global serve
 
 EXPOSE 3000
 
-CMD [ "npx", "serve", "build" ]
+CMD [ "npx", "serve" ]
