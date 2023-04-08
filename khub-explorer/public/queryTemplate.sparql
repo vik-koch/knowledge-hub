@@ -1,0 +1,51 @@
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX khub: <http://semanticweb.org/ontologies/khub#>
+PREFIX text: <http://jena.apache.org/text#>
+
+SELECT ?link ?title ?content ?email ?creationTime ?lastUpdateTime
+    (GROUP_CONCAT(DISTINCT STRAFTER(STR(?type), "#"); SEPARATOR=", ") AS ?types)
+    (GROUP_CONCAT(DISTINCT ?ancestorTitle; SEPARATOR="///") AS ?ancestorTitles)
+    (GROUP_CONCAT(DISTINCT ?ancestorLink; SEPARATOR="///") AS ?ancestorLinks)
+
+WHERE {
+    {
+        SELECT ?result (?score 
+            + 2.5 * COALESCE(AVG(?refScore), 0) 
+            + 0.5 * COALESCE(AVG(?parentScore), 0)  
+            + 0.5 * COALESCE(AVG(?childScore), 0) AS ?totalScore)
+
+        WHERE {
+            BIND ('$QUERY' AS ?query)
+            (?result ?score) text:query (khub:search ?query) .
+            OPTIONAL {
+                (?resultRef ?refScore) text:query (khub:search ?query) .
+                ?result khub:reference ?resultRef .
+            }
+            OPTIONAL {
+                (?parent ?parentScore) text:query (khub:search ?query) .
+                ?result khub:ancestor+ ?parent .
+            }
+            OPTIONAL {
+                (?child ?childScore) text:query (khub:search ?query) .
+                ?child khub:ancestor+ ?result .
+            }
+        }
+        GROUP BY ?result ?score
+    }
+
+    ?result khub:link ?link ;
+            rdf:type ?type .
+    OPTIONAL { ?result khub:title ?title } .
+    OPTIONAL { ?result khub:content ?content } .
+    OPTIONAL { ?result khub:email ?email } .
+    OPTIONAL { ?result khub:creationTime ?creationTime } .
+    OPTIONAL { ?result khub:lastUpdateTime ?lastUpdateTime } .
+    OPTIONAL {
+        ?result khub:ancestor+ ?parent .
+        ?parent khub:title ?ancestorTitle ;
+                khub:link ?ancestorLink .
+    }
+}
+
+GROUP BY ?link ?title ?content ?email ?creationTime ?lastUpdateTime ?totalScore
+ORDER BY DESC (?totalScore) DESC (?creationTime)

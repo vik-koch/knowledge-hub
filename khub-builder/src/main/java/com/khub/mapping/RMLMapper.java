@@ -46,7 +46,7 @@ public class RMLMapper {
         logger.info("Retrieved " + filenames.size() + " mapping files: " + String.join(", ", filenames));
         Pattern pattern = Pattern.compile("source\s*\"(.*)\"");
 
-        filenames.parallelStream().forEach(filename -> {
+        filenames.stream().forEach(filename -> {
             if (filename.endsWith(".ttl")) {
                 try {
                     Path absoluteMappingsPath = mappingsPath.toRealPath(LinkOption.NOFOLLOW_LINKS);
@@ -84,7 +84,7 @@ public class RMLMapper {
             String output = Paths.get(outputDirectoryName, filename).toString();
             String format = "turtle";
 
-            String[] command = {"docker-compose", "run", "--rm",
+            String[] command = {"docker-compose", "run", "-rm", "--use-aliases",
                                 "-v", volume, "rml-mapper", "-m", filename, "-o", output, "-s", format };
 
             Process process = DockerRunner.runCommand(dockerPath, command);
