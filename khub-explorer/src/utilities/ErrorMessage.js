@@ -1,13 +1,12 @@
-import Alert from 'react-bootstrap/Alert';
+import Fade from 'react-bootstrap/Fade';
+import Badge from 'react-bootstrap/Badge';
 
 function ErrorMessage(props) {
-  if (props.error === true) {
-    return (
-      <Alert variant='warning'>
-        <Alert.Heading>Unable to send a request!</Alert.Heading>
-      </Alert>
-    );
-  }
+  return (
+    <Fade in={props?.error}>
+      <h3 className='mb-0'><Badge bg='secondary'>Unable to send a request!</Badge></h3>
+    </Fade>
+  );
 }
 
 export default ErrorMessage

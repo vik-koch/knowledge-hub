@@ -111,6 +111,7 @@ function App() {
       }).catch(async (rejected) => {
         console.log(rejected);
         setLoading(false);
+        setContent(null);
 
         setError(true);
         await delay(2000);
@@ -138,6 +139,7 @@ function App() {
                   <Button disabled={!reachable} variant="primary" type='submit' >Search</Button>
                 </Form>
                 <LoadingSpinner isLoading={loading} />
+                <ErrorMessage error={error} />
               </Stack>
             </Col>
             <Col className='col-sm-auto align-self-center'>
@@ -149,7 +151,7 @@ function App() {
       <Row>
         <Col>
           <Container fluid='xxl'>
-            <ErrorMessage error={error} />
+            
             <Statistics size={content?.length} duration={duration}/>
             <SearchResults content={content} />
           </Container>
