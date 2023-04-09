@@ -1,5 +1,6 @@
 const zipTitleWithLinks = (titles, links) => titles.map((title, i) => ({title: title, link: links[i]})); 
 const options = { year: 'numeric', month: 'long', day: 'numeric' };
+const nodeNames = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'];
 
 function parseSparqlElements(elements) {
     const result = [];
@@ -38,23 +39,20 @@ function parseSparqlElement(element) {
       result.lastUpdateTime = lastUpdateTime.toLocaleDateString('en-UK', options);
     }
   
-    // Content snippet
+  	// Content snippet
     result.content = '';
+
     const childNodes = new DOMParser()
       .parseFromString(element.content?.value, "text/html")
       .body.childNodes;
-    
-    let snippet = []
-    Array.from(childNodes).every(element => {
-      if (element.textContent) snippet.push(element.innerText);
-      if (snippet.length === 3) return false;
-      return true;
-    });
-  
-    const snippetSize = 200;
-    const content = snippet.join(' ');
+
+    const snippet = parseChildNodes(childNodes);
+
+    const snippetSize = 400;
+    const content = snippet.slice(0, 7).join(' · ');
+
     result.content = content.length < snippetSize ? content 
-                   : content.substring(0, snippetSize) + '...' 
+                   : content.substring(0, snippetSize) + '...'
   
     // Ancestors
     const titles = element.ancestorTitles?.value.split('///');
@@ -71,6 +69,19 @@ function parseSparqlElement(element) {
     
     return result;
   
+}
+
+function parseChildNodes(childNodes) {
+  let result = []
+  childNodes.forEach(element => {
+    const text = element.innerText;
+    if (nodeNames.includes(element.nodeName) && text != null && /\S/.test(text)) {
+      result.push(text.replace(/\u00a0/g, " "));
+    } else {
+      result.push.apply(result, parseChildNodes(element.childNodes));
+    }
+  });
+  return result;
 }
 
 export default parseSparqlElements
