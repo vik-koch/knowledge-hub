@@ -28,7 +28,7 @@ if (typeof window !== 'undefined') {
 function App() {
 
   // Query template
-  const [queryTemplate, setQueryTemplate] = useState(null);
+  const [template, setTemplate] = useState(null);
 
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(false);
@@ -62,14 +62,14 @@ function App() {
 
   // Read query template from public
   useEffect(() => {
-    const fetchQueryTemplate = async () => {
+    const fetchTemplate = async () => {
       const data = await (
-        await fetch('/queryTemplate.sparql')
+        await fetch('/template.sparql')
       ).text();
-      setQueryTemplate(data);
+      setTemplate(data);
     };
     
-    fetchQueryTemplate();
+    fetchTemplate();
   }, []);
   
   // Poll the fuseki endpoint
@@ -89,7 +89,7 @@ function App() {
     } else {
       event.preventDefault();
 
-      let query = queryTemplate.replace('$QUERY', event.target[0].value);
+      let query = template.replace('$QUERY', event.target[0].value);
       let startTime = new Date();
       setLoading(true);
 
