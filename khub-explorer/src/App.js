@@ -134,9 +134,9 @@ function App() {
                     <span role='img' aria-label='books'>📚</span> KHub Explorer
                   </a>
                 </div>
-                <Form className="d-flex" onSubmit={handleClick}>
-                  <Form.Control type="search" placeholder="Type keywords..." className="me-3" aria-label="Search" />
-                  <Button disabled={!reachable} variant="primary" type='submit' >Search</Button>
+                <Form className='d-flex' onSubmit={handleClick}>
+                  <Form.Control type='search' placeholder='Type keywords...' className='me-3' aria-label='Search' />
+                  <Button disabled={!reachable} variant='primary' type='submit' >Search</Button>
                 </Form>
                 <LoadingSpinner isLoading={loading} />
                 <ErrorMessage error={error} />

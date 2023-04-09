@@ -46,7 +46,7 @@ function parseSparqlElement(element) {
 
     // Content snippet
     let content = '';
-    const document = new DOMParser().parseFromString(element.content?.value, "text/html").body;
+    const document = new DOMParser().parseFromString(element.content?.value, 'text/html').body;
 
     if (result.type === 'Confluence') {
       const snippet = parseChildNodes(document.childNodes);
@@ -78,7 +78,7 @@ function parseChildNodes(childNodes) {
   childNodes.forEach(element => {
     const text = element.innerText;
     if (nodeNames.includes(element.nodeName) && text != null && /\S/.test(text)) {
-      result.push(text.replace(/\u00a0/g, " "));
+      result.push(text.replace(/\u00a0/g, ' '));
     } else {
       result.push.apply(result, parseChildNodes(element.childNodes));
     }
