@@ -3,11 +3,19 @@ import Row from 'react-bootstrap/Row';
 import Stack from 'react-bootstrap/Stack';
 import Pagination from 'react-bootstrap/Pagination';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 function SearchResults(props) {
 
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    setCurrentPage(JSON.parse(window.localStorage.getItem('currentPage')));
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('currentPage', currentPage);
+  }, [currentPage]);
 
   if (props.content) {
     const size = 10;
@@ -86,7 +94,7 @@ function SourceIcon(element) {
 function Header(element) {
   return (
     <div>
-      <a href={element?.link} className="text-decoration-none">
+      <a href={element?.link} className='text-decoration-none'>
         {element?.title}
       </a>
     </div>
@@ -119,4 +127,4 @@ function Body(element) {
   return <div>{element.content}</div>
 }
 
-export { SearchResults };
+export default SearchResults

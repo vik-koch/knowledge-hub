@@ -1,5 +1,6 @@
 const zipTitleWithLinks = (titles, links) => titles.map((title, i) => ({title: title, link: links[i]})); 
 const options = { year: 'numeric', month: 'long', day: 'numeric' };
+const nodeNames = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'];
 
 function parseSparqlElements(elements) {
     const result = [];
@@ -38,24 +39,26 @@ function parseSparqlElement(element) {
       result.lastUpdateTime = lastUpdateTime.toLocaleDateString('en-UK', options);
     }
   
+    // Type
+    result.type = element.types.value.includes('Confluence') ? 'Confluence' 
+                : element.types.value.includes('Teams') ? 'Teams' 
+                : '';
+
     // Content snippet
-    result.content = '';
-    const childNodes = new DOMParser()
-      .parseFromString(element.content?.value, "text/html")
-      .body.childNodes;
-    
-    let snippet = []
-    Array.from(childNodes).every(element => {
-      if (element.textContent) snippet.push(element.innerText);
-      if (snippet.length === 3) return false;
-      return true;
-    });
-  
-    const snippetSize = 200;
-    const content = snippet.join(' ');
+    let content = '';
+    const document = new DOMParser().parseFromString(element.content?.value, 'text/html').body;
+
+    if (result.type === 'Confluence') {
+      const snippet = parseChildNodes(document.childNodes);
+      content = snippet.slice(0, 7).join(' · ');
+    } else {
+      content = document.innerText;
+    }
+
+    const snippetSize = 300;
     result.content = content.length < snippetSize ? content 
-                   : content.substring(0, snippetSize) + '...' 
-  
+                   : content.substring(0, snippetSize) + '...'
+
     // Ancestors
     const titles = element.ancestorTitles?.value.split('///');
     const links = element.ancestorLinks?.value.split('///');
@@ -64,13 +67,23 @@ function parseSparqlElement(element) {
       result.ancestors = zipped.reverse();
     }
   
-    // Type
-    result.type = element.types.value.includes('Confluence') ? 'Confluence' 
-                : element.types.value.includes('Teams') ? 'Teams' 
-                : '';
+
     
     return result;
   
 }
 
-export {parseSparqlElements}
+function parseChildNodes(childNodes) {
+  let result = []
+  childNodes.forEach(element => {
+    const text = element.innerText;
+    if (nodeNames.includes(element.nodeName) && text != null && /\S/.test(text)) {
+      result.push(text.replace(/\u00a0/g, ' '));
+    } else {
+      result.push.apply(result, parseChildNodes(element.childNodes));
+    }
+  });
+  return result;
+}
+
+export default parseSparqlElements
