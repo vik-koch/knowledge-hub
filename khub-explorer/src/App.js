@@ -34,13 +34,13 @@ function App() {
   const [error, setError] = useState(false);
 
   // Fuseki reachability status
-  const [reachabilityStatus, setReachabilityStatus] = useState(null);
+  const [reachable, setReachable] = useState(null);
   useEffect(() => {
-    setReachabilityStatus(JSON.parse(window.localStorage.getItem('reachabilityStatus')));
+    setReachable(JSON.parse(window.localStorage.getItem('reachable')));
   }, []);
   useEffect(() => {
-    window.localStorage.setItem('reachabilityStatus', reachabilityStatus);
-  }, [reachabilityStatus]);
+    window.localStorage.setItem('reachable', reachable);
+  }, [reachable]);
 
   // Showable content
   const [content, setContent] = useState(null);
@@ -76,8 +76,8 @@ function App() {
   useEffect(() => {
     const interval = setInterval(() => {
       fetch(fusekiEndpoint + '/$/ping')
-        .then((response) => setReachabilityStatus(response.ok))
-        .catch((_) => setReachabilityStatus(false));
+        .then((response) => setReachable(response.ok))
+        .catch((_) => setReachable(false));
     }, pollingInterval);
     return () => clearInterval(interval);
   }, []);
@@ -135,13 +135,13 @@ function App() {
                 </div>
                 <Form className="d-flex" onSubmit={handleClick}>
                   <Form.Control type="search" placeholder="Type keywords..." className="me-3" aria-label="Search" />
-                  <Button disabled={!reachabilityStatus} variant="primary" type='submit' >Search</Button>
+                  <Button disabled={!reachable} variant="primary" type='submit' >Search</Button>
                 </Form>
                 <LoadingSpinner isLoading={loading} />
               </Stack>
             </Col>
             <Col className='col-sm-auto align-self-center'>
-              <Status isReachable={reachabilityStatus} />
+              <Status isReachable={reachable} />
             </Col>
           </Container>
         </Col>
