@@ -39,21 +39,26 @@ function parseSparqlElement(element) {
       result.lastUpdateTime = lastUpdateTime.toLocaleDateString('en-UK', options);
     }
   
-  	// Content snippet
-    result.content = '';
+    // Type
+    result.type = element.types.value.includes('Confluence') ? 'Confluence' 
+                : element.types.value.includes('Teams') ? 'Teams' 
+                : '';
 
-    const childNodes = new DOMParser()
-      .parseFromString(element.content?.value, "text/html")
-      .body.childNodes;
+    // Content snippet
+    let content = '';
+    const document = new DOMParser().parseFromString(element.content?.value, "text/html").body;
 
-    const snippet = parseChildNodes(childNodes);
+    if (result.type === 'Confluence') {
+      const snippet = parseChildNodes(document.childNodes);
+      content = snippet.slice(0, 7).join(' · ');
+    } else {
+      content = document.innerText;
+    }
 
-    const snippetSize = 400;
-    const content = snippet.slice(0, 7).join(' · ');
-
+    const snippetSize = 300;
     result.content = content.length < snippetSize ? content 
                    : content.substring(0, snippetSize) + '...'
-  
+
     // Ancestors
     const titles = element.ancestorTitles?.value.split('///');
     const links = element.ancestorLinks?.value.split('///');
@@ -62,10 +67,7 @@ function parseSparqlElement(element) {
       result.ancestors = zipped.reverse();
     }
   
-    // Type
-    result.type = element.types.value.includes('Confluence') ? 'Confluence' 
-                : element.types.value.includes('Teams') ? 'Teams' 
-                : '';
+
     
     return result;
   
