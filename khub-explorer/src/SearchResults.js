@@ -17,6 +17,10 @@ function SearchResults(props) {
     window.localStorage.setItem('currentPage', currentPage);
   }, [currentPage]);
 
+  if (currentPage == null) {
+    setCurrentPage(1);
+  }
+
   if (props.content) {
     const size = 10;
 

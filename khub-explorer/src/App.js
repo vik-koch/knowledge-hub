@@ -27,40 +27,9 @@ if (typeof window !== 'undefined') {
 // Main application
 function App() {
 
-  // Query template
+  // Query template from public
   const [template, setTemplate] = useState(null);
 
-  const [loading, setLoading] = useState(null);
-  const [error, setError] = useState(false);
-
-  // Fuseki reachability status
-  const [reachable, setReachable] = useState(null);
-  useEffect(() => {
-    setReachable(JSON.parse(window.localStorage.getItem('reachable')));
-  }, []);
-  useEffect(() => {
-    window.localStorage.setItem('reachable', reachable);
-  }, [reachable]);
-
-  // Showable content
-  const [content, setContent] = useState(null);
-  useEffect(() => {
-    setContent(JSON.parse(window.localStorage.getItem('content')));
-  }, []);
-  useEffect(() => {
-    window.localStorage.setItem('content', JSON.stringify(content));
-  }, [content]);
-
-  // Request duration for statistics
-  const [duration, setDuration] = useState(null);
-  useEffect(() => {
-    setDuration(JSON.parse(window.localStorage.getItem('duration')));
-  }, []);
-  useEffect(() => {
-    window.localStorage.setItem('duration', duration);
-  }, [duration]);
-
-  // Read query template from public
   useEffect(() => {
     const fetchTemplate = async () => {
       const data = await (
@@ -68,32 +37,57 @@ function App() {
       ).text();
       setTemplate(data);
     };
-    
     fetchTemplate();
   }, []);
-  
+
+  // Helper states
+  const [loading, setLoading] = useState(null);
+  const [error, setError] = useState(false);
+
+  // Fuseki reachability status with local storage
+  const [reachable, setReachable] = useState(null);
+
+  useEffect(() => {
+    setReachable(JSON.parse(window.localStorage.getItem('reachable')));
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('reachable', reachable);
+  }, [reachable]);
+
   // Poll the fuseki endpoint
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch(fusekiEndpoint + '/$/ping')
+      fetch(fusekiEndpoint + '$/ping')
         .then((response) => setReachable(response.ok))
         .catch((_) => setReachable(false));
     }, pollingInterval);
     return () => clearInterval(interval);
   }, []);
 
+  // Showable content with local storage
+  const [content, setContent] = useState({results: null, duration: null});
+
+  useEffect(() => {
+    setContent(JSON.parse(window.localStorage.getItem('content')));
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('content', JSON.stringify(content));
+  }, [content]);
+
   // Handle search button
   const handleClick = async (event) => {
     if (event.target[0].value === '') {
-      setContent(null);
+      setContent({results: null, duration: null});
     } else {
       event.preventDefault();
 
-      let query = template.replace('$QUERY', event.target[0].value);
-      let startTime = new Date();
+      const query = template.replace('$QUERY', event.target[0].value);
+      const startTime = new Date();
       setLoading(true);
 
-      await fetch(fusekiEndpoint + '/' + fusekiService, {
+      await fetch(fusekiEndpoint + fusekiService, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/sparql-query',
@@ -104,20 +98,20 @@ function App() {
 
         if (response.ok) {
           const result = await response.json();
-          const parsedResult = parseSparqlElements(result)
-          setContent(parsedResult);
-          setDuration(((new Date() - startTime) / 1000).toFixed(2));
+          const parsedResults = parseSparqlElements(result)
+          const duration = ((new Date() - startTime) / 1000).toFixed(2);
+          setContent({results: parsedResults, duration: duration});
         }
       }).catch(async (rejected) => {
-        console.log(rejected);
         setLoading(false);
-        setContent(null);
+
+        console.log(rejected);
+        setContent({results: null, duration: null});
 
         setError(true);
-        await delay(2000);
+        await new Promise(_ => setTimeout(_, 2000));
         setError(false);
       });
-
     }
   };
 
@@ -151,9 +145,8 @@ function App() {
       <Row>
         <Col>
           <Container fluid='xxl'>
-            
-            <Statistics size={content?.length} duration={duration}/>
-            <SearchResults content={content} />
+            <Statistics size={content?.results?.length} duration={content?.duration}/>
+            <SearchResults content={content?.results} />
           </Container>
         </Col>
       </Row>
@@ -162,17 +155,13 @@ function App() {
   );
 }
 
-function delay(delay) {
-  return new Promise( res => setTimeout(res, delay) );
-}
-
 function initializeEnvironment() {
   fusekiEndpoint = process.env.REACT_APP_FUSEKI_ENDPOINT;
   fusekiService = process.env.REACT_APP_FUSEKI_SERVICE;
 
   if (!fusekiEndpoint) {
     console.log('No environment variable for Fuseki endpoint found, the default value is used instead')
-    fusekiEndpoint = 'http://localhost:3030';
+    fusekiEndpoint = 'http://localhost:3030/';
   }
 
   if (!fusekiService) {
