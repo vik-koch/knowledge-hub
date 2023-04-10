@@ -54,7 +54,7 @@ jobs:
         run: |
           mkdir -p ./explorer/app
           cp -r ./khub-explorer/src ./explorer/app/src
-          cp ./khub-explorer/public ./explorer/app/public
+          cp -r ./khub-explorer/public ./explorer/app/public
           cp ./khub-explorer/*.json ./explorer/app
           cp ./khub-explorer/Dockerfile ./explorer/Dockerfile
           cp ./khub-explorer/docker-compose.yaml ./explorer/docker-compose.yaml
