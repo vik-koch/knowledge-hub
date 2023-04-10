@@ -18,9 +18,9 @@ RUN printf \
         \"FUSEKI_SERVICE\": \"$FUSEKI_SERVICE\", \
         \"CONFLUENCE_TOKEN\": \"$CONFLUENCE_TOKEN\" \
     }" \
-    > "./config.json"
+    > "./public/config.json"
 
-RUN sed -i 's/"proxy": ""/"proxy": "$CONFLUENCE_ENDPOINT"/' ./package.json
+RUN sed -i "s~\"proxy\": \"\"~\"proxy\": \"$CONFLUENCE_ENDPOINT\"~" "./package.json"
 
 RUN npm ci
 RUN npm run build

@@ -95,7 +95,7 @@ function Main(props) {
 
       axios.get(`wiki/rest/api/search?cql=text~"${event.target[0].value}"`, {
         headers: {
-          Authorization: 'Basic ' + btoa(props.config?.CONFLUENCE_ENDPOINT),
+          Authorization: 'Basic ' + btoa(props.config?.CONFLUENCE_TOKEN),
         },
       }).then(async function (response) {
         setLoading(false);
