@@ -17,27 +17,30 @@ import LoadingSpinner from './utilities/LoadingSpinner';
 import Statistics from './utilities/Statistics'
 import Status from './utilities/Status'
 
-let fusekiEndpoint, fusekiService;
 const pollingInterval = 3000;
 
 // Main application
 function App() {
   // Query template and configuration from public
   const [template, setTemplate] = useState(null);
+  const [config, setConfig] = useState(null);
 
   useEffect(() => {
-    const fetchTemplate = async () => {
+    const fetchData = async () => {
       const template = await (await fetch('/template.sparql')).text();
+      const config = await (await fetch('/config.json')).json();
       setTemplate(template);
+      setConfig(config);
     };
-    fetchTemplate();
+    fetchData();
   }, []);
-  console.log(template);
-  return (<Main template={template} />);
+  console.log(config);
+  return (<Main template={template} config={config} />);
 }
 
 function Main(props) {
   const template = props.template;
+  const config = props.config;
 
   // Helper states
   const [loading, setLoading] = useState(null);
@@ -57,7 +60,7 @@ function Main(props) {
   // Poll the fuseki endpoint
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch(fusekiEndpoint + '$/ping')
+      fetch(config.FUSEKI_ENDPOINT + '$/ping')
         .then((response) => setReachable(response.ok))
         .catch((_) => setReachable(false));
     }, pollingInterval);
@@ -86,7 +89,7 @@ function Main(props) {
       const startTime = new Date();
       setLoading(true);
 
-      await fetch(fusekiEndpoint + fusekiService, {
+      await fetch(config.FUSEKI_ENDPOINT + config.FUSEKI_SERVICE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/sparql-query',

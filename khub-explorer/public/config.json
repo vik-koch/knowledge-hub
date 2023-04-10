@@ -1,0 +1,4 @@
+{
+    "FUSEKI_ENDPOINT": "http://localhost:3030/",
+    "FUSEKI_SERVICE": "dataset"
+}
