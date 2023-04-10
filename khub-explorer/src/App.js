@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect} from 'react';
 
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
@@ -20,25 +20,24 @@ import Status from './utilities/Status'
 let fusekiEndpoint, fusekiService;
 const pollingInterval = 3000;
 
-if (typeof window !== 'undefined') {
-  initializeEnvironment();
-}
-
 // Main application
 function App() {
-
-  // Query template from public
+  // Query template and configuration from public
   const [template, setTemplate] = useState(null);
 
   useEffect(() => {
     const fetchTemplate = async () => {
-      const data = await (
-        await fetch('/template.sparql')
-      ).text();
-      setTemplate(data);
+      const template = await (await fetch('/template.sparql')).text();
+      setTemplate(template);
     };
     fetchTemplate();
   }, []);
+  console.log(template);
+  return (<Main template={template} />);
+}
+
+function Main(props) {
+  const template = props.template;
 
   // Helper states
   const [loading, setLoading] = useState(null);
@@ -118,7 +117,7 @@ function App() {
   return (
     <Container fluid>
       <Row className='bg-light'>
-        <Col>        
+        <Col>
           <Container className='py-3 d-flex justify-content-between' fluid='xxl'>
             <Col className='col-sm-auto'>
               <Stack direction='horizontal' gap={3}>
@@ -151,23 +150,7 @@ function App() {
         </Col>
       </Row>
     </Container>
-
   );
-}
-
-function initializeEnvironment() {
-  fusekiEndpoint = process.env.REACT_APP_FUSEKI_ENDPOINT;
-  fusekiService = process.env.REACT_APP_FUSEKI_SERVICE;
-
-  if (!fusekiEndpoint) {
-    console.log('No environment variable for Fuseki endpoint found, the default value is used instead')
-    fusekiEndpoint = 'http://localhost:3030/';
-  }
-
-  if (!fusekiService) {
-    console.log('No environment variable for Fuseki service found, the default value is used instead')
-    fusekiService = 'dataset';
-  }
 }
 
 export default App;
