@@ -52,7 +52,7 @@ jobs:
 
       - name: Copy Artifacts
         run: |
-          mkdir ./explorer
+          mkdir -p ./explorer/app
           cp -r ./khub-explorer/src ./explorer/app/src
           cp ./khub-explorer/public ./explorer/app/public
           cp ./khub-explorer/*.json ./explorer/app
