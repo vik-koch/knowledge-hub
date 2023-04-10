@@ -17,6 +17,8 @@ import LoadingSpinner from './utilities/LoadingSpinner';
 import Statistics from './utilities/Statistics'
 import Status from './utilities/Status'
 
+import axios from 'axios';
+
 const pollingInterval = 3000;
 
 // Main application
@@ -51,7 +53,6 @@ function Main(props) {
 
   // Fuseki reachability status with local storage
   const [reachable, setReachable] = useState(null);
-
   useEffect(() => {
     setReachable(JSON.parse(window.localStorage.getItem('reachable')));
   }, []);
@@ -87,27 +88,25 @@ function Main(props) {
       setContent({results: null, duration: null});
     } else {
       event.preventDefault();
-
+      
       const query = props.template.replace('$QUERY', event.target[0].value);
       const startTime = new Date();
       setLoading(true);
 
-      await fetch(props.config?.FUSEKI_ENDPOINT + props.config?.FUSEKI_SERVICE, {
-        method: 'POST',
+      axios.get(`wiki/rest/api/search?cql=text~"${event.target[0].value}"`, {
         headers: {
-          'Content-Type': 'application/sparql-query',
+          Authorization: 'Basic ' + btoa(props.config?.CONFLUENCE_ENDPOINT),
         },
-        body: query
-      }).then(async (response) => {
+      }).then(async function (response) {
         setLoading(false);
-
-        if (response.ok) {
-          const result = await response.json();
-          const parsedResults = parseSparqlElements(result)
+        console.log(response);
+        if (response.status === 200) {
+          const results = response.data;
+          // const parsedResults = parseSparqlElements(result)
           const duration = ((new Date() - startTime) / 1000).toFixed(2);
-          setContent({results: parsedResults, duration: duration});
+          // setContent({results: parsedResults, duration: duration});
         }
-      }).catch(async (rejected) => {
+      }).catch(async function (rejected) {
         setLoading(false);
 
         console.log(rejected);
@@ -117,6 +116,32 @@ function Main(props) {
         await new Promise(_ => setTimeout(_, 2000));
         setError(false);
       });
+
+      // await fetch(props.config?.FUSEKI_ENDPOINT + props.config?.FUSEKI_SERVICE, {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/sparql-query',
+      //   },
+      //   body: query
+      // }).then(async (response) => {
+      //   setLoading(false);
+
+      //   if (response.ok) {
+      //     const result = await response.json();
+      //     const parsedResults = parseSparqlElements(result)
+      //     const duration = ((new Date() - startTime) / 1000).toFixed(2);
+      //     setContent({results: parsedResults, duration: duration});
+      //   }
+      // }).catch(async (rejected) => {
+      //   setLoading(false);
+
+      //   console.log(rejected);
+      //   setContent({results: null, duration: null});
+
+      //   setError(true);
+      //   await new Promise(_ => setTimeout(_, 2000));
+      //   setError(false);
+      // });
     }
   };
 
