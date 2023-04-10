@@ -55,6 +55,8 @@ services:
       args:
         - FUSEKI_ENDPOINT=http://localhost:3030/
         - FUSEKI_SERVICE=dataset
+        - CONFLUENCE_ENDPOINT=
+        - CONFLUENCE_TOKEN=
       context: .
       dockerfile: Dockerfile
     ports:

@@ -3,7 +3,6 @@ on: push
 
 env:
   JDK_VERSION: 17
-  NODE_VERSION: 18
   FUSEKI_VERSION: 4.7.0
 
 jobs:
@@ -51,21 +50,12 @@ jobs:
       - name: Check out
         uses: actions/checkout@v3
 
-      - name: Set up Node.js ${{env.NODE_VERSION}}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{env.NODE_VERSION}}
-
-      - name: Build KHub Explorer
-        run: |
-          cd ./khub-explorer
-          npm ci
-          npm run build
-
       - name: Copy Artifacts
         run: |
           mkdir ./explorer
-          cp -r ./khub-explorer/build ./explorer/app
+          cp -r ./khub-explorer/src ./explorer/app/src
+          cp ./khub-explorer/public ./explorer/app/public
+          cp ./khub-explorer/*.json ./explorer/app
           cp ./khub-explorer/Dockerfile ./explorer/Dockerfile
           cp ./khub-explorer/docker-compose.yaml ./explorer/docker-compose.yaml
 
