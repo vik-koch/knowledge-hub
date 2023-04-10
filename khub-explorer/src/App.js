@@ -34,7 +34,7 @@ function App() {
     };
     fetchData();
   }, []);
-  console.log(config);
+
   return (<Main template={template} config={config} />);
 }
 
