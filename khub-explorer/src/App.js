@@ -68,7 +68,7 @@ function Main(props) {
         .catch((_) => setReachable(false));
     }, pollingInterval);
     return () => clearInterval(interval);
-  }, []);
+  }, [props.config?.FUSEKI_ENDPOINT]);
 
   // Showable content with local storage
   const [content, setContent] = useState({results: null, duration: null});
