@@ -11,13 +11,13 @@ WORKDIR ${KHUB_DIR}
 COPY ./app .
 
 RUN printf \
-    "{ \
-        \"FUSEKI_ENDPOINT\": \"$FUSEKI_ENDPOINT\", \
-        \"FUSEKI_SERVICE\": \"$FUSEKI_SERVICE\" \
+    "window.env = { \
+        \"REACT_APP_FUSEKI_ENDPOINT\": \"$FUSEKI_ENDPOINT\", \
+        \"REACT_APP_FUSEKI_SERVICE\": \"$FUSEKI_SERVICE\" \
     }" \
-    > "./config.json"
+    > "./env.js"
 
-RUN npm install --global serve
+RUN npm install serve
 
 EXPOSE 3000
 
