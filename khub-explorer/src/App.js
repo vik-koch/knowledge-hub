@@ -17,28 +17,33 @@ import LoadingSpinner from './utilities/LoadingSpinner';
 import Statistics from './utilities/Statistics'
 import Status from './utilities/Status'
 
-let fusekiEndpoint, fusekiService;
 const pollingInterval = 3000;
-
-if (typeof window !== 'undefined') {
-  initializeEnvironment();
-}
 
 // Main application
 function App() {
 
-  // Query template from public
+  // Query template and configuration from public
   const [template, setTemplate] = useState(null);
+  const [config, setConfig] = useState(null);
 
   useEffect(() => {
-    const fetchTemplate = async () => {
-      const data = await (
-        await fetch('/template.sparql')
-      ).text();
-      setTemplate(data);
+    const fetchData = async () => {
+      const template = await (await fetch('/template.sparql')).text();
+      const config = await (await fetch('/config.json')).json();
+      setTemplate(template);
+      setConfig(config);
     };
-    fetchTemplate();
+    fetchData();
   }, []);
+
+  if (template != null && config != null) {
+    return <Main template={template} config={config} />;
+  } else {
+    <div>Loading...</div>
+  }
+}
+
+function Main(props) {
 
   // Helper states
   const [loading, setLoading] = useState(null);
@@ -58,12 +63,12 @@ function App() {
   // Poll the fuseki endpoint
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch(fusekiEndpoint + '$/ping')
+      fetch(props.config?.FUSEKI_ENDPOINT + '$/ping')
         .then((response) => setReachable(response.ok))
         .catch((_) => setReachable(false));
     }, pollingInterval);
     return () => clearInterval(interval);
-  }, []);
+  }, [props.config?.FUSEKI_ENDPOINT]);
 
   // Showable content with local storage
   const [content, setContent] = useState({results: null, duration: null});
@@ -83,11 +88,11 @@ function App() {
     } else {
       event.preventDefault();
 
-      const query = template.replace('$QUERY', event.target[0].value);
+      const query = props.template.replace('$QUERY', event.target[0].value);
       const startTime = new Date();
       setLoading(true);
 
-      await fetch(fusekiEndpoint + fusekiService, {
+      await fetch(props.config?.FUSEKI_ENDPOINT + props.config?.FUSEKI_SERVICE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/sparql-query',
@@ -118,7 +123,7 @@ function App() {
   return (
     <Container fluid>
       <Row className='bg-light'>
-        <Col>        
+        <Col>
           <Container className='py-3 d-flex justify-content-between' fluid='xxl'>
             <Col className='col-sm-auto'>
               <Stack direction='horizontal' gap={3}>
@@ -151,23 +156,7 @@ function App() {
         </Col>
       </Row>
     </Container>
-
   );
-}
-
-function initializeEnvironment() {
-  fusekiEndpoint = process.env.REACT_APP_FUSEKI_ENDPOINT;
-  fusekiService = process.env.REACT_APP_FUSEKI_SERVICE;
-
-  if (!fusekiEndpoint) {
-    console.log('No environment variable for Fuseki endpoint found, the default value is used instead')
-    fusekiEndpoint = 'http://localhost:3030/';
-  }
-
-  if (!fusekiService) {
-    console.log('No environment variable for Fuseki service found, the default value is used instead')
-    fusekiService = 'dataset';
-  }
 }
 
 export default App;

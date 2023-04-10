@@ -7,12 +7,15 @@ ARG KHUB_DIR=/app
 ARG FUSEKI_ENDPOINT
 ARG FUSEKI_SERVICE
 
-ENV NODE_ENV=production
-ENV REACT_APP_FUSEKI_ENDPOINT=$FUSEKI_ENDPOINT
-ENV REACT_APP_FUSEKI_SERVICE=$FUSEKI_SERVICE
-
 WORKDIR ${KHUB_DIR}
 COPY ./app .
+
+RUN printf \
+    "{ \
+        \"FUSEKI_ENDPOINT\": \"$FUSEKI_ENDPOINT\", \
+        \"FUSEKI_SERVICE\": \"$FUSEKI_SERVICE\" \
+    }" \
+    > "./config.json"
 
 RUN npm install --global serve
 
