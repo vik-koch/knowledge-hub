@@ -10,7 +10,7 @@ ARG FUSEKI_SERVICE
 WORKDIR ${KHUB_DIR}
 COPY ./app .
 
-RUN echo \
+RUN printf \
     "{ \
         \"FUSEKI_ENDPOINT\": \"$FUSEKI_ENDPOINT\", \
         \"FUSEKI_SERVICE\": \"$FUSEKI_SERVICE\" \

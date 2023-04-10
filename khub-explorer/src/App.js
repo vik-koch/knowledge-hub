@@ -1,4 +1,4 @@
-import { useState, useEffect} from 'react';
+import { useState, useEffect } from 'react';
 
 import Container from 'react-bootstrap/Container';
 import Col from 'react-bootstrap/Col';
@@ -21,6 +21,7 @@ const pollingInterval = 3000;
 
 // Main application
 function App() {
+
   // Query template and configuration from public
   const [template, setTemplate] = useState(null);
   const [config, setConfig] = useState(null);
@@ -35,12 +36,14 @@ function App() {
     fetchData();
   }, []);
 
-  return (<Main template={template} config={config} />);
+  if (template != null && config != null) {
+    return <Main template={template} config={config} />;
+  } else {
+    <div>Loading...</div>
+  }
 }
 
 function Main(props) {
-  const template = props.template;
-  const config = props.config;
 
   // Helper states
   const [loading, setLoading] = useState(null);
@@ -60,7 +63,7 @@ function Main(props) {
   // Poll the fuseki endpoint
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch(config.FUSEKI_ENDPOINT + '$/ping')
+      fetch(props.config?.FUSEKI_ENDPOINT + '$/ping')
         .then((response) => setReachable(response.ok))
         .catch((_) => setReachable(false));
     }, pollingInterval);
@@ -85,11 +88,11 @@ function Main(props) {
     } else {
       event.preventDefault();
 
-      const query = template.replace('$QUERY', event.target[0].value);
+      const query = props.template.replace('$QUERY', event.target[0].value);
       const startTime = new Date();
       setLoading(true);
 
-      await fetch(config.FUSEKI_ENDPOINT + config.FUSEKI_SERVICE, {
+      await fetch(props.config?.FUSEKI_ENDPOINT + props.config?.FUSEKI_SERVICE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/sparql-query',
