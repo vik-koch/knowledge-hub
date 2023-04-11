@@ -82,6 +82,27 @@ function Main(props) {
     window.localStorage.setItem('content', JSON.stringify(content));
   }, [content]);
 
+  const onResolve = async (status, results, startTime, parse) => {
+    setLoading(false);
+
+    if (status === 200 || status === 'ok') {
+      const parsedResults = parse(await results);
+      const duration = ((new Date() - startTime) / 1000).toFixed(2);
+      setContent({results: parsedResults, duration: duration});
+    }
+  }
+  
+  const onReject = async (rejected) => {
+    setLoading(false);
+
+    console.log(rejected);
+    setContent({results: null, duration: null});
+
+    setError(true);
+    await new Promise(_ => setTimeout(_, 2000));
+    setError(false);
+  }
+
   // Handle search button
   const handleClick = async (event) => {
     if (event.target[0].value === '') {
@@ -89,59 +110,29 @@ function Main(props) {
     } else {
       event.preventDefault();
       
-      const query = props.template.replace('$QUERY', event.target[0].value);
+      const choice = Math.round(Math.random());
       const startTime = new Date();
       setLoading(true);
-
-      axios.get(`wiki/rest/api/search?cql=siteSearch~"${event.target[0].value}"&limit=100&expand=content.ancestors`, {
-        headers: {
-          Authorization: 'Basic ' + btoa(props.config?.CONFLUENCE_TOKEN),
-        },
-      }).then(async function (response) {
-        setLoading(false);
-        console.log(response);
-        if (response.status === 200) {
-          const result = response.data;
-          const parsedResults = parseConfluenceElements(result)
-          const duration = ((new Date() - startTime) / 1000).toFixed(2);
-          setContent({results: parsedResults, duration: duration});
-        }
-      }).catch(async function (rejected) {
-        setLoading(false);
-
-        console.log(rejected);
-        setContent({results: null, duration: null});
-
-        setError(true);
-        await new Promise(_ => setTimeout(_, 2000));
-        setError(false);
-      });
-
-      // await fetch(props.config?.FUSEKI_ENDPOINT + props.config?.FUSEKI_SERVICE, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/sparql-query',
-      //   },
-      //   body: query
-      // }).then(async (response) => {
-      //   setLoading(false);
-
-      //   if (response.ok) {
-      //     const result = await response.json();
-      //     const parsedResults = parseSparqlElements(result)
-      //     const duration = ((new Date() - startTime) / 1000).toFixed(2);
-      //     setContent({results: parsedResults, duration: duration});
-      //   }
-      // }).catch(async (rejected) => {
-      //   setLoading(false);
-
-      //   console.log(rejected);
-      //   setContent({results: null, duration: null});
-
-      //   setError(true);
-      //   await new Promise(_ => setTimeout(_, 2000));
-      //   setError(false);
-      // });
+      console.log(choice);
+      if (choice === 0) {
+        fetch(props.config?.FUSEKI_ENDPOINT + props.config?.FUSEKI_SERVICE, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/sparql-query',
+          },
+          body: props.template.replace('$QUERY', event.target[0].value)
+        })
+        .then(response => onResolve(response?.status, response?.json(), startTime, parseSparqlElements))
+        .catch(rejected => onReject(rejected));
+      } else {
+        axios.get(`wiki/rest/api/search?cql=siteSearch~"${event.target[0].value}"&limit=50&expand=content.ancestors`, {
+          headers: {
+            Authorization: 'Basic ' + btoa(props.config?.CONFLUENCE_TOKEN),
+          },
+        })
+        .then(response => onResolve(response?.status, response?.data, startTime, parseConfluenceElements))
+        .catch(rejected => onReject(rejected));
+      }
     }
   };
 

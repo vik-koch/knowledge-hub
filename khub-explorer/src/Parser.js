@@ -120,7 +120,7 @@ function parseConfluenceElement(element, baseUrl) {
       link: baseUrl + element._links.webui
     })
   });
-  result.ancestors = ancestors.length != 0 ? ancestors : null;
+  result.ancestors = ancestors.length !== 0 ? ancestors : null;
 
   return result;
 }
