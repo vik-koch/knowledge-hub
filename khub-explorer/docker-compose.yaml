@@ -3,36 +3,9 @@ services:
   fuseki:
     image: fuseki
     entrypoint: "" # Overrides the default entrypoint
-    environment:
+    environment: 
       - JAVA_OPTIONS=-Xmx4096m -Xms2048m
-
-    # The script first creates Lucene index, if an index directory is not empty, by 
-    # calling the the integrated Jena TextIndexer and then starts the Fuseki server
-    # It uses container environment variables declared in the Dockerfile
-    command: >
-      sh -c "CONFIG_FILE=$$FUSEKI_DIR/configuration/explorer-config.ttl
-            TDB_DIR=..$$(grep -o 'tdb2:location \"[^\"]*\"' $$CONFIG_FILE | cut -d ' ' -f 2 | tr -d '\"')
-            INDEX_DIR=..$$(grep -o 'text:directory \"[^\"]*\"' $$CONFIG_FILE | cut -d ' ' -f 2 | tr -d '\"')
-
-            if [ ! "$$(ls -A $$TDB_DIR)" ]
-            then
-              echo No TDB2 dataset $$TDB_DIR is found
-              exit 1
-            fi
-
-            if [ ! "$$(ls -A $$INDEX_DIR)" ]
-            then
-              echo Started to index the dataset...
-              START=$$(date +%s)
-              $$JAVA_HOME/bin/java $$JAVA_OPTIONS -cp $$FUSEKI_JAR jena.textindexer --desc=$$CONFIG_FILE
-              END=$$(date +%s)
-              echo Finished dataset indexing in $$(($$END-$$START)) seconds
-            else
-              echo Skipped indexing the dataset because the index folder $$INDEX_DIR is not empty...
-            fi
-
-            echo Starting the Fuseki Server...  
-            $$JAVA_HOME/bin/java $$JAVA_OPTIONS -jar $$FUSEKI_JAR --config $$CONFIG_FILE --ping"
+    command: sh -c "$$JAVA_HOME/bin/java $$JAVA_OPTIONS -jar $$FUSEKI_JAR --config $$FUSEKI_DIR/configuration/explorer-config.ttl --ping"
 
     build:
       args: 
@@ -56,6 +29,8 @@ services:
         - FUSEKI_ENDPOINT=http://localhost:3030/
         - FUSEKI_SERVICE=dataset
         - CONFLUENCE_ENDPOINT=
+        # Please put your private Confluence API token here:
+        # https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/
         - CONFLUENCE_TOKEN=
       context: .
       dockerfile: Dockerfile
