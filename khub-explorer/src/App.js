@@ -93,7 +93,7 @@ function Main(props) {
       const startTime = new Date();
       setLoading(true);
 
-      axios.get(`wiki/rest/api/search?cql=siteSearch~"${event.target[0].value}"&limit=10&expand=content.ancestors`, {
+      axios.get(`wiki/rest/api/search?cql=siteSearch~"${event.target[0].value}"&limit=100&expand=content.ancestors`, {
         headers: {
           Authorization: 'Basic ' + btoa(props.config?.CONFLUENCE_TOKEN),
         },

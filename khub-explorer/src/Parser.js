@@ -1,6 +1,7 @@
 const zipTitleWithLinks = (titles, links) => titles.map((title, i) => ({title: title, link: links[i]})); 
 const options = { year: 'numeric', month: 'long', day: 'numeric' };
 const nodeNames = ['P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6'];
+const highlightRegex = /@@@(end)*hl@@@/g;
 
 function parseSparqlElements(elements) {
   const result = [];
@@ -88,7 +89,9 @@ function parseConfluenceElements(elements) {
 
   if (elements.results != null) {
     elements.results.forEach(element => {
-      result.push(parseConfluenceElement(element, elements?._links?.base));
+      if (element.content?.type === 'page') {
+        result.push(parseConfluenceElement(element, elements?._links?.base));
+      }
     });
   }
 
@@ -98,24 +101,22 @@ function parseConfluenceElements(elements) {
 function parseConfluenceElement(element, baseUrl) {
   const result = {};
 
-  const regex = /@@@(end)*hl@@@/g;
-
   result.link = baseUrl + element.url;
-  result.title = element.title.replaceAll(regex, '');
+  result.title = element.title.replaceAll(highlightRegex, '');
   
   const lastUpdateTime = new Date(element.lastModified);
   result.lastUpdateTime = lastUpdateTime.toLocaleDateString('en-UK', options);
 
   result.type = 'Confluence';
   result.content = element.excerpt
-    .replaceAll(regex, '')
+    .replaceAll(highlightRegex, '')
     .replaceAll(/(\n)+/g, ' · ')
     .replaceAll(/\s\s+/g, ' ')
   
   let ancestors = []
   element.content?.ancestors.forEach(element => {
     ancestors.push({
-      title: element.title.replaceAll(regex, ''),
+      title: element.title.replaceAll(highlightRegex, ''),
       link: baseUrl + element._links.webui
     })
   });
