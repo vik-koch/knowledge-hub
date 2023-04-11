@@ -88,11 +88,6 @@ public class DockerRunner {
             processBuilder.directory(directory);
 
             Process process = processBuilder.start();
-            BufferedReader errorReader = process.errorReader();
-            String line;
-            while ((line = errorReader.readLine()) != null) {
-                System.out.println(line);
-            }
 
             process.waitFor(3, TimeUnit.SECONDS);
             return process;
