@@ -16,6 +16,7 @@ import ErrorMessage from './utilities/ErrorMessage';
 import LoadingSpinner from './utilities/LoadingSpinner';
 import Statistics from './utilities/Statistics'
 import Status from './utilities/Status'
+import Voting from './utilities/Voting'
 
 import axios from 'axios';
 
@@ -50,6 +51,8 @@ function Main(props) {
   // Helper states
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(false);
+  const [choice, setChoice] = useState(null);
+  const [voted, setVoted] = useState(null);
 
   // Fuseki reachability status with local storage
   const [reachable, setReachable] = useState(null);
@@ -103,18 +106,25 @@ function Main(props) {
     setError(false);
   }
 
+  const setVote = (value) => {
+    // log
+    console.log(value);
+    setVoted(true);
+  }
+
   // Handle search button
   const handleClick = async (event) => {
     if (event.target[0].value === '') {
       setContent({results: null, duration: null});
     } else {
       event.preventDefault();
-      
-      const choice = Math.round(Math.random());
+
+      const random = Math.round(Math.random());
+      setChoice(random);
+
       const startTime = new Date();
       setLoading(true);
-      console.log(choice);
-      if (choice === 0) {
+      if (random === 0) {
         fetch(props.config?.FUSEKI_ENDPOINT + props.config?.FUSEKI_SERVICE, {
           method: 'POST',
           headers: {
@@ -158,7 +168,10 @@ function Main(props) {
               </Stack>
             </Col>
             <Col className='col-sm-auto align-self-center'>
-              <Status isReachable={reachable} />
+              <Stack direction='horizontal' gap={5}>
+                <Voting voted={voted} setVote={setVote} />
+                <Status isReachable={reachable} />
+              </Stack>
             </Col>
           </Container>
         </Col>
