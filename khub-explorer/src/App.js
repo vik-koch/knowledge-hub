@@ -54,6 +54,14 @@ function Main(props) {
   const [choice, setChoice] = useState(null);
   const [voted, setVoted] = useState(null);
 
+  useEffect(() => {
+    setVoted(JSON.parse(window.localStorage.getItem('voted')));
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('voted', voted);
+  }, [voted]);
+
   // Fuseki reachability status with local storage
   const [reachable, setReachable] = useState(null);
   useEffect(() => {
@@ -92,9 +100,10 @@ function Main(props) {
       const parsedResults = parse(await results);
       const duration = ((new Date() - startTime) / 1000).toFixed(2);
       setContent({results: parsedResults, duration: duration});
+      setVoted(false);
     }
   }
-  
+
   const onReject = async (rejected) => {
     setLoading(false);
 
@@ -169,7 +178,7 @@ function Main(props) {
             </Col>
             <Col className='col-sm-auto align-self-center'>
               <Stack direction='horizontal' gap={5}>
-                <Voting voted={voted} setVote={setVote} />
+                <Voting size={content?.results?.length} voted={voted} setVote={setVote} />
                 <Status isReachable={reachable} />
               </Stack>
             </Col>
