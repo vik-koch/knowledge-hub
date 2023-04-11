@@ -22,12 +22,8 @@ public class HttpRequestBuilder {
      */
     public static HttpRequest build(String uri, String... headers) throws URISyntaxException {
         try {
-            HttpRequest request = HttpRequest.newBuilder()
-                .GET()
-                .uri(new URI(uri))
-                .headers(headers)
-                .build();
-            return request;
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder().GET().uri(new URI(uri));
+            return headers == null ? requestBuilder.build() : requestBuilder.headers(headers).build();
 
         } catch (URISyntaxException | NullPointerException | IllegalArgumentException e) {
             logger.warning("Invalid request URI format for \"" + uri + "\"");
