@@ -10,7 +10,7 @@ import Stack from 'react-bootstrap/Stack';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import SearchResults from './SearchResults';
-import parseSparqlElements from './Parser';
+import { parseSparqlElements, parseConfluenceElements } from './Parser';
 
 import ErrorMessage from './utilities/ErrorMessage';
 import LoadingSpinner from './utilities/LoadingSpinner';
@@ -93,7 +93,7 @@ function Main(props) {
       const startTime = new Date();
       setLoading(true);
 
-      axios.get(`wiki/rest/api/search?cql=text~"${event.target[0].value}"`, {
+      axios.get(`wiki/rest/api/search?cql=siteSearch~"${event.target[0].value}"&limit=10&expand=content.ancestors`, {
         headers: {
           Authorization: 'Basic ' + btoa(props.config?.CONFLUENCE_TOKEN),
         },
@@ -101,10 +101,10 @@ function Main(props) {
         setLoading(false);
         console.log(response);
         if (response.status === 200) {
-          const results = response.data;
-          // const parsedResults = parseSparqlElements(result)
+          const result = response.data;
+          const parsedResults = parseConfluenceElements(result)
           const duration = ((new Date() - startTime) / 1000).toFixed(2);
-          // setContent({results: parsedResults, duration: duration});
+          setContent({results: parsedResults, duration: duration});
         }
       }).catch(async function (rejected) {
         setLoading(false);

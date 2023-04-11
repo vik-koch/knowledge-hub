@@ -83,4 +83,45 @@ function parseChildNodes(childNodes) {
   return result;
 }
 
-export default parseSparqlElements
+function parseConfluenceElements(elements) {
+  const result = [];
+
+  if (elements.results != null) {
+    elements.results.forEach(element => {
+      result.push(parseConfluenceElement(element, elements?._links?.base));
+    });
+  }
+
+  return result;
+}
+
+function parseConfluenceElement(element, baseUrl) {
+  const result = {};
+
+  const regex = /@@@(end)*hl@@@/g;
+
+  result.link = baseUrl + element.url;
+  result.title = element.title.replaceAll(regex, '');
+  
+  const lastUpdateTime = new Date(element.lastModified);
+  result.lastUpdateTime = lastUpdateTime.toLocaleDateString('en-UK', options);
+
+  result.type = 'Confluence';
+  result.content = element.excerpt
+    .replaceAll(regex, '')
+    .replaceAll(/(\n)+/g, ' · ')
+    .replaceAll(/\s\s+/g, ' ')
+  
+  let ancestors = []
+  element.content?.ancestors.forEach(element => {
+    ancestors.push({
+      title: element.title.replaceAll(regex, ''),
+      link: baseUrl + element._links.webui
+    })
+  });
+  result.ancestors = ancestors.length != 0 ? ancestors : null;
+
+  return result;
+}
+
+export { parseSparqlElements, parseConfluenceElements } 
