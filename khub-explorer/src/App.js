@@ -51,7 +51,30 @@ function Main(props) {
   // Helper states
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(false);
+
+  // Search query
+  const [query, setQuery] = useState(null);
+
+  useEffect(() => {
+    setQuery(JSON.parse(window.localStorage.getItem('query')));
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('query', query);
+  }, [query]);
+
+  // Random choice
   const [choice, setChoice] = useState(null);
+
+  useEffect(() => {
+    setChoice(JSON.parse(window.localStorage.getItem('choice')));
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('choice', choice);
+  }, [choice]);
+
+  // Voted flag
   const [voted, setVoted] = useState(null);
 
   useEffect(() => {
@@ -116,8 +139,22 @@ function Main(props) {
   }
 
   const setVote = (value) => {
-    // log
-    console.log(value);
+    if (props.config?.LOGGING_ENDPOINT !== null) {
+      fetch(props.config?.LOGGING_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          timestamp: new Date(),
+          query: query,
+          source: choice === 0 ? 'fuseki' : 'confluence',
+          liked: value
+        })
+      })
+      .then(response => console.log(response))
+      .catch(rejected => console.log(rejected));
+    }
     setVoted(true);
   }
 
@@ -127,6 +164,9 @@ function Main(props) {
       setContent({results: null, duration: null});
     } else {
       event.preventDefault();
+      
+      const query = event.target[0].value;
+      setQuery(query);
 
       const random = Math.round(Math.random());
       setChoice(random);

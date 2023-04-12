@@ -32,6 +32,7 @@ services:
         # Please put your private Confluence API token here:
         # https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/
         - CONFLUENCE_TOKEN=
+        - LOGGING_ENDPOINT=
       context: .
       dockerfile: Dockerfile
     ports:
