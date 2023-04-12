@@ -84,7 +84,7 @@ public class RMLMapper {
             String output = Paths.get(outputDirectoryName, filename).toString();
             String format = "turtle";
 
-            String[] command = {"docker-compose", "run", "-rm", "--use-aliases",
+            String[] command = {"docker-compose", "run", "--rm",
                                 "-v", volume, "rml-mapper", "-m", filename, "-o", output, "-s", format };
 
             Process process = DockerRunner.runCommand(dockerPath, command);

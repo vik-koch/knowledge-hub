@@ -82,7 +82,7 @@ public class ConfluenceCrawler extends AbstractCrawler {
         String taskName = "Confluence spaces";
         logOnTaskStart(taskName);
 
-        String requestUrl = endpoint + "rest/api/space?type=global&limit=9999";
+        String requestUrl = endpoint + "rest/api/space?type=global&limit=100";
         List<JsonElement> spaces = retrieve(requestUrl);
         spaces.forEach(element -> {
             JsonObject object = element.getAsJsonObject();
@@ -222,7 +222,7 @@ public class ConfluenceCrawler extends AbstractCrawler {
             do {
                 HttpRequest request = HttpRequestBuilder.build(requestUrl, requestHeader.toNameValuePair());
                 HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-                JsonObject jsonObject = JsonParser.parseString(response.body()).getAsJsonObject();
+                JsonObject jsonObject = JsonParser.parseString(response.body().trim()).getAsJsonObject();
 
                 jsonArray.addAll(jsonObject.getAsJsonArray("results"));
 
@@ -237,7 +237,7 @@ public class ConfluenceCrawler extends AbstractCrawler {
 
         } catch (NullPointerException | JsonParseException | ClassCastException | IllegalStateException  e) {
             logger.warning("Retrieved malformed JSON format for request \"" + requestUrl + "\"");
-                
+
         } catch (URISyntaxException e) {
             // Do nothing
         }
