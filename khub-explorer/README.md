@@ -8,6 +8,8 @@ The text index and Apache Fuseki server configuration is defined in [the assembl
 * `khub:title`
 * `rdfs:label`
 
+⚠ This configuration is a simple keyword search, for indexing the whole content `khub:content` must be part of the `text:EntityMap`.
+
 All named graphs in the given TDB2 store are joined. The `OWLMicroFBRuleReasoner` reasoner is applied for inference, which allows querying parent-child relationships for the `reference` predicate. For example, if a custom ontology defines a class hierarchy with Class1 -> Class2 -> Class3 and a knowledge artifact references an instance of Class3, it will be found, if the RDF label of Class1 or Class2 is part of the search query.
 
 When querying the graph, the weight of the text score of all ancestor and descendant nodes is part of the final result. The following formula is used: 
@@ -20,5 +22,7 @@ SELECT ?result (?score
 See [the query template](/khub-explorer/public/template.sparql) for more information.
 
 #### 2. Search Application
-KHub Explorer is a dockerized **React** application that can communicate with any Fuseki server defined in [docker-compose.yaml](/khub-explorer/docker-compose.yaml). Query speed depends on the size of the dataset and the available computing resources. There is currently a known bug where the first query to the Fuseki server may take up to 2-3 minutes.  
+KHub Explorer is a dockerized **React** application that can communicate with any Fuseki server defined in [docker-compose.yaml](/khub-explorer/docker-compose.yaml). Query speed depends on the size of the dataset and the available computing resources. 
+
+⚠ There is currently a known bug where the first query to the Fuseki server may take up to 2-3 minutes.  
 
