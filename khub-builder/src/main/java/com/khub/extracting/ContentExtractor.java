@@ -59,8 +59,9 @@ public class ContentExtractor {
      * @param contentPath - the {@link Path} for {@code content} data
      * @param queriesPath - the {@link Path} for queries to retrieve {@code content} data
      * @param outputDirectoryName - the directory name to save extracted files to
+     * @param contentPredicate - the predicate name of knowledge artifacts' content
      */
-    public boolean run(Path contentPath, Path queriesPath, String outputDirectoryName) {
+    public boolean run(Path contentPath, Path queriesPath, String outputDirectoryName, String contentPredicate) {
 
         Map<String, Object> resultMap = new HashMap<String, Object>();
 
@@ -99,8 +100,8 @@ public class ContentExtractor {
                             Map<String, String> queryResult = parseQueryResult(result.nextSolution());
     
                             // Check if the query result contains content property
-                            if (queryResult.containsKey("content")) {
-                                String content = queryResult.remove("content");
+                            if (queryResult.containsKey(contentPredicate)) {
+                                String content = queryResult.remove(contentPredicate);
     
                                 // Parse all tables in HTML content body
                                 Elements tables = Jsoup.parse(content).getElementsByTag("table");

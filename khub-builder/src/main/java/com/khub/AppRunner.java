@@ -265,7 +265,7 @@ public class AppRunner {
      */
     private boolean extractContent() {
         ContentExtractor extractor = ContentExtractor.of(config.tdbPath);
-        return extractor != null && extractor.run(config.contentPath, config.queriesPath, "source");
+        return extractor != null && extractor.run(config.contentPath, config.queriesPath, "source", config.contentPredicate);
     }
 
     /**
