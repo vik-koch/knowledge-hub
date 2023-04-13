@@ -22,8 +22,9 @@ Knowledge Hub is a semantic search application for enterprise knowledge based on
         * ChannelMessage.Read.All
 2. Fill in the `confluence.endpoint`, `confluence.token` and `teams.token` in the KHub Builder configuration file. For Confluence Cloud use `https://your-domain.atlassian.net/wiki/`, for Confluence Server - `http://your-domain.com/`, the application will prepend the second part of the endpoint starting with `rest/api/...`. Use tokens from 1. or `null` for sending crawling requests without authentication header. Make other configuration adjustments if needed.
 3. (Optional) Define queries and mapping files for additional knowledge extraction, see examples in [Knowledge Graph Enriching](/khub-builder/README.md#3-knowledge-graph-enriching).
-4. Run the pipeline completely or only its separate steps with `java -jar khub-builder.jar`, see additional commands with `--help`. After successful run, several named graphs are constructed and saved in Jena TDB in the directory configured in `tdb.path`.
-5. Run `start-khub-explorer.bat` or `docker-compose up` in the explorer directory for starting Jena.TextIndexer, Fuseki Server and KHub Explorer. If needed, [Fuseki assembler file](/khub-explorer/config/explorer-config.ttl) and [docker-compose.yaml](/khub-explorer/docker-compose.yaml) can be modified. The KHub Explorer will start locally allowing full-text search on the constructed knowledge graph.
+4. Build the Docker images manually with `docker-compose build` from resources folder, otherwise some pipeline steps might fail or get stuck and will need to be rerun.
+5. Run the pipeline completely or only its separate steps with `java -jar khub-builder.jar`, see additional commands with `--help`. After successful run, several named graphs are constructed and saved in Jena TDB in the directory configured in `tdb.path`.
+6. Run `start-khub-explorer.bat` or `docker-compose up` in the explorer directory for starting Jena.TextIndexer, Fuseki Server and KHub Explorer. If needed, [Fuseki assembler file](/khub-explorer/config/explorer-config.ttl) and [docker-compose.yaml](/khub-explorer/docker-compose.yaml) can be modified. The KHub Explorer will start locally allowing full-text search on the constructed knowledge graph.
 
 ## Dependencies
 | Dependency | Version | License |
