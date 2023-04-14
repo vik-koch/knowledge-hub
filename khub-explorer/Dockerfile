@@ -23,7 +23,7 @@ RUN PERSONAL_UUID=$(uuidgen --sha1 --namespace @dns --name $CONFLUENCE_EMAIL) \
         \"FUSEKI_SERVICE\": \"$FUSEKI_SERVICE\", \
         \"CONFLUENCE_EMAIL\": \"$CONFLUENCE_EMAIL\", \
         \"CONFLUENCE_TOKEN\": \"$CONFLUENCE_TOKEN\", \
-        \"LOGGING_ENDPOINT\": \"$LOGGING_ENDPOINT\" \
+        \"LOGGING_ENDPOINT\": \"$LOGGING_ENDPOINT\", \
         \"PERSONAL_UUID\": \"$PERSONAL_UUID\" \
     }" \
     > "./public/config.json"
