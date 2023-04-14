@@ -4,19 +4,14 @@ import Stack from 'react-bootstrap/Stack';
 
 function Voting({ size, voted, setVote }) {
 
-  const message = size === undefined | size === 0 ? ''
-    : !voted ? 'Do you like the results?'
-    : 'Thank you!';
-
-  const disabled = voted || size === undefined || size === 0;
-
+  const disabled = voted || size === undefined || size === 0 || isNaN(size);
+  console.log(size);
   return (
+    
     <Stack direction='horizontal' gap={3}>
-      {message}
-        <ButtonGroup aria-label='Voting'>
-          <Button disabled={disabled} variant='outline-success' onClick={() => setVote(true)}>👍</Button>
-          <Button disabled={disabled} variant='outline-danger' onClick={() => setVote(false)}>👎</Button>
-        </ButtonGroup>
+        <Button disabled={disabled} variant='secondary' onClick={() => setVote('left')}>{'<<<'}</Button>
+        <div>Which results are better?</div>
+        <Button disabled={disabled} variant='secondary' onClick={() => setVote('right')}>{'>>>'}</Button>
     </Stack>
   );
 }

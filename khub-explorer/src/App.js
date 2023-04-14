@@ -54,6 +54,17 @@ function Main(props) {
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(false);
 
+  // Random source
+  const [random, setRandom] = useState(null);
+
+  useEffect(() => {
+    setRandom(JSON.parse(window.localStorage.getItem('random')));
+  }, []);
+
+  useEffect(() => {
+    window.localStorage.setItem('random', JSON.stringify(random));
+  }, [random]);
+
   // Logging info, incl. search query and source
   const [logging, setLogging] = useState(null);
 
@@ -128,7 +139,9 @@ function Main(props) {
   }
 
   const setVote = (value) => {
-    logData(Object.assign(logging, {liked: value}));
+    const sides = random === 0 ? ['fuseki', 'confluence'] : ['confluence', 'fuseki']
+    const vote = value === 'left' ? sides[0] : sides[1];
+    logData(Object.assign(logging, {vote: vote}));
     setVoted(true);
   }
 
@@ -162,14 +175,13 @@ function Main(props) {
       Promise.all([queryFuseki(props.template), queryFuseki(props.sizeTemplate), queryConfluence()])
         .then(async (response) => {
         setLoading(false);
-
         const [fuseki, fusekiSize, confluence] = [response[0], response[1], response[2]];
         if (fuseki?.status === 200 && confluence?.status === 200) {
           const parsedFuseki = parseSparqlElements(fuseki.data);
           const parsedConfluence = parseConfluenceElements(confluence.data);
 
-          const random = Math.round(Math.random());
-          const [results1, results2] = random === 0 
+          const randomNumber = Math.round(Math.random());
+          const [results1, results2] = randomNumber === 0 
             ? [parsedFuseki, parsedConfluence] 
             : [parsedConfluence, parsedFuseki]
 
@@ -182,6 +194,8 @@ function Main(props) {
           logData(logging);
 
           setContent({left: results1, right: results2});
+          setVoted(false);
+          setRandom(randomNumber);
         } else {
           console.log(response);
 
@@ -216,7 +230,7 @@ function Main(props) {
             </Col>
             <Col className='col-sm-auto align-self-center'>
               <Stack direction='horizontal' gap={5}>
-                <Voting size={content?.results?.length} voted={voted} setVote={setVote} />
+                
                 <Status isReachable={reachable} />
               </Stack>
             </Col>
@@ -226,6 +240,11 @@ function Main(props) {
       <Row>
         <Col>
           <Container fluid='xxl'>
+            <Row>
+              <Col className='d-flex justify-content-center pt-3'>
+                <Voting size={content?.left?.length + content?.right?.length} voted={voted} setVote={setVote} />
+              </Col>
+            </Row>
             <Row>
               <Col>
                 <SearchResults content={content?.left} />
