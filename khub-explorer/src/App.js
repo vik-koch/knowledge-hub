@@ -123,6 +123,7 @@ function Main(props) {
       const parsedResults = parse(await results);
       const duration = ((new Date() - startTime) / 1000).toFixed(2);
       setContent({results: parsedResults, duration: duration});
+      logData(null);
       setVoted(false);
     }
   }
@@ -138,23 +139,30 @@ function Main(props) {
     setError(false);
   }
 
-  const setVote = (value) => {
+  const logData = (object) => {
     if (props.config?.LOGGING_ENDPOINT !== null) {
+      let body = {
+        timestamp: new Date(),
+        uuid: props.config?.PERSONAL_UUID,
+        query: query,
+        source: choice === 0 ? 'fuseki' : 'confluence',
+      };
+      body = Object.assign(body, object);
+
       fetch(props.config?.LOGGING_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          timestamp: new Date(),
-          query: query,
-          source: choice === 0 ? 'fuseki' : 'confluence',
-          liked: value
-        })
+        body: JSON.stringify(body)
       })
       .then(response => console.log(response))
       .catch(rejected => console.log(rejected));
     }
+  }
+
+  const setVote = (value) => {
+    logData({liked: value});
     setVoted(true);
   }
 
