@@ -186,7 +186,7 @@ function Main(props) {
       } else {
         axios.get(`wiki/rest/api/search?cql=siteSearch~"${event.target[0].value}"&limit=50&expand=content.ancestors`, {
           headers: {
-            Authorization: 'Basic ' + btoa(props.config?.CONFLUENCE_TOKEN),
+            Authorization: 'Basic ' + btoa(`${props.config?.CONFLUENCE_EMAIL}:${props.config?.CONFLUENCE_TOKEN}`),
           },
         })
         .then(response => onResolve(response?.status, response?.data, startTime, parseConfluenceElements))

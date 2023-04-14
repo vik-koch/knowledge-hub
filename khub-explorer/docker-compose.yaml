@@ -29,8 +29,10 @@ services:
         - FUSEKI_ENDPOINT=http://localhost:3030/
         - FUSEKI_SERVICE=dataset
         - CONFLUENCE_ENDPOINT=
-        # Please put your private Confluence API token here:
-        # https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/
+        # Please put your corporate email address:
+        - CONFLUENCE_EMAIL=
+        # Please create and put your private Confluence API token here:
+        # See (https://id.atlassian.com/manage-profile/security/api-tokens)
         - CONFLUENCE_TOKEN=
         - LOGGING_ENDPOINT=
       context: .
