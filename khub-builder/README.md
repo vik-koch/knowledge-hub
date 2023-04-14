@@ -27,7 +27,7 @@ Currently supported object and data properties:
 | - | - |
 | ancestor | Denotes the parent node (superordinate channel, team, space, etc.) of a knowledge artifact |
 | author | Denotes the author of a knowledge artifact |
-| reference | Denotes the textual reference to another node *(see [3. Knowledge graph enriching](#3.-knowledge-graph-enriching))* |
+| reference | Denotes the textual reference to another node *(see [3. Knowledge Graph Enriching](#3-knowledge-graph-enriching))* |
 | content | The content of the knowledge artifact |
 | creationTime | The creation time of a knowledge artifact |
 | email | The e-mail address of a person |
@@ -75,7 +75,7 @@ Multiple variables can be used in `SELECT` clause. In order to parse `content` l
 * If table has headers, it is mapped as key-value pairs, otherwise a `Row_#` placeholder is used
 * Variables correspond to other query variables besides `content`
 
-These JSON files are mapped with mapping files defined in `content.path` similarly to the present mapping files *(see [2. Mapping and Persisting](#-2.-mapping-and-persisting))*. For accessing the table values the `$.*.*[*]` iterator can be used.
+These JSON files are mapped with mapping files defined in `content.path` similarly to the present mapping files *(see [2. Mapping and Persisting](#2-mapping-and-persisting))*. For accessing the table values the `$.*.*[*]` iterator can be used.
 
 After mapping the new entities are imported into Jena TDB. Custom ontologies can be used for more semantics.
 
@@ -85,7 +85,7 @@ The `title` and `content` literals of the main graph are traversed to find textu
 
 | Name | Configuration Key | Description |
 | - | - | - |
-| knowledge | knowledge.model.name | Main graph with knowledge artifacts *(see [2. Mapping and Persisting](#-2.-mapping-and-persisting))* |
+| knowledge | knowledge.model.name | Main graph with knowledge artifacts *(see [2. Mapping and Persisting](#2-mapping-and-persisting))* |
 | ontology  | ontology.model.name  | Graph including **KHub** and other custom ontologies specified in `ontology.path` |
-| content   | content.model.name   | Graph with new derived entities mainly from tables *(see [3. knowledge graph enriching](#3.-knowledge-graph-enriching))* |
+| content   | content.model.name   | Graph with new derived entities mainly from tables *(see [3. Knowledge Graph Enriching](#3-knowledge-graph-enriching))* |
 | reference | reference.model.name | Graph with `reference` predicates |
