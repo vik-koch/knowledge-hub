@@ -52,27 +52,16 @@ function Main(props) {
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(false);
 
-  // Search query
-  const [query, setQuery] = useState(null);
+  // Logging info, incl. search query and source
+  const [loggingData, setLoggingData] = useState(null);
 
   useEffect(() => {
-    setQuery(JSON.parse(window.localStorage.getItem('query')));
+    setLoggingData(JSON.parse(window.localStorage.getItem('loggingData')));
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem('query', JSON.stringify(query));
-  }, [query]);
-
-  // Random choice
-  const [choice, setChoice] = useState(null);
-
-  useEffect(() => {
-    setChoice(JSON.parse(window.localStorage.getItem('choice')));
-  }, []);
-
-  useEffect(() => {
-    window.localStorage.setItem('choice', choice);
-  }, [choice]);
+    window.localStorage.setItem('loggingData', JSON.stringify(loggingData));
+  }, [loggingData]);
 
   // Voted flag
   const [voted, setVoted] = useState(null);
@@ -116,14 +105,15 @@ function Main(props) {
     window.localStorage.setItem('content', JSON.stringify(content));
   }, [content]);
 
-  const onResolve = async (status, results, startTime, parse) => {
+  const onResolve = async (status, results, startTime, parse, loggingData) => {
     setLoading(false);
 
     if (status === 200 || status === 'ok') {
       const parsedResults = parse(await results);
       const duration = ((new Date() - startTime) / 1000).toFixed(2);
       setContent({results: parsedResults, duration: duration});
-      logData(null);
+      setLoggingData(loggingData);
+      logData(loggingData);
       setVoted(false);
     }
   }
@@ -133,6 +123,7 @@ function Main(props) {
 
     console.log(rejected);
     setContent({results: null, duration: null});
+    setLoggingData(null);
 
     setError(true);
     await new Promise(_ => setTimeout(_, 2000));
@@ -143,9 +134,7 @@ function Main(props) {
     if (props.config?.LOGGING_ENDPOINT !== null) {
       let body = {
         timestamp: new Date(),
-        uuid: props.config?.PERSONAL_UUID,
-        query: query,
-        source: choice === 0 ? 'fuseki' : 'confluence',
+        uuid: props.config?.PERSONAL_UUID
       };
       body = Object.assign(body, object);
 
@@ -162,7 +151,7 @@ function Main(props) {
   }
 
   const setVote = (value) => {
-    logData({liked: value});
+    logData(Object.assign(loggingData, {liked: value}));
     setVoted(true);
   }
 
@@ -174,11 +163,9 @@ function Main(props) {
       event.preventDefault();
       
       const query = event.target[0].value;
-      setQuery(query);
-
       const random = Math.round(Math.random());
-      setChoice(random);
-
+      const loggingData = {query: query, source: random === 0 ? 'fuseki' : 'confluence'}
+      
       const startTime = new Date();
       setLoading(true);
       if (random === 0) {
@@ -187,17 +174,17 @@ function Main(props) {
           headers: {
             'Content-Type': 'application/sparql-query',
           },
-          body: props.template.replace('$QUERY', event.target[0].value)
+          body: props.template.replace('$QUERY', query)
         })
-        .then(response => onResolve(response?.status, response?.json(), startTime, parseSparqlElements))
+        .then(response => onResolve(response?.status, response?.json(), startTime, parseSparqlElements, loggingData))
         .catch(rejected => onReject(rejected));
       } else {
-        axios.get(`wiki/rest/api/search?cql=siteSearch~"${event.target[0].value}"&limit=50&expand=content.ancestors`, {
+        axios.get(`wiki/rest/api/search?cql=siteSearch~"${query}"&limit=50&expand=content.ancestors`, {
           headers: {
             Authorization: 'Basic ' + btoa(`${props.config?.CONFLUENCE_EMAIL}:${props.config?.CONFLUENCE_TOKEN}`),
           },
         })
-        .then(response => onResolve(response?.status, response?.data, startTime, parseConfluenceElements))
+        .then(response => onResolve(response?.status, response?.data, startTime, parseConfluenceElements, loggingData))
         .catch(rejected => onReject(rejected));
       }
     }
