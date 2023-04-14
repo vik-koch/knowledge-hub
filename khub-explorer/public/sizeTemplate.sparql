@@ -1,0 +1,9 @@
+PREFIX khub: <http://semanticweb.org/ontologies/khub#>
+PREFIX text: <http://jena.apache.org/text#>
+
+SELECT (COUNT(?result) AS ?totalSize)
+WHERE {
+    BIND ('$QUERY' AS ?query)
+    (?result ?score) text:query (khub:search ?query) .
+    ?result khub:link ?link
+}

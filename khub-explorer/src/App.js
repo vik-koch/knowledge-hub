@@ -14,7 +14,6 @@ import { parseSparqlElements, parseConfluenceElements } from './Parser';
 
 import ErrorMessage from './utilities/ErrorMessage';
 import LoadingSpinner from './utilities/LoadingSpinner';
-import Statistics from './utilities/Statistics'
 import Status from './utilities/Status'
 import Voting from './utilities/Voting'
 
@@ -27,20 +26,23 @@ function App() {
 
   // Query template and configuration from public
   const [template, setTemplate] = useState(null);
+  const [sizeTemplate, setSizeTemplate] = useState(null);
   const [config, setConfig] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       const template = await (await fetch('/template.sparql')).text();
+      const sizeTemplate = await (await fetch('/sizeTemplate.sparql')).text();
       const config = await (await fetch('/config.json')).json();
       setTemplate(template);
+      setSizeTemplate(sizeTemplate);
       setConfig(config);
     };
     fetchData();
   }, []);
 
   if (template != null && config != null) {
-    return <Main template={template} config={config} />;
+    return <Main template={template} sizeTemplate={sizeTemplate} config={config} />;
   } else {
     <div>Loading...</div>
   }
@@ -53,15 +55,15 @@ function Main(props) {
   const [error, setError] = useState(false);
 
   // Logging info, incl. search query and source
-  const [loggingData, setLoggingData] = useState(null);
+  const [logging, setLogging] = useState(null);
 
   useEffect(() => {
-    setLoggingData(JSON.parse(window.localStorage.getItem('loggingData')));
+    setLogging(JSON.parse(window.localStorage.getItem('logging')));
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem('loggingData', JSON.stringify(loggingData));
-  }, [loggingData]);
+    window.localStorage.setItem('logging', JSON.stringify(logging));
+  }, [logging]);
 
   // Voted flag
   const [voted, setVoted] = useState(null);
@@ -95,7 +97,7 @@ function Main(props) {
   }, [props.config?.FUSEKI_ENDPOINT]);
 
   // Showable content with local storage
-  const [content, setContent] = useState({results: null, duration: null});
+  const [content, setContent] = useState({left: null, right: null});
 
   useEffect(() => {
     setContent(JSON.parse(window.localStorage.getItem('content')));
@@ -104,31 +106,6 @@ function Main(props) {
   useEffect(() => {
     window.localStorage.setItem('content', JSON.stringify(content));
   }, [content]);
-
-  const onResolve = async (status, results, startTime, parse, loggingData) => {
-    setLoading(false);
-
-    if (status === 200 || status === 'ok') {
-      const parsedResults = parse(await results);
-      const duration = ((new Date() - startTime) / 1000).toFixed(2);
-      setContent({results: parsedResults, duration: duration});
-      setLoggingData(loggingData);
-      logData(loggingData);
-      setVoted(false);
-    }
-  }
-
-  const onReject = async (rejected) => {
-    setLoading(false);
-
-    console.log(rejected);
-    setContent({results: null, duration: null});
-    setLoggingData(null);
-
-    setError(true);
-    await new Promise(_ => setTimeout(_, 2000));
-    setError(false);
-  }
 
   const logData = (object) => {
     if (props.config?.LOGGING_ENDPOINT !== null) {
@@ -151,42 +128,68 @@ function Main(props) {
   }
 
   const setVote = (value) => {
-    logData(Object.assign(loggingData, {liked: value}));
+    logData(Object.assign(logging, {liked: value}));
     setVoted(true);
   }
 
   // Handle search button
   const handleClick = async (event) => {
     if (event.target[0].value === '') {
-      setContent({results: null, duration: null});
+      setContent({left: null, right: null});
     } else {
       event.preventDefault();
-      
+
       const query = event.target[0].value;
-      const random = Math.round(Math.random());
-      const loggingData = {query: query, source: random === 0 ? 'fuseki' : 'confluence'}
-      
-      const startTime = new Date();
       setLoading(true);
-      if (random === 0) {
-        fetch(props.config?.FUSEKI_ENDPOINT + props.config?.FUSEKI_SERVICE, {
-          method: 'POST',
+
+      const queryFuseki = (template) => {
+        return axios.post(props.config?.FUSEKI_ENDPOINT + props.config?.FUSEKI_SERVICE,
+          template.replace('$QUERY', query), {
           headers: {
             'Content-Type': 'application/sparql-query',
-          },
-          body: props.template.replace('$QUERY', query)
-        })
-        .then(response => onResolve(response?.status, response?.json(), startTime, parseSparqlElements, loggingData))
-        .catch(rejected => onReject(rejected));
-      } else {
-        axios.get(`wiki/rest/api/search?cql=siteSearch~"${query}"&limit=10&expand=content.ancestors`, {
-          headers: {
-            Authorization: 'Basic ' + btoa(`${props.config?.CONFLUENCE_EMAIL}:${props.config?.CONFLUENCE_TOKEN}`),
-          },
-        })
-        .then(response => onResolve(response?.status, response?.data, startTime, parseConfluenceElements, loggingData))
-        .catch(rejected => onReject(rejected));
+          }
+        });
       }
+
+      const queryConfluence = () => {
+        return axios.get(`wiki/rest/api/search?cql=siteSearch~"${query}"&limit=10&expand=content.ancestors`, {
+          headers: {
+            'Authorization': 'Basic ' + btoa(`${props.config?.CONFLUENCE_EMAIL}:${props.config?.CONFLUENCE_TOKEN}`),
+          },
+        });
+      }
+
+      Promise.all([queryFuseki(props.template), queryFuseki(props.sizeTemplate), queryConfluence()])
+        .then(async (response) => {
+        setLoading(false);
+
+        const [fuseki, fusekiSize, confluence] = [response[0], response[1], response[2]];
+        if (fuseki?.status === 200 && confluence?.status === 200) {
+          const parsedFuseki = parseSparqlElements(fuseki.data);
+          const parsedConfluence = parseConfluenceElements(confluence.data);
+
+          const random = Math.round(Math.random());
+          const [results1, results2] = random === 0 
+            ? [parsedFuseki, parsedConfluence] 
+            : [parsedConfluence, parsedFuseki]
+
+          const logging = {
+            query: query,
+            fuseki: fusekiSize?.data?.results?.bindings[0]?.totalSize?.value,
+            confluence: confluence?.data?.totalSize,
+          }
+          setLogging(logging);
+          logData(logging);
+
+          setContent({left: results1, right: results2});
+        } else {
+          console.log(response);
+
+          setError(true);
+          await new Promise(_ => setTimeout(_, 2000));
+          setError(false);
+        }
+      });
     }
   };
 
@@ -199,7 +202,7 @@ function Main(props) {
               <Stack direction='horizontal' gap={3}>
                 <div>
                   {/* eslint-disable-next-line */}
-                  <a href='#' className='text-reset text-decoration-none' onClick={(event) => setContent(null)}>
+                  <a href='#' className='text-reset text-decoration-none' onClick={() => {setContent(null)}}>
                     <span role='img' aria-label='books'>📚</span> KHub Explorer
                   </a>
                 </div>
@@ -223,7 +226,14 @@ function Main(props) {
       <Row>
         <Col>
           <Container fluid='xxl'>
-            <SearchResults content={content?.results} />
+            <Row>
+              <Col>
+                <SearchResults content={content?.left} />
+              </Col>
+              <Col>
+                <SearchResults content={content?.right} />
+              </Col>
+            </Row>
           </Container>
         </Col>
       </Row>
