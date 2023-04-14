@@ -40,30 +40,14 @@ function SearchResults(props) {
       );
     }
   
-    let lastPage = paginationItems.length;
-  
     let searchResults = props.content.map((element, index) => <SearchResult key={index} {...element} />);
     for (let index = 0; index < searchResults.length; index += size) {
       paginatedSearchResults[pageKey] = searchResults.slice(index, index + size);
       pageKey++;
     }
   
-    let leftLimit = currentPage - 1 > 5 ? 5 : currentPage - 1; 
-  
-    return (
-      <div>
-        {paginatedSearchResults[currentPage]}
-        {lastPage > 1 &&
-          <Pagination className='' >
-            {currentPage !== 1 && <Pagination.Prev onClick={_ => setCurrentPage(currentPage - 1)}/>}
-            {paginationItems.slice(currentPage - leftLimit - 1, currentPage + 5)}
-            {currentPage !== lastPage && <Pagination.Next onClick={_ => setCurrentPage(currentPage + 1)}/>}
-          </Pagination>
-        }
-      </div>
-    );
+    return paginatedSearchResults[currentPage];
   }
-  
 }
 
 function SearchResult(element) {
@@ -128,7 +112,7 @@ function DateTimeInfo(element) {
 }
 
 function Body(element) {
-  return <div>{element.content}</div>
+  return <div className='text-break'>{element.content}</div>
 }
 
 export default SearchResults
