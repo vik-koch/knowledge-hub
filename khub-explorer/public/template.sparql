@@ -31,7 +31,7 @@ WHERE {
             }
         }
         GROUP BY ?result ?score
-        LIMIT 50
+        LIMIT 10
     }
 
     ?result khub:link ?link ;

@@ -179,7 +179,7 @@ function Main(props) {
         .then(response => onResolve(response?.status, response?.json(), startTime, parseSparqlElements, loggingData))
         .catch(rejected => onReject(rejected));
       } else {
-        axios.get(`wiki/rest/api/search?cql=siteSearch~"${query}"&limit=50&expand=content.ancestors`, {
+        axios.get(`wiki/rest/api/search?cql=siteSearch~"${query}"&limit=10&expand=content.ancestors`, {
           headers: {
             Authorization: 'Basic ' + btoa(`${props.config?.CONFLUENCE_EMAIL}:${props.config?.CONFLUENCE_TOKEN}`),
           },
@@ -223,7 +223,6 @@ function Main(props) {
       <Row>
         <Col>
           <Container fluid='xxl'>
-            <Statistics size={content?.results?.length} duration={content?.duration}/>
             <SearchResults content={content?.results} />
           </Container>
         </Col>
