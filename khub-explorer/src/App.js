@@ -60,7 +60,7 @@ function Main(props) {
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem('query', query);
+    window.localStorage.setItem('query', JSON.stringify(query));
   }, [query]);
 
   // Random choice

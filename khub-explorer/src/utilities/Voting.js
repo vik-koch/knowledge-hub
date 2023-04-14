@@ -3,7 +3,7 @@ import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import Stack from 'react-bootstrap/Stack';
 
 function Voting({ size, voted, setVote }) {
-  console.log(size);
+
   const message = size === undefined | size === 0 ? ''
     : !voted ? 'Do you like the results?'
     : 'Thank you!';
