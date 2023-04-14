@@ -105,13 +105,15 @@ function parseConfluenceElement(element, baseUrl) {
   result.title = element.title.replaceAll(highlightRegex, '');
   
   const lastUpdateTime = new Date(element.lastModified);
-  result.lastUpdateTime = lastUpdateTime.toLocaleDateString('en-UK', options);
+  if (element.content?.ancestors?.length !== 0) {
+    result.lastUpdateTime = lastUpdateTime.toLocaleDateString('en-UK', options);
+    result.content = element.excerpt
+      .replaceAll(highlightRegex, '')
+      .replaceAll(/(\n)+/g, ' · ')
+      .replaceAll(/\s\s+/g, ' ')
+  }
 
   result.type = 'Confluence';
-  result.content = element.excerpt
-    .replaceAll(highlightRegex, '')
-    .replaceAll(/(\n)+/g, ' · ')
-    .replaceAll(/\s\s+/g, ' ')
   
   let ancestors = []
   element.content?.ancestors.forEach(element => {
