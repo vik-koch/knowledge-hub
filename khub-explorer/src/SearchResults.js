@@ -76,7 +76,9 @@ function SourceIcon(element) {
   let imageInfo = element?.type === 'Confluence' ? ['./confluence.svg', 'Confluence']
     : element?.type === 'Teams' ? ['./teams.svg', 'MS Teams'] : null;
 
-  return <img src={imageInfo && imageInfo[0]} width='24' alt={imageInfo[1]} />
+  if (imageInfo !== null) {
+    return <img src={imageInfo && imageInfo[0]} width='24' alt={imageInfo[1]} />;
+  }
 }
 
 function Header(element) {

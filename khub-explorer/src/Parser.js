@@ -42,6 +42,7 @@ function parseSparqlElement(element) {
 
   // Type
   result.type = element.types.value.includes('Confluence') ? 'Confluence' 
+              : element.types.value.includes('Person') ? 'Confluence' 
               : element.types.value.includes('Teams') ? 'Teams' 
               : '';
 
