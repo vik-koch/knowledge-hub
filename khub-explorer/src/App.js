@@ -207,11 +207,13 @@ function Main(props) {
     }
   };
 
+  const size = content?.left?.length + content?.right?.length;
+
   return (
     <Container fluid>
       <Row className='bg-light'>
         <Col>
-          <Container className='py-3 d-flex justify-content-between' fluid='xxl'>
+          <Container className='py-3 d-flex justify-content-between' fluid='xxl' style={{maxWidth: '1500px'}}>
             <Col className='col-sm-auto'>
               <Stack direction='horizontal' gap={3}>
                 <div>
@@ -230,7 +232,6 @@ function Main(props) {
             </Col>
             <Col className='col-sm-auto align-self-center'>
               <Stack direction='horizontal' gap={5}>
-                
                 <Status isReachable={reachable} />
               </Stack>
             </Col>
@@ -239,16 +240,17 @@ function Main(props) {
       </Row>
       <Row>
         <Col>
-          <Container fluid='xxl'>
+          <Container fluid='xxl' style={{maxWidth: '1500px'}}>
             <Row>
               <Col className='d-flex justify-content-center pt-3'>
-                <Voting size={content?.left?.length + content?.right?.length} voted={voted} setVote={setVote} />
+                <Voting size={size} voted={voted} setVote={setVote} />
               </Col>
             </Row>
             <Row>
               <Col>
                 <SearchResults content={content?.left} />
               </Col>
+              <div className='vr' style={{padding: '0', margin: '25px 15px 0 15px', visibility: size === undefined || isNaN(size) ? 'hidden' : 'visible'}}></div>
               <Col>
                 <SearchResults content={content?.right} />
               </Col>
