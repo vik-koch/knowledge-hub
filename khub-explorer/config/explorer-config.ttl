@@ -11,7 +11,8 @@ PREFIX khub:	<http://semanticweb.org/ontologies/khub#>
 
 :service a fuseki:Service ;
     fuseki:name "dataset" ;
-	fuseki:serviceQuery "" , "query" , "sparql" ;
+	fuseki:endpoint [ fuseki:operation fuseki:query ; fuseki:name "sparql" ];
+    fuseki:endpoint [ fuseki:operation fuseki:shacl ; fuseki:name "shacl" ];
     fuseki:dataset :text_dataset .
 
 :dataset_tdb2 a tdb2:DatasetTDB2 ;

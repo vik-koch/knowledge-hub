@@ -1,0 +1,191 @@
+@prefix dash: <http://datashapes.org/dash#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix khub: <http://semanticweb.org/ontologies/khub#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix : <http://example.org/rules/> .
+
+### Confluence specific property shapes ###
+
+:ConfluenceLinkPropertyShape
+    a sh:PropertyShape ;
+	sh:path khub:link ;
+	sh:datatype xsd:string ;
+	sh:minCount 1 ;
+	sh:maxCount 1 ;
+	sh:pattern "^https://([a-z]*).atlassian.net/wiki/.*$" .
+
+:ConfluenceAncestorPropertyShape
+	a sh:PropertyShape ;
+	sh:path khub:ancestor ;
+	sh:nodeKind sh:IRI ;
+	sh:or (
+		[ sh:class khub:Page ]
+		[ sh:class khub:Space ]
+	) ;
+	sh:minCount 1 ;
+	sh:maxCount 1 .
+
+### MS Teams specific property shapes ###
+
+:TeamsLinkPropertyShape
+    a sh:PropertyShape ;
+	sh:path khub:link ;
+	sh:datatype xsd:string ;
+	sh:minCount 1 ;
+	sh:maxCount 1 ;
+	sh:pattern "^https://teams.microsoft.com/.*$" .
+
+:TeamsAncestorPropertyShape
+	a sh:PropertyShape ;
+	sh:path khub:ancestor ;
+	sh:nodeKind sh:IRI ;
+	sh:or (
+		[ sh:class khub:Channel ]
+		[ sh:class khub:Team ]
+	) ;
+	sh:minCount 1 ;
+	sh:maxCount 1 .
+	
+### Common property shapes ###
+
+:AuthorPropertyShape
+    a sh:PropertyShape ;
+	sh:path khub:author ;
+	sh:nodeKind sh:IRI ;
+	sh:class khub:Person ;
+	sh:minCount 1 ;
+	sh:maxCount 1 .
+
+:TitlePropertyShape
+	a sh:PropertyShape ;
+	sh:path khub:title ;
+	sh:datatype xsd:string ;
+	sh:minCount 1 ;
+	sh:maxCount 1 .
+	
+:OptionalTitlePropertyShape
+	a sh:PropertyShape ;
+	sh:path khub:title ;
+	sh:datatype xsd:string ;
+	sh:minCount 0 ;
+	sh:maxCount 1 .
+
+:ContentPropertyShape
+	a sh:PropertyShape ;
+	sh:path khub:content ;
+	sh:datatype xsd:string ;
+	sh:minCount 1 ;
+	sh:maxCount 1 .
+
+:OptionalContentPropertyShape
+	a sh:PropertyShape ;
+	sh:path khub:content ;
+	sh:datatype xsd:string ;
+	sh:minCount 0 ;
+	sh:maxCount 1 .
+
+:CreationTimePropertyShape
+	a sh:PropertyShape ;
+	sh:path khub:creationTime ;
+	sh:datatype xsd:string ;
+	sh:minCount 1 ;
+	sh:maxCount 1 .
+
+:LastUpdateTimePropertyShape
+	a sh:PropertyShape ;
+	sh:path khub:lastUpdateTime ;
+	sh:datatype xsd:string ;
+	sh:minCount 1 ;
+	sh:maxCount 1 .
+	
+:OptionalLastUpdateTimePropertyShape
+	a sh:PropertyShape ;
+	sh:path khub:lastUpdateTime ;
+	sh:datatype xsd:string ;
+	sh:minCount 0 ;
+	sh:maxCount 1 .
+
+:EmailPropertyShape
+	a sh:PropertyShape ;
+	sh:path khub:email ;
+	sh:datatype xsd:string ;
+	sh:minCount 1 ;
+	sh:maxCount 1 ;
+	sh:pattern "^.+@.+\\..{2,}$" .
+
+:OptionalEmailPropertyShape
+	a sh:PropertyShape ;
+	sh:path khub:email ;
+	sh:datatype xsd:string ;
+	sh:minCount 0 ;
+	sh:maxCount 1 ;
+	sh:pattern "^.+@.+\\..{2,}$" .
+
+### Node shapes ###
+
+:ChannelShape
+    a sh:NodeShape ;
+    sh:targetClass khub:Channel ;
+    sh:property :TeamsLinkPropertyShape ;
+	sh:property :TeamsAncestorPropertyShape ;
+	sh:property :TitlePropertyShape ;
+	sh:property :CreationTimePropertyShape ;
+	sh:property :OptionalContentPropertyShape ;
+	sh:property :OptionalEmailPropertyShape .
+	
+:CommentaryShape
+    a sh:NodeShape ;
+    sh:targetClass khub:Commentary ;
+    sh:property :ConfluenceLinkPropertyShape ;
+	sh:property :ConfluenceAncestorPropertyShape ;
+	sh:property :AuthorPropertyShape ;
+	sh:property :TitlePropertyShape ;
+	sh:property :ContentPropertyShape ;
+	sh:property :CreationTimePropertyShape ;
+	sh:property :LastUpdateTimePropertyShape .
+
+:PageShape
+    a sh:NodeShape ;
+    sh:targetClass khub:Page ;
+    sh:property :ConfluenceLinkPropertyShape ;
+	sh:property :ConfluenceAncestorPropertyShape ;
+	sh:property :AuthorPropertyShape ;
+	sh:property :TitlePropertyShape ;
+	sh:property :ContentPropertyShape ;
+	sh:property :CreationTimePropertyShape ;
+	sh:property :LastUpdateTimePropertyShape .
+
+:PostShape
+    a sh:NodeShape ;
+    sh:targetClass khub:Post ;
+    sh:property :TeamsLinkPropertyShape ;
+	sh:property :TeamsAncestorPropertyShape ;
+	sh:property :AuthorPropertyShape ;
+	sh:property :OptionalTitlePropertyShape ;
+	sh:property :ContentPropertyShape ;
+	sh:property :CreationTimePropertyShape ;
+	sh:property :OptionalLastUpdateTimePropertyShape .
+	
+:SpaceShape
+    a sh:NodeShape ;
+    sh:targetClass khub:Space ;
+    sh:property :ConfluenceLinkPropertyShape ;
+	sh:property :TitlePropertyShape .
+	
+:TeamShape
+    a sh:NodeShape ;
+    sh:targetClass khub:Team ;
+    sh:property :TeamsLinkPropertyShape ;
+	sh:property :TitlePropertyShape ;
+	sh:property :ContentPropertyShape ;
+	sh:property :CreationTimePropertyShape ;
+	sh:property :OptionalEmailPropertyShape .
+	
+:PersonShape
+    a sh:NodeShape ;
+    sh:targetClass khub:Person ;
+    sh:property :ConfluenceLinkPropertyShape ;
+	sh:property :TitlePropertyShape ;
+	sh:property :EmailPropertyShape .
