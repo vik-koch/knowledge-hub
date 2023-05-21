@@ -9,7 +9,7 @@
 ### Confluence specific property shapes ###
 
 :ConfluenceLinkPropertyShape
-    a sh:PropertyShape ;
+	a sh:PropertyShape ;
 	sh:path khub:link ;
 	sh:datatype xsd:string ;
 	sh:minCount 1 ;
@@ -30,7 +30,7 @@
 ### MS Teams specific property shapes ###
 
 :TeamsLinkPropertyShape
-    a sh:PropertyShape ;
+	a sh:PropertyShape ;
 	sh:path khub:link ;
 	sh:datatype xsd:string ;
 	sh:minCount 1 ;
@@ -51,7 +51,7 @@
 ### Common property shapes ###
 
 :AuthorPropertyShape
-    a sh:PropertyShape ;
+	a sh:PropertyShape ;
 	sh:path khub:author ;
 	sh:nodeKind sh:IRI ;
 	sh:class khub:Person ;
@@ -126,9 +126,9 @@
 ### Node shapes ###
 
 :ChannelShape
-    a sh:NodeShape ;
-    sh:targetClass khub:Channel ;
-    sh:property :TeamsLinkPropertyShape ;
+	a sh:NodeShape ;
+	sh:targetClass khub:Channel ;
+	sh:property :TeamsLinkPropertyShape ;
 	sh:property :TeamsAncestorPropertyShape ;
 	sh:property :TitlePropertyShape ;
 	sh:property :CreationTimePropertyShape ;
@@ -136,9 +136,9 @@
 	sh:property :OptionalEmailPropertyShape .
 	
 :CommentaryShape
-    a sh:NodeShape ;
-    sh:targetClass khub:Commentary ;
-    sh:property :ConfluenceLinkPropertyShape ;
+	a sh:NodeShape ;
+	sh:targetClass khub:Commentary ;
+	sh:property :ConfluenceLinkPropertyShape ;
 	sh:property :ConfluenceAncestorPropertyShape ;
 	sh:property :AuthorPropertyShape ;
 	sh:property :TitlePropertyShape ;
@@ -147,9 +147,9 @@
 	sh:property :LastUpdateTimePropertyShape .
 
 :PageShape
-    a sh:NodeShape ;
-    sh:targetClass khub:Page ;
-    sh:property :ConfluenceLinkPropertyShape ;
+	a sh:NodeShape ;
+	sh:targetClass khub:Page ;
+	sh:property :ConfluenceLinkPropertyShape ;
 	sh:property :ConfluenceAncestorPropertyShape ;
 	sh:property :AuthorPropertyShape ;
 	sh:property :TitlePropertyShape ;
@@ -158,9 +158,9 @@
 	sh:property :LastUpdateTimePropertyShape .
 
 :PostShape
-    a sh:NodeShape ;
-    sh:targetClass khub:Post ;
-    sh:property :TeamsLinkPropertyShape ;
+	a sh:NodeShape ;
+	sh:targetClass khub:Post ;
+	sh:property :TeamsLinkPropertyShape ;
 	sh:property :TeamsAncestorPropertyShape ;
 	sh:property :AuthorPropertyShape ;
 	sh:property :OptionalTitlePropertyShape ;
@@ -169,23 +169,23 @@
 	sh:property :OptionalLastUpdateTimePropertyShape .
 	
 :SpaceShape
-    a sh:NodeShape ;
-    sh:targetClass khub:Space ;
-    sh:property :ConfluenceLinkPropertyShape ;
+	a sh:NodeShape ;
+	sh:targetClass khub:Space ;
+	sh:property :ConfluenceLinkPropertyShape ;
 	sh:property :TitlePropertyShape .
 	
 :TeamShape
-    a sh:NodeShape ;
-    sh:targetClass khub:Team ;
-    sh:property :TeamsLinkPropertyShape ;
+	a sh:NodeShape ;
+	sh:targetClass khub:Team ;
+	sh:property :TeamsLinkPropertyShape ;
 	sh:property :TitlePropertyShape ;
 	sh:property :ContentPropertyShape ;
 	sh:property :CreationTimePropertyShape ;
 	sh:property :OptionalEmailPropertyShape .
 	
 :PersonShape
-    a sh:NodeShape ;
-    sh:targetClass khub:Person ;
-    sh:property :ConfluenceLinkPropertyShape ;
+	a sh:NodeShape ;
+	sh:targetClass khub:Person ;
+	sh:property :ConfluenceLinkPropertyShape ;
 	sh:property :TitlePropertyShape ;
 	sh:property :EmailPropertyShape .
